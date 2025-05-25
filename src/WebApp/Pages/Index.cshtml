@@ -1,0 +1,116 @@
+﻿@page
+@using WebApp.Pages;
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@if (Model.QueryTooShort)
+{
+    <div class="alert alert-warning" role="alert">
+        Please enter at least 4 characters for your search query.
+    </div>
+}
+<h1>Lead Collection</h1>
+
+<div class="alert alert-info" role="alert" style="background-color: #e3f2fd; border-left: 5px solid #2196f3; margin-bottom: 30px;">
+    <h5>How to Use the Lead Generator</h5>
+    <ul>
+        <li><strong>Search Query:</strong> Enter a name, company, or keyword. For best results, use at least 4 characters.</li>
+        <li><strong>Search as exact phrase:</strong> If checked, the query will search for the exact phrase otherwise, it will search for all words, not necessarily together.</li>
+        <li><strong>Platforms:</strong> Select one or more platforms to search (e.g., LinkedIn, GitHub, YouTube).</li>
+        <li><strong>Domains (optional):</strong> Add email domains (e.g., &#64;gmail.com, &#64;company.com) to filter results. Leave blank to include all domains.</li>
+        <li><strong>Results:</strong> The tool will search public profiles and display leads with available names, emails, and phone numbers (if found).</li>
+    </ul>
+  <strong>Note:</strong>Results are cached for faster repeated searches. Export options are available for CSV download.
+</div>
+
+<div style="background-color: #f9f9f9; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 30px;">
+<form method="post">
+   <div style="margin-bottom: 20px; display: flex; align-items: center;">
+        <label style="margin-right: 10px;"><strong>Who are you trying to find?</strong></label>
+        <input asp-for="SearchQuery" placeholder="e.g. Data Engineer" style="width: 400px; margin-right: 15px;" />
+        <input type="checkbox" asp-for="SearchAsPhrase" id="SearchAsPhrase" style="margin-left: 10px;" />
+        <label asp-for="SearchAsPhrase" style="margin-bottom: 0; margin-left: 5px;">Search as exact phrase</label>
+    </div>
+        
+    <div style="margin-bottom: 20px;">
+        <label><strong>Where should we search?</strong></label><br />
+        <p>Select the online platforms where your potential leads are active:</p>
+        @foreach (var platform in new[] { "linkedin.com/in", "github.com", "youtube.com", "twitter.com", "facebook.com","instagram.com", "tiktok.com" })
+        {
+            <input type="checkbox" name="SelectedPlatforms" value="@platform"
+                @(Model.SelectedPlatforms.Contains(platform) ? "checked" : "") />
+            <label>@platform</label><br />
+        }
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label><strong>Which email domains should we include?</strong></label><br />
+        <p>Only show leads that can be contacted via these types of email addresses:</p>
+        @foreach (var domain in new[] { "@gmail.com", "@yahoo.com", "@outlook.com" })
+        {
+            <input type="checkbox" name="SelectedDomains" value="@domain"
+                   @(Model.SelectedDomains.Contains(domain) ? "checked" : "") />
+            <label>@domain</label><br />
+        }
+    </div>
+
+    <button type="submit">Search Leads</button>
+</form>
+</div>
+
+@if (Model.Results?.Any() == true)
+{
+    <div style="background-color: #f1f8e9; padding: 20px; border-radius: 8px; margin-top: 30px;">
+
+        <h2 style="margin-top: 30px;">Search Results</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var group in Model.Results.GroupBy(r => r.Platform))
+            {
+                <tr><th colspan="4">@group.Key</th></tr>
+                @foreach (var lead in group)
+                {
+                    <tr>
+                        <td>@lead.Name</td>
+                        <td>@lead.Email</td>
+                        <td>@lead.Phone</td>
+                        <td>@lead.Link</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <form method="post" asp-page-handler="Download">
+        <input type="hidden" asp-for="SearchQuery" />
+        @foreach (var platform in Model.SelectedPlatforms)
+        {
+            <input type="hidden" name="SelectedPlatforms" value="@platform" />
+        }
+        @foreach (var domain in Model.SelectedDomains)
+        {
+            <input type="hidden" name="SelectedDomains" value="@domain" />
+        }
+
+        <button type="submit">Download Results as CSV</button>
+        <div style="margin-bottom: 20px;">
+            <input type="checkbox" asp-for="ExportOnlyWithPhone" />
+            <label asp-for="ExportOnlyWithPhone">Only include leads with a phone number</label>
+        </div>      
+    </form>
+
+    <div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;"">
+        📁 <strong>Note:</strong> Your CSV file will download through your browser. Check your <em>Downloads</em> folder.
+    </div>
+}

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <SignAssembly>True</SignAssembly>
+	  <AssemblyOriginatorKeyFile>AIEventing.snk</AssemblyOriginatorKeyFile>
+	  <Authors>dwaing@outlook.com</Authors>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <Title>AI-Assisted .NET Lead Generator</Title>
+	  <Description>Automated and straight forward method to generate thousands of high-quality leads.</Description>
+	  <Copyright>Copyright © 2025 Dwain Gilmer - All rights reserved.</Copyright>
+	  <PackageProjectUrl>https://github.com/DwaineDGIlmer/EzLeadGenerator</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/DwaineDGIlmer/ExLeadGenerator</RepositoryUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageTags>logging</PackageTags>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+	
+	<ItemGroup>
+		<None Remove="wwwroot\**\*.gz" />
+		<None Remove="wwwroot\**\*.br" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
