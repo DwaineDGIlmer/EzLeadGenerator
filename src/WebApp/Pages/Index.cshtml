@@ -22,7 +22,10 @@
         <li><strong>Domains (optional):</strong> Add email domains (e.g., &#64;gmail.com, &#64;company.com) to filter results. Leave blank to include all domains.</li>
         <li><strong>Results:</strong> The tool will search public profiles and display leads with available names, emails, and phone numbers (if found).</li>
     </ul>
-  <strong>Note:</strong>Results are cached for faster repeated searches. Export options are available for CSV download.
+</div>
+
+<div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;">
+     <strong>Note:</strong>Results are cached for faster repeated searches. Export options are available for CSV download.
 </div>
 
 <div style="background-color: #f9f9f9; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 30px;">
@@ -103,14 +106,13 @@
             <input type="hidden" name="SelectedDomains" value="@domain" />
         }
 
+        <div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;">
+            📁 <strong>Note:</strong> Your CSV file will download through your browser. Check your <em>Downloads</em> folder.
+        </div>
         <button type="submit">Download Results as CSV</button>
         <div style="margin-bottom: 20px;">
             <input type="checkbox" asp-for="ExportOnlyWithPhone" />
             <label asp-for="ExportOnlyWithPhone">Only include leads with a phone number</label>
         </div>      
     </form>
-
-    <div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;"">
-        📁 <strong>Note:</strong> Your CSV file will download through your browser. Check your <em>Downloads</em> folder.
-    </div>
 }

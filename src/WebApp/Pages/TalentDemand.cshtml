@@ -24,8 +24,11 @@
         <li><strong>Include job descriptions:</strong> Check to display job descriptions in the results.</li>
         <li><strong>Results:</strong> Jobs are grouped by company and can be downloaded as a CSV file.</li>
         </ul>
-    <strong>Note:</strong>Results are cached for faster repeated searches. Export options are available for CSV download.
  </div>
+ 
+<div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;">
+     <strong>Note:</strong>Results are cached for faster repeated searches. Export options are available for CSV download.
+</div>
 
 <div style="background-color: #f9f9f9; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 30px;">
 <form method="post">
@@ -56,6 +59,9 @@
     <input type="hidden" name="Location" value="@Model.Location" />
     <input type="hidden" name="IncludeDescriptions" value="@Model.IncludeDescriptions" />
 
+    <div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;">
+        📁 <strong>Note:</strong> Your CSV file will download through your browser. Check your <em>Downloads</em> folder.
+    </div>
     <div style="background-color: #f1f8e9; padding: 20px; border-radius: 8px; margin-top: 30px;">
     <form method="post" asp-page-handler="Download" style="margin-top: 20px;">
         <button type="submit">Download CSV</button>
