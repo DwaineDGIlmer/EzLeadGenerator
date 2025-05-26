@@ -9,20 +9,21 @@ namespace UnitTests.Pages;
 public class TalentDemandModelTests
 {
     private readonly Mock<IConfiguration> _mockConfig;
+    private readonly IMemoryCache _memoryCache;
 
     public TalentDemandModelTests()
     {
         _mockConfig = new Mock<IConfiguration>();
+        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchApiKey"))]).Returns("dummy-api-key");
+        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchEndpoint"))]).Returns("https://example.com/api/jobs");
+        _memoryCache = new MemoryCache(new MemoryCacheOptions());
     }
 
     [Fact]
     public async Task OnPostAsync_QueryTooShort_SetsQueryTooShort()
     {
         // Arrange
-        var mockCache = new Mock<IMemoryCache>();
-        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchApiKey"))]).Returns("dummy-api-key");
-        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchJobsEndpoint"))]).Returns("https://example.com/api/jobs");
-        var model = new TalentDemandModel(_mockConfig.Object, mockCache.Object)
+        var model = new TalentDemandModel(_mockConfig.Object, _memoryCache)
         {
             JobTitle = "AI",
             Location = "NY"
@@ -44,10 +45,7 @@ public class TalentDemandModelTests
     public async Task OnPostAsync_ValidQuery_DoesNotSetQueryTooShort()
     {
         // Arrange
-        var mockCache = new Mock<IMemoryCache>();
-        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchApiKey"))]).Returns("dummy-api-key");
-        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchJobsEndpoint"))]).Returns("https://example.com/api/jobs");
-        var model = new TalentDemandModel(_mockConfig.Object, mockCache.Object)
+        var model = new TalentDemandModel(_mockConfig.Object, _memoryCache)
         {
             JobTitle = "AI Engineer",
             Location = "Remote",

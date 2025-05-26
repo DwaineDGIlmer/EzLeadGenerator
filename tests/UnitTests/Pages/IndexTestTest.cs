@@ -13,6 +13,8 @@ public class IndexModelTests
     public IndexModelTests()
     {
         _mockConfig = new Mock<IConfiguration>();
+        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchApiKey"))]).Returns("dummy-api-key");
+        _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchEndpoint"))]).Returns("https://example.com/api/jobs");
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
     }
 
