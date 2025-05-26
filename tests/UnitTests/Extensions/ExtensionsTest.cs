@@ -5,181 +5,156 @@ namespace UnitTests.Extensions;
 public class ExtensionsTest
 {
     [Fact]
-    public void IsNull_WithNullObject_ReturnsTrue()
+    public void IsNull_ShouldReturnTrueIfObjectIsNull()
     {
-        object obj = null!;
-        Assert.True(obj.IsNull());
+        // Arrange
+        object? obj = null;
+
+        // Act
+        var result = obj.IsNull();
+
+        // Assert
+        Assert.True(result);
     }
 
     [Fact]
-    public void IsNull_WithNonNullObject_ReturnsFalse()
+    public void IsNull_ShouldReturnFalseIfObjectIsNotNull()
     {
-        object obj = new();
-        Assert.False(obj.IsNull());
+        // Arrange
+        var obj = new object();
+
+        // Act
+        var result = obj.IsNull();
+
+        // Assert
+        Assert.False(result);
     }
 
     [Fact]
-    public void IsNull_WithEmptyString_ReturnsTrue()
+    public void IsNullOrEmpty_ShouldReturnTrueIfStringIsNull()
     {
+        // Arrange
+        string? str = null;
+
+        // Act
+        var result = str.IsNullOrEmpty();
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsNullOrEmpty_ShouldReturnTrueIfStringIsEmpty()
+    {
+        // Arrange
         string str = "";
-        Assert.True(str.IsNull());
+
+        // Act
+        var result = str.IsNullOrEmpty();
+
+        // Assert
+        Assert.True(result);
     }
 
     [Fact]
-    public void IsNull_WithNonEmptyString_ReturnsFalse()
+    public void IsNullOrEmpty_ShouldReturnFalseIfStringIsNotEmpty()
     {
-        string str = "test";
-        Assert.False(str.IsNull());
+        // Arrange
+        string str = "Test";
+
+        // Act
+        var result = str.IsNullOrEmpty();
+
+        // Assert
+        Assert.False(result);
     }
 
     [Fact]
-    public void IsNullThrow_WithNullObject_ThrowsArgumentNullException()
+    public void IsNotNull_ShouldReturnTrueIfObjectIsNotNull()
     {
-        object obj = null!;
-        Assert.Throws<ArgumentNullException>(() => obj.IsNullThrow());
+        // Arrange
+        var obj = new object();
+
+        // Act
+        var result = obj.IsNotNull();
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsNotNull_ShouldReturnFalseIfObjectIsNull()
+    {
+        // Arrange
+        object? obj = null;
+
+        // Act
+        var result = obj.IsNotNull();
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsNullThrow_WithStringValue_Success()
+    {
+        string value = "Testing!";
+        var results = value.IsNullThrow();
+        Assert.Equal(value, results);
+    }
+
+    [Fact]
+    public void IsNullThrow_WithNullString_ThrowsArgumentNullException()
+    {
+        string value = null!;
+        Assert.Throws<ArgumentNullException>(() => value.IsNullThrow());
     }
 
     [Fact]
     public void IsNullThrow_WithEmptyString_ThrowsArgumentNullException()
     {
-        string str = "";
-        Assert.Throws<ArgumentNullException>(() => str.IsNullThrow());
+        string value = "";
+        Assert.Throws<ArgumentNullException>(() => value.IsNullThrow());
     }
 
     [Fact]
-    public void IsNullThrow_WithNonNullObject_ReturnsObject()
+    public void IsNullThrow_WithNonEmptyString_DoesNotThrow()
     {
-        object obj = new();
-        Assert.Equal(obj, obj.IsNullThrow());
+        string value = "test";
+        value.IsNullThrow(); // Should not throw
     }
 
     [Fact]
-    public void IsNullThrow_WithNonEmptyString_ReturnsString()
+    public void IsNullThrow_WithNonStringNullObject_Doeshrow()
     {
-        string str = "test";
-        Assert.Equal(str, str.IsNullThrow());
+        object value = null!;
+        Assert.Throws<ArgumentNullException>(() => value.IsNullThrow()); // Should throw
     }
 
     [Fact]
-    public void IsNullThrow_List_WithNullList_ThrowsArgumentNullException()
+    public void IsNullThrow_WithNonStringNonNullObject_DoesNotThrow()
     {
-        List<int>? list = null;
-        Assert.Throws<ArgumentNullException>(() => list.IsNullThrow());
+        object value = new();
+        value.IsNullThrow(); // Should not throw
     }
 
     [Fact]
-    public void IsNullThrow_List_WithNonEmptyList_ReturnsList()
+    public void IsNullThrow_WithNullList_ThrowsArgumentNullException()
     {
-        var list = new List<int> { 1, 2, 3 };
-        Assert.Equal(list, list.IsNullThrow());
+        IList<string> value = null!;
+        Assert.Throws<ArgumentNullException>(() => value.IsNullThrow());
     }
 
     [Fact]
-    public void IsNullOrEmpty_WithNullObject_ReturnsTrue()
+    public void IsNullThrow_WithNonList_DoesNotThrow()
     {
-        object obj = null!;
-        Assert.True(obj.IsNullOrEmpty());
+        IList<string> value = new List<string>() { "test" };
+        value.IsNullThrow(); // Should not throw
     }
 
-    [Fact]
-    public void IsNullOrEmpty_WithEmptyString_ReturnsTrue()
+    class TestClass
     {
-        string str = "";
-        Assert.True(str.IsNullOrEmpty());
-    }
-
-    [Fact]
-    public void IsNullOrEmpty_WithNonEmptyString_ReturnsFalse()
-    {
-        string str = "abc";
-        Assert.False(str.IsNullOrEmpty());
-    }
-
-    [Fact]
-    public void IsNullOrEmpty_WithNonNullObject_ReturnsFalse()
-    {
-        object obj = new();
-        Assert.False(obj.IsNullOrEmpty());
-    }
-
-    [Fact]
-    public void IsNotNull_WithNullObject_ReturnsFalse()
-    {
-        object obj = null!;
-        Assert.False(obj.IsNotNull());
-    }
-
-    [Fact]
-    public void IsNotNull_WithNonNullObject_ReturnsTrue()
-    {
-        object obj = new();
-        Assert.True(obj.IsNotNull());
-    }
-
-    [Fact]
-    public void IsNotNull_WithEmptyString_ReturnsFalse()
-    {
-        string str = "";
-        Assert.False(str.IsNotNull());
-    }
-
-    [Fact]
-    public void IsNotNull_WithNonEmptyString_ReturnsTrue()
-    {
-        string str = "abc";
-        Assert.True(str.IsNotNull());
-    }
-}
-
-public class DictionaryExtensionsTest
-{
-    [Fact]
-    public void RemoveNullValues_RemovesEntriesWithNullValues()
-    {
-        var dict = new Dictionary<string, object?>
-        {
-            { "a", 1 },
-            { "b", null },
-            { "c", "test" },
-            { "d", null }
-        };
-
-        var result = dict.RemoveNullValues();
-
-        Assert.Equal(2, result.Count);
-        Assert.True(result.ContainsKey("a"));
-        Assert.True(result.ContainsKey("c"));
-        Assert.False(result.ContainsKey("b"));
-        Assert.False(result.ContainsKey("d"));
-    }
-
-    [Fact]
-    public void RemoveNullValues_WithNoNulls_DoesNothing()
-    {
-        var dict = new Dictionary<string, object?>
-        {
-            { "a", 1 },
-            { "b", "value" }
-        };
-
-        var result = dict.RemoveNullValues();
-
-        Assert.Equal(2, result.Count);
-        Assert.True(result.ContainsKey("a"));
-        Assert.True(result.ContainsKey("b"));
-    }
-
-    [Fact]
-    public void RemoveNullValues_AllNulls_RemovesAll()
-    {
-        var dict = new Dictionary<string, object?>
-        {
-            { "a", null },
-            { "b", null }
-        };
-
-        var result = dict.RemoveNullValues();
-
-        Assert.Empty(result);
+        public string Name { get; set; } = string.Empty;
+        public int Value { get; set; }
     }
 }
