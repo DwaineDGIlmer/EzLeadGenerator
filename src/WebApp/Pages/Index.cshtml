@@ -65,36 +65,12 @@
 
 @if (Model.Results?.Any() == true)
 {
-    <div style="background-color: #f1f8e9; padding: 20px; border-radius: 8px; margin-top: 30px;">
-
-        <h2 style="margin-top: 30px;">Search Results</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Link</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var group in Model.Results.GroupBy(r => r.Platform))
-            {
-                <tr><th colspan="4">@group.Key</th></tr>
-                @foreach (var lead in group)
-                {
-                    <tr>
-                        <td>@lead.Name</td>
-                        <td>@lead.Email</td>
-                        <td>@lead.Phone</td>
-                        <td>@lead.Link</td>
-                    </tr>
-                }
-            }
-            </tbody>
-        </table>
+    <div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;">
+        📁 <strong>Note:</strong> Your CSV file will download through your browser. Check your <em>Downloads</em> folder.
     </div>
 
+
+    <div style="background-color: #f1f8e9; padding: 20px; border-radius: 8px; margin-top: 30px;">
     <form method="post" asp-page-handler="Download">
         <input type="hidden" asp-for="SearchQuery" />
         @foreach (var platform in Model.SelectedPlatforms)
@@ -106,13 +82,39 @@
             <input type="hidden" name="SelectedDomains" value="@domain" />
         }
 
-        <div style="margin-top: 10px; background-color: #e0f7fa; padding: 10px; border: 1px solid #00acc1; border-radius: 6px;">
-            📁 <strong>Note:</strong> Your CSV file will download through your browser. Check your <em>Downloads</em> folder.
-        </div>
-        <button type="submit">Download Results as CSV</button>
+     
         <div style="margin-bottom: 20px;">
+            <button type="submit">Download Results as CSV</button>
             <input type="checkbox" asp-for="ExportOnlyWithPhone" />
             <label asp-for="ExportOnlyWithPhone">Only include leads with a phone number</label>
-        </div>      
+        </div>
     </form>
+
+    <h2 style="margin-top: 30px;">Search Results</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var group in Model.Results.GroupBy(r => r.Platform))
+        {
+            <tr><th colspan="4">@group.Key</th></tr>
+            @foreach (var lead in group)
+            {
+                <tr>
+                    <td>@lead.Name</td>
+                    <td>@lead.Email</td>
+                    <td>@lead.Phone</td>
+                    <td>@lead.Link</td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+    </div>
 }
