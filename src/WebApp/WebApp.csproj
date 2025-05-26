@@ -6,7 +6,7 @@
 	  <Nullable>enable</Nullable>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <SignAssembly>True</SignAssembly>
-	  <AssemblyOriginatorKeyFile>C:\Users\dwain\source\repos\EzLeadGenerator\AIEventing.snk</AssemblyOriginatorKeyFile>
+	  <AssemblyOriginatorKeyFile>AIEventing.snk</AssemblyOriginatorKeyFile>
 	  <Authors>dwaing@outlook.com</Authors>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
