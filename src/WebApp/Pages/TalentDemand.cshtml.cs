@@ -54,10 +54,16 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
     public bool QueryTooShort { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets the key used to identify cached results.
+    /// </summary>
+    [BindProperty]
+    public string ResultsCacheKey { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets a value indicating whether to search for the job title as a phrase. 
     /// </summary>
     [BindProperty]
-    public bool SearchJobTitleAsPhrase { get; set; } = false; // <-- Add this line
+    public bool SearchJobTitleAsPhrase { get; set; } = false; 
 
     /// <summary>
     /// /// Gets or sets a value indicating whether to search for the job title as a phrase.
@@ -74,7 +80,6 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
     public async Task<IActionResult> OnPostAsync()
     {
         await FetchJobResultsAsync();
-        TempData["LastJobResults"] = JsonSerializer.Serialize(GroupedJobResults);
         return Page();
     }
 
@@ -87,14 +92,18 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
     /// MIME type of "text/csv" and a default filename of "job_listings.csv".</returns>
     public async Task<IActionResult> OnPostDownloadAsync()
     {
-        if (TempData.TryGetValue("LastJobResults", out var json) && json is string jsonString)
+        await Task.Delay(100);
+
+        if (_cache.TryGetValue(ResultsCacheKey, out Dictionary<string, List<JobPosting>>? cachedResults) &&
+           cachedResults.IsNotNull() &&
+           cachedResults!.Count > 0)
         {
-            GroupedJobResults = JsonSerializer.Deserialize<Dictionary<string, List<JobPosting>>>(jsonString)
-                ?? [];
+            GroupedJobResults = cachedResults;
         }
         else
-        {
-            await FetchJobResultsAsync();
+        { 
+            // Handle cache miss
+            return RedirectToPage();
         }
 
         var csv = new StringBuilder();
@@ -124,13 +133,6 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
     /// <returns></returns>
     private async Task FetchJobResultsAsync()
     {
-        var jobResults = new List<JobPosting>();
-        var apiKey = _config[Defaults.GetSettings(Defaults.SearchApiKey)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey);
-        apiKey.IsNullThrow();
-
-        var baseEndpoint = _config[Defaults.GetSettings(Defaults.SearchEndpoint)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiUrl);
-        baseEndpoint.IsNullThrow();
-
         if (string.IsNullOrWhiteSpace(JobTitle) ||
             string.IsNullOrEmpty(Location) ||
             JobTitle.Length <= 3 ||
@@ -141,11 +143,27 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         }
         QueryTooShort = false;
 
-        var cacheKey = $"talent:{JobTitle}:{string.Join(",", Location)}:{string.Join(",", SearchJobTitleAsPhrase)}:{IncludeDescriptions}";
-        if (_cache.TryGetValue(cacheKey, out Dictionary<string, List<JobPosting>>? cachedResults))
+        ResultsCacheKey = $"talent:{JobTitle}:{string.Join(",", Location)}:{string.Join(",", SearchJobTitleAsPhrase)}:{IncludeDescriptions}";
+        if (_cache.TryGetValue(ResultsCacheKey, out Dictionary<string, List<JobPosting>>? cachedResults) &&
+            cachedResults.IsNotNull() &&
+            cachedResults!.Count > 0)
         {
             GroupedJobResults = cachedResults!;
             return;
+        }
+
+        var jobResults = new List<JobPosting>();
+        var apiKey = _config[Defaults.GetSettings(Defaults.SearchApiKey)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey);
+        apiKey.IsNullThrow();
+
+        var baseEndpoint = _config[Defaults.GetSettings(Defaults.SearchEndpoint)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiUrl);
+        baseEndpoint.IsNullThrow();
+
+        var value = _config[Defaults.GetSettings(Defaults.LogToFileSystem)];
+        bool logToFileSystem = false;
+        if (!string.IsNullOrEmpty(value))
+        {
+            _ = bool.TryParse(value, out logToFileSystem);
         }
 
         string query = SearchJobTitleAsPhrase
@@ -163,6 +181,19 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
             return;
         }
         _logger.LogInformation("Success in fetching lead results: {StatusCode}", response.StatusCode);
+
+        var content = await response.Content.ReadAsStringAsync();
+        if (content.IsNullOrEmpty())
+        {
+            _logger.LogWarning("Received empty content for query: {SearchQuery}", query);
+            return;
+        }
+
+        if (logToFileSystem)
+        {
+            var filename = Path.Combine(Path.GetTempPath(), $"Talent.{GenerateRandomString()}.json");
+            await System.IO.File.WriteAllTextAsync(filename, content);
+        }
 
         var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         if (!json.RootElement.TryGetProperty("jobs_results", out var jobs) || jobs.ValueKind != JsonValueKind.Array) return;
@@ -230,7 +261,22 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
             .GroupBy(j => string.IsNullOrWhiteSpace(j.Company) ? "Unknown Company" : j.Company)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        _cache.Set(cacheKey, GroupedJobResults, TimeSpan.FromMinutes(10));
+        _cache.Set(ResultsCacheKey, GroupedJobResults, TimeSpan.FromMinutes(10));
+    }
+
+    /// <summary>
+    /// Generates a random alphanumeric string of the specified length.
+    /// </summary>
+    /// <remarks>The generated string is composed of characters from the set:  'A-Z', 'a-z', and '0-9'. A new
+    /// instance of <see cref="Random"/> is used for each call,  which may result in less randomness if called in quick
+    /// succession.</remarks>
+    /// <param name="length">The length of the random string to generate. The default value is 10. Must be a non-negative integer.</param>
+    /// <returns>A randomly generated string consisting of uppercase letters, lowercase letters, and digits.</returns>
+    public static string GenerateRandomString(int length = 10)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string([.. Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)])]);
     }
 }
 

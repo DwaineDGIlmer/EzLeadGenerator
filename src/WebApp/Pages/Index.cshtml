@@ -69,9 +69,8 @@
         📁 <strong>Note:</strong> Your CSV file will download through your browser. Check your <em>Downloads</em> folder.
     </div>
 
-
     <div style="background-color: #f1f8e9; padding: 20px; border-radius: 8px; margin-top: 30px;">
-    <form method="post" asp-page-handler="Download">
+        <form method="post" asp-page-handler="Download">
         <input type="hidden" asp-for="SearchQuery" />
         @foreach (var platform in Model.SelectedPlatforms)
         {

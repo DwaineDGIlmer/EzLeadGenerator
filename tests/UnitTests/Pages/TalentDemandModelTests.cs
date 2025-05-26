@@ -28,6 +28,44 @@ public class TalentDemandModelTests
     }
 
     [Fact]
+    public void GenerateRandomString_ReturnsStringOfCorrectLength()
+    {
+        // Arrange
+        int length = 10;
+
+        // Act
+        var result = IndexModel.GenerateRandomString(length);
+
+        // Assert
+        Assert.Equal(length, result.Length);
+    }
+
+    [Fact]
+    public void GenerateRandomString_ReturnsAlphanumericString()
+    {
+        // Arrange
+        int length = 20;
+        var result = TalentDemandModel.GenerateRandomString(length);
+
+        // Act & Assert
+        Assert.Matches("^[A-Za-z0-9]+$", result);
+    }
+
+    [Fact]
+    public void GenerateRandomString_ReturnsDifferentStrings()
+    {
+        // Arrange
+        int length = 10;
+
+        // Act
+        var result1 = TalentDemandModel.GenerateRandomString(length);
+        var result2 = TalentDemandModel.GenerateRandomString(length);
+
+        // Assert
+        Assert.NotEqual(result1, result2);
+    }
+
+    [Fact]
     public async Task OnPostAsync_QueryTooShort_SetsQueryTooShort()
     {
         // Arrange

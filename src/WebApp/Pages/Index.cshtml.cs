@@ -11,7 +11,6 @@ using WebApp.Extensions;
 
 namespace WebApp.Pages;
 
-
 /// <summary>
 /// The page model for the Index page, handling search queries and lead generation logic.
 /// Initializes a new instance of the <see cref="IndexModel"/> class with the specified dependencies.
@@ -123,13 +122,6 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
     /// <returns></returns>
     private async Task FetchLeadsAsync()
     {
-        Results.Clear();
-        var apiKey = _config[Defaults.GetSettings(Defaults.SearchApiKey)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey);
-        apiKey.IsNullThrow();
-
-        var baseEndpoint = _config[Defaults.GetSettings(Defaults.SearchEndpoint)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiUrl);
-        baseEndpoint.IsNullThrow();
-
         if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length <= 3)
         {
             QueryTooShort = true;
@@ -142,17 +134,33 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
 
         var platforms = SelectedPlatforms;
         var domains = SelectedDomains?.Where(d => !string.IsNullOrWhiteSpace(d)).ToList() ?? [];
+        var domainFilter = domains.Count != 0
+            ? $"({string.Join(" OR ", domains.Select(d => $"\"{d}\""))})"
+            : string.Empty;
 
         var cacheKey = $"leads:{SearchQuery}:{string.Join(",", platforms)}:{string.Join(",", domains)}:{PageNumber}";
-        if (_cache.TryGetValue(cacheKey, out List<LeadInfo>? cachedResults))
+        if (_cache.TryGetValue(cacheKey, out List<LeadInfo>? cachedResults) &&
+            cachedResults.IsNotNull() &&
+            cachedResults!.Count > 0)
         {
             Results.AddRange(cachedResults!);
             return;
         }
 
-        var domainFilter = domains.Count != 0
-            ? $"({string.Join(" OR ", domains.Select(d => $"\"{d}\""))})"
-            : string.Empty;
+        Results.Clear();
+
+        var apiKey = _config[Defaults.GetSettings(Defaults.SearchApiKey)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey);
+        apiKey.IsNullThrow();
+
+        var baseEndpoint = _config[Defaults.GetSettings(Defaults.SearchEndpoint)] ?? Environment.GetEnvironmentVariable(Defaults.EnvSearchApiUrl);
+        baseEndpoint.IsNullThrow();
+
+        var value = _config[Defaults.GetSettings(Defaults.LogToFileSystem)];
+        bool logToFileSystem = false;
+        if (!string.IsNullOrEmpty(value))
+        {
+            _ = bool.TryParse(value, out logToFileSystem);
+        }
 
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Defaults.JsonMimeType));
         foreach (var platform in platforms)
@@ -172,7 +180,20 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
             }
             _logger.LogInformation("Success in fetching job results: {StatusCode}", response.StatusCode);
 
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var content = await response.Content.ReadAsStringAsync();
+            if (content.IsNullOrEmpty())
+            {
+                _logger.LogWarning("Received empty content for query: {SearchQuery}", SearchQuery);
+                continue;
+            }
+
+            if (logToFileSystem)
+            {
+                var filename = Path.Combine("Leads", Path.GetTempPath(), ".json");
+                await System.IO.File.WriteAllTextAsync(filename, content);
+            }
+
+            using var json = JsonDocument.Parse(content);
             if (!json.RootElement.TryGetProperty("organic_results", out var results)) continue;
 
             foreach (var result in results.EnumerateArray())
@@ -204,27 +225,52 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
                                 .Cast<Match>()
                                 .Select(m => m.Value)
                                 .Where(email => domains.Count == 0 || domains.Any(d => email.EndsWith(d)))
-                                .Distinct();
+                                .Distinct()
+                                .ToList();
 
                 var phones = PhoneRegex().Matches(snippet)
                                 .Cast<Match>()
                                 .Select(m => m.Value)
-                                .Distinct();
+                                .Distinct()
+                                .ToList();
 
-                foreach (var email in emails)
+                // Add a result if there is at least one email, phone, or a non-empty link
+                if (emails.Count > 0 || phones.Count > 0 || !string.IsNullOrWhiteSpace(url))
                 {
-                    Results.Add(new LeadInfo
+                    // If there are no emails, add a single result with empty email
+                    if (emails.Count == 0)
+                        emails.Add(string.Empty);
+
+                    foreach (var email in emails)
                     {
-                        Name = name,
-                        Email = email,
-                        Phone = phones.FirstOrDefault() ?? string.Empty,
-                        Link = url ?? string.Empty,
-                        Platform = platform
-                    });
+                        Results.Add(new LeadInfo
+                        {
+                            Name = name,
+                            Email = email.IsNullOrEmpty() ? "None" : email,
+                            Phone = phones.FirstOrDefault() ?? "None",
+                            Link = url ?? "None",
+                            Platform = platform
+                        });
+                    }
                 }
             }
         }
         _cache.Set(cacheKey, Results.ToList(), TimeSpan.FromMinutes(10));
+    }
+
+    /// <summary>
+    /// Generates a random alphanumeric string of the specified length.
+    /// </summary>
+    /// <remarks>The generated string is composed of characters from the set:  'A-Z', 'a-z', and '0-9'. A new
+    /// instance of <see cref="Random"/> is used for each call,  which may result in less randomness if called in quick
+    /// succession.</remarks>
+    /// <param name="length">The length of the random string to generate. The default value is 10. Must be a non-negative integer.</param>
+    /// <returns>A randomly generated string consisting of uppercase letters, lowercase letters, and digits.</returns>
+    public static string GenerateRandomString(int length = 10)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string([.. Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)])]);
     }
 
     [GeneratedRegex(@"[\w\.-]+@[\w\.-]+\.[a-z]{2,}")]

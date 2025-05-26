@@ -64,6 +64,13 @@
         public const string SearchEndpoint = nameof(SearchEndpoint);
 
         /// <summary>
+        /// Represents the name of the search endpoint as a constant string.
+        /// </summary>
+        /// <remarks>This constant can be used to reference the search endpoint in a consistent and
+        /// type-safe manner throughout the application.</remarks>
+        public const string LogToFileSystem = nameof(LogToFileSystem);
+
+        /// <summary>
         /// Retrieves the value of a specified settings key if it is a recognized constant.
         /// </summary>
         /// <param name="settings">The settings key to retrieve. Must be one of the predefined constants:  <c>EzLeadsSettings</c>,
@@ -75,7 +82,7 @@
             // Only allow known constants
             return settings switch
             {
-                EzLeadsSettings or SearchApiKey or SearchEndpoint => $"{EzLeadsSettings}:{settings}",
+                EzLeadsSettings or SearchApiKey or SearchEndpoint or LogToFileSystem => $"{EzLeadsSettings}:{settings}",
                 _ => throw new ArgumentException($"Invalid settings key: {settings}", nameof(settings)),
             };
         }
