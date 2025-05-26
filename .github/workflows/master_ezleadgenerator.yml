@@ -55,4 +55,4 @@ jobs:
           app-name: 'EzLeadGenerator'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AB98DCAD0FA34EBB8F65495D023EEBF7 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_384E9289296141E29E3C6347287316FD }}
