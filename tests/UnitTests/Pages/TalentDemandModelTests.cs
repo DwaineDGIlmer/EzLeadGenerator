@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using WebApp.Pages;
@@ -18,9 +19,10 @@ public class TalentDemandModelTests
     public async Task OnPostAsync_QueryTooShort_SetsQueryTooShort()
     {
         // Arrange
+        var mockCache = new Mock<IMemoryCache>();
         _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchApiKey"))]).Returns("dummy-api-key");
         _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchJobsEndpoint"))]).Returns("https://example.com/api/jobs");
-        var model = new TalentDemandModel(_mockConfig.Object)
+        var model = new TalentDemandModel(_mockConfig.Object, mockCache.Object)
         {
             JobTitle = "AI",
             Location = "NY"
@@ -42,20 +44,16 @@ public class TalentDemandModelTests
     public async Task OnPostAsync_ValidQuery_DoesNotSetQueryTooShort()
     {
         // Arrange
+        var mockCache = new Mock<IMemoryCache>();
         _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchApiKey"))]).Returns("dummy-api-key");
         _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchJobsEndpoint"))]).Returns("https://example.com/api/jobs");
-        var model = new TalentDemandModel(_mockConfig.Object)
+        var model = new TalentDemandModel(_mockConfig.Object, mockCache.Object)
         {
             JobTitle = "AI Engineer",
-            Location = "Remote"
-        };
-
-        model.GroupedJobResults = new Dictionary<string, List<JobPosting>>()
-        {
-            { "dummy", new List<JobPosting>()
-                        {
-                         new JobPosting() { }
-                        }
+            Location = "Remote",
+            GroupedJobResults = new Dictionary<string, List<JobPosting>>()
+            {
+                { "dummy", new List<JobPosting>() { new() { } } }
             }
         };
 
