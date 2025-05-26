@@ -16,189 +16,194 @@ namespace Harness.Controllers
 
         [HttpGet("leads")]
         public async Task<IActionResult> GetLeads(
-#pragma warning disable IDE0060 // Remove unused parameter
         [FromQuery] string engine)
-#pragma warning restore IDE0060 // Remove unused parameter
         {
             await Task.Delay(10);
 
-            var result = new
+            if (!string.IsNullOrWhiteSpace(engine))
             {
-                organic_results = new object[]
+                if (engine == "google_jobs")
                 {
-            new {
-                position = 1,
-                title = "Jane Doe - Data Engineer at TechCorp",
-                link = "https://www.linkedin.com/in/janedoe",
-                displayed_link = "linkedin.com/in/janedoe",
-                snippet = "Jane Doe is a Data Engineer at TechCorp. Contact: jane.doe@gmail.com, (555) 123-4567"
-            },
-            new {
-                position = 2,
-                title = "John Smith | Data Engineer | GitHub",
-                link = "https://github.com/johnsmith",
-                displayed_link = "github.com/johnsmith",
-                snippet = "Open source Data Engineer. Email: john.smith@yahoo.com, Phone: 555-987-6543"
-            },
-            new {
-                position = 3,
-                title = "Emily Zhang - Data Engineer - YouTube",
-                link = "https://www.youtube.com/emilyzhang",
-                displayed_link = "youtube.com/emilyzhang",
-                snippet = "Emily Zhang shares Data Engineering tutorials. Reach at emily.zhang@gmail.com or 555.222.3333"
-            },
-            new {
-                position = 4,
-                title = "Carlos Rivera | Data Engineer | Instagram",
-                link = "https://instagram.com/carlos.rivera",
-                displayed_link = "instagram.com/carlos.rivera",
-                snippet = "Carlos Rivera, Data Engineer. Contact: carlos.rivera@yahoo.com, (555) 444-5555"
-            },
-            new {
-                position = 5,
-                title = "Priya Patel - Data Engineer - TikTok",
-                link = "https://tiktok.com/@priyapatel",
-                displayed_link = "tiktok.com/@priyapatel",
-                snippet = "Priya Patel creates Data Engineering content. Email: priya.patel@gmail.com"
-            },
-            new {
-                position = 6,
-                title = "<b>Jane Doe</b> - Freelance Designer",
-                // link is missing to test fallback
-                displayed_link = "jane.design",
-                // snippet is missing to test fallback and skipping
-            },
-            new {
-                position = 7,
-                // No title, but has 'name' to test alternate property
-                name = "Alternate Name Field",
-                link = "https://alternate.example.com",
-                displayed_link = "alternate.example.com",
-                snippet = "No email here, just a phone: (123) 456-7890"
-            },
-            new {
-                position = 8,
-                // No title, but has 'name' to test alternate property
-                name = "Martin Short",
-                link = "https://facebook.com",
-                displayed_link = "facebook.com",
-                snippet = "No email here, just a phone: (123) 456-7890"
-            },
-            new {
-                position = 9,
-                // No title, but has 'name' to test alternate property
-                name = "Eric Cartman",
-                link = "https://twitter.com",
-                displayed_link = "twitter.com",
-                snippet = " phone: (123) 456-7890"
+                    return Ok(GetJobsResults());
+                }
+                if (engine == "google")
+                {
+                    return Ok(GetLeadResults());
                 }
             }
-            };
 
-            return Ok(result);
+            return BadRequest("Invalid or missing 'engine' query parameter. Only 'google' is supported.");
         }
 
-        [HttpGet("Jobs")]
-        public async Task<IActionResult> GetJobs(
-#pragma warning disable IDE0060 // Remove unused parameter
-        [FromQuery] string engine)
-#pragma warning restore IDE0060 // Remove unused parameter
+        private object GetJobsResults()
         {
-            await Task.Delay(10);
-
-            var result = new
+            return new
             {
                 jobs_results = new object[]
                 {
-            new {
-                title = "AI Engineer",
-                company_name = "OpenAI",
-                location = "Remote",
-                extensions = new[] { "Full-time", "Remote" },
-                detected_extensions = new { posted_at = "2 days ago" },
-                description = "Build and optimize AI systems for human alignment.",
-                apply_options = new[] { new { link = "https://openai.com/careers/apply/ai-engineer" } }
-            },
-            new {
-                title = "Machine Learning Engineer",
-                company_name = "Anthropic",
-                location = "San Francisco, CA",
-                extensions = new[] { "Full-time" },
-                detected_extensions = new { posted_at = "1 day ago" },
-                description = "Join our research team to scale safe ML models.",
-                apply_options = new[] { new { link = "https://anthropic.com/careers/ml-engineer" } }
-            },
-            new {
-                title = "Data Scientist",
-                company_name = "Google",
-                location = "Mountain View, CA",
-                extensions = new[] { "Internship" },
-                detected_extensions = new { posted_at = "3 days ago" },
-                description = "Analyze big data to improve Search and Ads.",
-                apply_options = new[] { new { link = "https://careers.google.com/jobs/results/data-scientist" } }
-            },
-            new {
-                title = "AI Researcher",
-                company_name = "Meta",
-                location = "Menlo Park, CA",
-                extensions = new[] { "Contract" },
-                detected_extensions = new { posted_at = "5 days ago" },
-                description = "Advance state-of-the-art in neural networks.",
-                apply_options = new[] { new { link = "https://www.metacareers.com/jobs/ai-researcher" } }
-            },
-            new {
-                title = "Deep Learning Specialist",
-                company_name = "NVIDIA",
-                location = "Austin, TX",
-                extensions = new[] { "Full-time" },
-                detected_extensions = new { posted_at = "Today" },
-                description = "Develop DL systems for real-time inference.",
-                apply_options = new[] { new { link = "https://www.nvidia.com/en-us/about-nvidia/careers" } }
-            },
+                new {
+                    title = "AI Engineer",
+                    company_name = "OpenAI",
+                    location = "Remote",
+                    extensions = new[] { "Full-time", "Remote" },
+                    detected_extensions = new { posted_at = "2 days ago" },
+                    description = "Build and optimize AI systems for human alignment.",
+                    apply_options = new[] { new { link = "https://openai.com/careers/apply/ai-engineer" } }
+                },
+                new {
+                    title = "Machine Learning Engineer",
+                    company_name = "Anthropic",
+                    location = "San Francisco, CA",
+                    extensions = new[] { "Full-time" },
+                    detected_extensions = new { posted_at = "1 day ago" },
+                    description = "Join our research team to scale safe ML models.",
+                    apply_options = new[] { new { link = "https://anthropic.com/careers/ml-engineer" } }
+                },
+                new {
+                    title = "Data Scientist",
+                    company_name = "Google",
+                    location = "Mountain View, CA",
+                    extensions = new[] { "Internship" },
+                    detected_extensions = new { posted_at = "3 days ago" },
+                    description = "Analyze big data to improve Search and Ads.",
+                    apply_options = new[] { new { link = "https://careers.google.com/jobs/results/data-scientist" } }
+                },
+                new {
+                    title = "AI Researcher",
+                    company_name = "Meta",
+                    location = "Menlo Park, CA",
+                    extensions = new[] { "Contract" },
+                    detected_extensions = new { posted_at = "5 days ago" },
+                    description = "Advance state-of-the-art in neural networks.",
+                    apply_options = new[] { new { link = "https://www.metacareers.com/jobs/ai-researcher" } }
+                },
+                new {
+                    title = "Deep Learning Specialist",
+                    company_name = "NVIDIA",
+                    location = "Austin, TX",
+                    extensions = new[] { "Full-time" },
+                    detected_extensions = new { posted_at = "Today" },
+                    description = "Develop DL systems for real-time inference.",
+                    apply_options = new[] { new { link = "https://www.nvidia.com/en-us/about-nvidia/careers" } }
+                },
 
-            // Flawed Entries Below
+                // Flawed Entries Below
 
-            new {
-                title = "",
-                company_name = "Unknown Corp",
-                location = "",
-                extensions = Array.Empty<string>(),
-                description = "Exciting opportunity.",
-                apply_options = Array.Empty<object>()
-            },
-            new {
-                title = "AI Consultant",
-                company_name = "",
-                location = "Remote",
-                extensions = new[] { "Full-time" },
-                detected_extensions = new { },
-                apply_options = Array.Empty < object >()
-            },
-            new {
-                title = "ML Research Intern",
-                company_name = "Startup Labs",
-                location = "",
-                description = "Internship for final-year students.",
-                apply_options = Array.Empty < object >()
-            },
-            new {
-                title = "Data Analyst",
-                company_name = "Acme Corp",
-                location = "New York, NY",
-                extensions = new[] { "Part-time" },
-                apply_options = new[] { new { link = "" } },
-                description = "Collect and analyze customer data."
-            },
-            new {
-                title = "Researcher",
-                company_name = "Black Box AI",
-                location = "Remote"
-                // missing extensions, posted_at, description, and apply link
-            }
+                new {
+                    title = "",
+                    company_name = "Unknown Corp",
+                    location = "",
+                    extensions = Array.Empty<string>(),
+                    description = "Exciting opportunity.",
+                    apply_options = Array.Empty<object>()
+                },
+                new {
+                    title = "AI Consultant",
+                    company_name = "",
+                    location = "Remote",
+                    extensions = new[] { "Full-time" },
+                    detected_extensions = new { },
+                    apply_options = Array.Empty < object >()
+                },
+                new {
+                    title = "ML Research Intern",
+                    company_name = "Startup Labs",
+                    location = "",
+                    description = "Internship for final-year students.",
+                    apply_options = Array.Empty < object >()
+                },
+                new {
+                    title = "Data Analyst",
+                    company_name = "Acme Corp",
+                    location = "New York, NY",
+                    extensions = new[] { "Part-time" },
+                    apply_options = new[] { new { link = "" } },
+                    description = "Collect and analyze customer data."
+                },
+                new {
+                    title = "Researcher",
+                    company_name = "Black Box AI",
+                    location = "Remote"
+                    // missing extensions, posted_at, description, and apply link
+                }
                 }
             };
+        }
 
-            return Ok(result);
+        private object GetLeadResults()
+        {
+            return new
+            {
+                organic_results = new object[]
+              {
+                new {
+                    position = 1,
+                    title = "Jane Doe - Data Engineer at TechCorp",
+                    link = "https://www.linkedin.com/in/janedoe",
+                    displayed_link = "linkedin.com/in/janedoe",
+                    snippet = "Jane Doe is a Data Engineer at TechCorp. Contact: jane.doe@gmail.com, (555) 123-4567"
+                },
+                new {
+                    position = 2,
+                    title = "John Smith | Data Engineer | GitHub",
+                    link = "https://github.com/johnsmith",
+                    displayed_link = "github.com/johnsmith",
+                    snippet = "Open source Data Engineer. Email: john.smith@yahoo.com, Phone: 555-987-6543"
+                },
+                new {
+                    position = 3,
+                    title = "Emily Zhang - Data Engineer - YouTube",
+                    link = "https://www.youtube.com/emilyzhang",
+                    displayed_link = "youtube.com/emilyzhang",
+                    snippet = "Emily Zhang shares Data Engineering tutorials. Reach at emily.zhang@gmail.com or 555.222.3333"
+                },
+                new {
+                    position = 4,
+                    title = "Carlos Rivera | Data Engineer | Instagram",
+                    link = "https://instagram.com/carlos.rivera",
+                    displayed_link = "instagram.com/carlos.rivera",
+                    snippet = "Carlos Rivera, Data Engineer. Contact: carlos.rivera@yahoo.com, (555) 444-5555"
+                },
+                new {
+                    position = 5,
+                    title = "Priya Patel - Data Engineer - TikTok",
+                    link = "https://tiktok.com/@priyapatel",
+                    displayed_link = "tiktok.com/@priyapatel",
+                    snippet = "Priya Patel creates Data Engineering content. Email: priya.patel@gmail.com"
+                },
+                new {
+                    position = 6,
+                    title = "<b>Jane Doe</b> - Freelance Designer",
+                    // link is missing to test fallback
+                    displayed_link = "jane.design",
+                    // snippet is missing to test fallback and skipping
+                },
+                new {
+                    position = 7,
+                    // No title, but has 'name' to test alternate property
+                    name = "Alternate Name Field",
+                    link = "https://alternate.example.com",
+                    displayed_link = "alternate.example.com",
+                    snippet = "No email here, just a phone: (123) 456-7890"
+                },
+                new {
+                    position = 8,
+                    // No title, but has 'name' to test alternate property
+                    name = "Martin Short",
+                    link = "https://facebook.com",
+                    displayed_link = "facebook.com",
+                    snippet = "No email here, just a phone: (123) 456-7890"
+                },
+                new {
+                    position = 9,
+                    // No title, but has 'name' to test alternate property
+                    name = "Eric Cartman",
+                    link = "https://twitter.com",
+                    displayed_link = "twitter.com",
+                    snippet = " phone: (123) 456-7890"
+                    }
+              }
+            };
         }
     }
 }

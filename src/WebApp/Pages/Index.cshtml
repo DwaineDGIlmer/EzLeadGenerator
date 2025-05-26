@@ -40,12 +40,12 @@
     <div style="margin-bottom: 20px;">
         <label><strong>Where should we search?</strong></label><br />
         <p>Select the online platforms where your potential leads are active:</p>
-        @foreach (var platform in new[] { "linkedin.com/in", "github.com", "youtube.com", "twitter.com", "facebook.com","instagram.com", "tiktok.com" })
-        {
-            <input type="checkbox" name="SelectedPlatforms" value="@platform"
-                @(Model.SelectedPlatforms.Contains(platform) ? "checked" : "") />
-            <label>@platform</label><br />
-        }
+    @foreach (var platform in new[] { "linkedin.com/in", "github.com", "youtube.com", "twitter.com", "facebook.com","instagram.com", "tiktok.com" })
+    {
+        <input type="checkbox" name="SelectedPlatforms" value="@platform"
+            @(Model.SelectedPlatforms.Contains(platform) ? "checked" : "") style="margin-right: 8px;" />
+        <label style="margin-right: 18px;">@platform</label>
+    }
     </div>
 
     <div style="margin-bottom: 20px;">
@@ -54,8 +54,8 @@
         @foreach (var domain in new[] { "@gmail.com", "@yahoo.com", "@outlook.com" })
         {
             <input type="checkbox" name="SelectedDomains" value="@domain"
-                   @(Model.SelectedDomains.Contains(domain) ? "checked" : "") />
-            <label>@domain</label><br />
+                @(Model.SelectedDomains.Contains(domain) ? "checked" : "") style="margin-right: 8px;" />
+            <label style="margin-right: 18px;">@domain</label>
         }
     </div>
 

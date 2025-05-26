@@ -170,6 +170,7 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
                 _logger.LogError("Failed to fetch job results: {StatusCode}", response.StatusCode);
                 continue;
             }
+            _logger.LogInformation("Success in fetching job results: {StatusCode}", response.StatusCode);
 
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             if (!json.RootElement.TryGetProperty("organic_results", out var results)) continue;

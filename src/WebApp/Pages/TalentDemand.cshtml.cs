@@ -159,9 +159,10 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         var response = await _httpClient.GetAsync(url);
         if (!response.IsSuccessStatusCode) 
         { 
-            _logger.LogError("Failed to fetch job results: {StatusCode}", response.StatusCode);
+            _logger.LogError("Failed to fetch lead results: {StatusCode}", response.StatusCode);
             return;
-        }            
+        }
+        _logger.LogInformation("Success in fetching lead results: {StatusCode}", response.StatusCode);
 
         var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         if (!json.RootElement.TryGetProperty("jobs_results", out var jobs) || jobs.ValueKind != JsonValueKind.Array) return;
