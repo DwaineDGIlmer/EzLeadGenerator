@@ -1,4 +1,12 @@
+using Core.Extensions;
+using Loggers.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Initialize the logging services
+builder.Services.InitializeServices(builder.Configuration);
+builder.Services.InitializeLogging(builder.Configuration);
+builder.Services.AddResilientHttpClient(builder.Configuration, nameof(EzLeadGenerator));
 
 // Add services to the container.
 builder.Services.AddRazorPages();

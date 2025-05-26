@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using WebApp.Pages;
+using System.Net.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace UnitTests.Pages;
 
@@ -9,6 +12,8 @@ public class IndexModelTests
 {
     private readonly Mock<IConfiguration> _mockConfig;
     private readonly IMemoryCache _memoryCache;
+    private readonly Mock<IHttpClientFactory> _mockHttpClientFactory;
+    private readonly Mock<ILogger<IndexModel>> _mockLogger;
 
     public IndexModelTests()
     {
@@ -16,13 +21,22 @@ public class IndexModelTests
         _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchApiKey"))]).Returns("dummy-api-key");
         _mockConfig.Setup(c => c[It.Is<string>(s => s.Contains("SearchEndpoint"))]).Returns("https://example.com/api/jobs");
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
+        _mockHttpClientFactory = new Mock<IHttpClientFactory>();
+        _mockLogger = new Mock<ILogger<IndexModel>>();
+
+        // Setup HttpClientFactory to return a default HttpClient (or a mock if you want to control responses)
+        _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient());
     }
 
     [Fact]
     public async Task OnPostAsync_QueryTooShort_SetsQueryTooShort()
     {
         // Arrange
-        var model = new IndexModel(_mockConfig.Object, _memoryCache)
+        var model = new IndexModel(
+            _mockConfig.Object,
+            _memoryCache,
+            _mockHttpClientFactory.Object,
+            _mockLogger.Object)
         {
             SearchQuery = "ab"
         };
@@ -39,7 +53,11 @@ public class IndexModelTests
     public async Task OnPostAsync_NoPlatforms_ReturnsNoResults()
     {
         // Arrange
-        var model = new IndexModel(_mockConfig.Object, _memoryCache)
+        var model = new IndexModel(
+            _mockConfig.Object,
+            _memoryCache,
+            _mockHttpClientFactory.Object,
+            _mockLogger.Object)
         {
             SearchQuery = "test",
             SelectedPlatforms = []

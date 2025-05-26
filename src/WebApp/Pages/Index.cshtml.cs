@@ -11,22 +11,21 @@ using WebApp.Extensions;
 
 namespace WebApp.Pages;
 
+
 /// <summary>
-/// Represents the model for the Index page, providing functionality for handling search queries, managing user-selected
-/// filters, and exporting search results.
+/// The page model for the Index page, handling search queries and lead generation logic.
+/// Initializes a new instance of the <see cref="IndexModel"/> class with the specified dependencies.
 /// </summary>
-/// <remarks>This class is used in Razor Pages to handle user input, perform search operations, and manage the
-/// state of search results. It supports both synchronous and asynchronous operations for fetching and exporting leads.
-/// The search functionality relies on external APIs and caching mechanisms to optimize performance.</remarks>
-/// <remarks>
-/// Initializes a new instance of the <see cref="IndexModel"/> class.
-/// </remarks>
-/// <param name="config">The configuration settings used by the model.</param>
-/// <param name="cache">The memory cache instance used for caching data.</param>
-public partial class IndexModel(IConfiguration config, IMemoryCache cache) : PageModel
+/// <param name="config">The application configuration.</param>
+/// <param name="cache">The memory cache instance.</param>
+/// <param name="httpClientFactory">The HTTP client factory to create resilent client.</param>
+/// <param name="logger">The logger instance for this model.</param>
+public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttpClientFactory httpClientFactory, ILogger<IndexModel> logger) : PageModel
 {
     private readonly IConfiguration _config = config;
     private readonly IMemoryCache _cache = cache;
+    private readonly ILogger<IndexModel> _logger = logger;
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient(nameof(EzLeadGenerator));
 
     /// <summary>
     /// Gets or sets the search query entered by the user.
@@ -155,6 +154,7 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache) : Pag
             ? $"({string.Join(" OR ", domains.Select(d => $"\"{d}\""))})"
             : string.Empty;
 
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Defaults.JsonMimeType));
         foreach (var platform in platforms)
         {
             var query = SearchAsPhrase
@@ -163,11 +163,13 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache) : Pag
 
             var endpoint = $"{baseEndpoint}?engine=google&q={Uri.EscapeDataString(query)}&api_key={apiKey}&start={(PageNumber - 1) * 10}";
 
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Defaults.JsonMimeType));
-
-            var response = await httpClient.GetAsync(endpoint);
-            if (!response.IsSuccessStatusCode) continue;
+            _logger.LogInformation("Fetching leads for query: {SearchQuery}, Platforms: {Platforms}, Domains: {Domains}, Page: {PageNumber}", SearchQuery, platforms, domainFilter, PageNumber);
+            var response = await _httpClient.GetAsync(endpoint);
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch job results: {StatusCode}", response.StatusCode);
+                continue;
+            }
 
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             if (!json.RootElement.TryGetProperty("organic_results", out var results)) continue;

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -21,10 +20,14 @@ namespace WebApp.Pages;
 /// </remarks>
 /// <param name="config">The configuration settings used by the model.</param>
 /// <param name="cache">The memory cache instance used for caching data.</param>
-public class TalentDemandModel(IConfiguration config, IMemoryCache cache) : PageModel
+/// <param name="httpClientFactory">The HTTP client factory to creat resilent client.</param>
+/// <param name="logger">The logger instance for this model.</param>
+public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpClientFactory httpClientFactory, ILogger<TalentDemandModel> logger) : PageModel
 {
     private readonly IConfiguration _config = config;
     private readonly IMemoryCache _cache = cache;
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient(nameof(EzLeadGenerator));
+    private readonly ILogger<TalentDemandModel> _logger = logger;
 
     /// <summary>
     /// Gets or sets the job title associated with the current entity.
@@ -150,11 +153,15 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache) : Page
             : $"{JobTitle} \"{Location}\"";
         string url = $"{baseEndpoint}?engine=google_jobs&q={Uri.EscapeDataString(query)}&api_key={apiKey}";
 
-        using var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Defaults.JsonMimeType));
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Defaults.JsonMimeType));
+        _logger.LogInformation("Fetching job results from {Url}", url);
 
-        var response = await httpClient.GetAsync(url);
-        if (!response.IsSuccessStatusCode) return;
+        var response = await _httpClient.GetAsync(url);
+        if (!response.IsSuccessStatusCode) 
+        { 
+            _logger.LogError("Failed to fetch job results: {StatusCode}", response.StatusCode);
+            return;
+        }            
 
         var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         if (!json.RootElement.TryGetProperty("jobs_results", out var jobs) || jobs.ValueKind != JsonValueKind.Array) return;
