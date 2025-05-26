@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -17,10 +19,12 @@ namespace WebApp.Pages;
 /// <remarks>
 /// Initializes a new instance of the <see cref="TalentDemandModel"/> class with the specified configuration.
 /// </remarks>
-/// <param name="config"></param>
-public class TalentDemandModel(IConfiguration config) : PageModel
+/// <param name="config">The configuration settings used by the model.</param>
+/// <param name="cache">The memory cache instance used for caching data.</param>
+public class TalentDemandModel(IConfiguration config, IMemoryCache cache) : PageModel
 {
     private readonly IConfiguration _config = config;
+    private readonly IMemoryCache _cache = cache;
 
     /// <summary>
     /// Gets or sets the job title associated with the current entity.
@@ -90,8 +94,6 @@ public class TalentDemandModel(IConfiguration config) : PageModel
             await FetchJobResultsAsync();
         }
 
-        System.Diagnostics.Debug.WriteLine($"JobTitle: {JobTitle}, Location: {Location}");
-
         var csv = new StringBuilder();
         csv.AppendLine("Title,Company,Location,Type,Posted,Description,ApplyLink");
 
@@ -135,6 +137,13 @@ public class TalentDemandModel(IConfiguration config) : PageModel
             return;
         }
         QueryTooShort = false;
+
+        var cacheKey = $"talent:{JobTitle}:{string.Join(",", Location)}:{string.Join(",", SearchJobTitleAsPhrase)}:{IncludeDescriptions}";
+        if (_cache.TryGetValue(cacheKey, out Dictionary<string, List<JobPosting>>? cachedResults))
+        {
+            GroupedJobResults = cachedResults!;
+            return;
+        }
 
         string query = SearchJobTitleAsPhrase
             ? $"\"{JobTitle}\" \"{Location}\""
@@ -212,6 +221,8 @@ public class TalentDemandModel(IConfiguration config) : PageModel
         GroupedJobResults = jobResults
             .GroupBy(j => string.IsNullOrWhiteSpace(j.Company) ? "Unknown Company" : j.Company)
             .ToDictionary(g => g.Key, g => g.ToList());
+
+        _cache.Set(cacheKey, GroupedJobResults, TimeSpan.FromMinutes(10));
     }
 }
 
