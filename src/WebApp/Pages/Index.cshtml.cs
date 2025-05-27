@@ -134,9 +134,6 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
 
         var platforms = SelectedPlatforms;
         var domains = SelectedDomains?.Where(d => !string.IsNullOrWhiteSpace(d)).ToList() ?? [];
-        var domainFilter = domains.Count != 0
-            ? $"({string.Join(" OR ", domains.Select(d => $"\"{d}\""))})"
-            : string.Empty;
 
         var cacheKey = $"leads:{SearchQuery}:{string.Join(",", platforms)}:{string.Join(",", domains)}:{PageNumber}";
         if (_cache.TryGetValue(cacheKey, out List<LeadInfo>? cachedResults) &&
@@ -171,7 +168,7 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
 
             var endpoint = $"{baseEndpoint}?engine=google&q={Uri.EscapeDataString(query)}&api_key={apiKey}&start={(PageNumber - 1) * 10}";
 
-            _logger.LogInformation("Fetching leads for query: {SearchQuery}, Platforms: {Platforms}, Domains: {Domains}, Page: {PageNumber}", SearchQuery, platforms, domainFilter, PageNumber);
+            _logger.LogInformation("Fetching leads for query: {SearchQuery}, Platforms: {Platforms}, Page: {PageNumber}", SearchQuery, platforms, PageNumber);
             var response = await _httpClient.GetAsync(endpoint);
             if (!response.IsSuccessStatusCode)
             {
@@ -219,12 +216,14 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
                 var name = WebUtility.HtmlDecode(rawTitle ?? string.Empty);
 
                 if (string.IsNullOrWhiteSpace(snippet))
+                {
+                    _logger.LogWarning("Skipping result with empty snippet for URL: {Url}", url);
                     continue;
-
-                var emails = EmailRegex().Matches(snippet)
+                }
+               
+               var emails = EmailRegex().Matches(snippet)
                                 .Cast<Match>()
                                 .Select(m => m.Value)
-                                .Where(email => domains.Count == 0 || domains.Any(d => email.EndsWith(d)))
                                 .Distinct()
                                 .ToList();
 
@@ -255,7 +254,7 @@ public partial class IndexModel(IConfiguration config, IMemoryCache cache, IHttp
                 }
             }
         }
-        _cache.Set(cacheKey, Results.ToList(), TimeSpan.FromMinutes(10));
+        _cache.Set(cacheKey, Results.ToList(), TimeSpan.FromMinutes(20));
     }
 
     /// <summary>

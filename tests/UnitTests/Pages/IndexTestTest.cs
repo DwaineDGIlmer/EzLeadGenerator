@@ -3,8 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WebApp.Pages;
-using System.Net.Http;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace UnitTests.Pages;
 

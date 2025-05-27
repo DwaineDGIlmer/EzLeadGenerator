@@ -63,7 +63,7 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
     /// Gets or sets a value indicating whether to search for the job title as a phrase. 
     /// </summary>
     [BindProperty]
-    public bool SearchJobTitleAsPhrase { get; set; } = false; 
+    public bool SearchJobTitleAsPhrase { get; set; } = false;
 
     /// <summary>
     /// /// Gets or sets a value indicating whether to search for the job title as a phrase.
@@ -101,7 +101,7 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
             GroupedJobResults = cachedResults;
         }
         else
-        { 
+        {
             // Handle cache miss
             return RedirectToPage();
         }
@@ -175,8 +175,8 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         _logger.LogInformation("Fetching job results from {Url}", url);
 
         var response = await _httpClient.GetAsync(url);
-        if (!response.IsSuccessStatusCode) 
-        { 
+        if (!response.IsSuccessStatusCode)
+        {
             _logger.LogError("Failed to fetch lead results: {StatusCode}", response.StatusCode);
             return;
         }
@@ -261,7 +261,7 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
             .GroupBy(j => string.IsNullOrWhiteSpace(j.Company) ? "Unknown Company" : j.Company)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        _cache.Set(ResultsCacheKey, GroupedJobResults, TimeSpan.FromMinutes(10));
+        _cache.Set(ResultsCacheKey, GroupedJobResults, TimeSpan.FromMinutes(20));
     }
 
     /// <summary>
