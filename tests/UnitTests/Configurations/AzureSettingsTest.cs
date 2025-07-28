@@ -1,86 +1,88 @@
-namespace Application.Configurations.Tests
+using Application.Configurations;
+using Application.Constants;
+
+
+namespace UnitTests.Configurations;
+
+public class AzureSettingsTest
 {
-    public class AzureSettingsTest
+    [Fact]
+    public void AzureTableName_ShouldHaveDefaultValue()
     {
-        [Fact]
-        public void AzureTableName_ShouldHaveDefaultValue()
-        {
-            // Arrange
-            var settings = new AzureSettings();
+        var settings = new AzureSettings();
+        Assert.Equal(Defaults.AzureTableName, settings.AzureTableName);
+    }
 
-            // Act
-            var tableName = settings.AzureTableName;
+    [Fact]
+    public void AzureTableName_CanBeSet()
+    {
+        var settings = new AzureSettings();
+        var expected = "CustomTable";
+        settings.AzureTableName = expected;
+        Assert.Equal(expected, settings.AzureTableName);
+    }
 
-            // Assert
-            Assert.Equal(Application.Constants.Defaults.AzureTableName, tableName);
-        }
+    [Fact]
+    public void CompanyProfilePartionKey_ShouldHaveDefaultValue()
+    {
+        var settings = new AzureSettings();
+        Assert.Equal(Defaults.CompanyProfilePartionKey, settings.CompanyProfilePartionKey);
+    }
 
-        [Fact]
-        public void AzureTableName_CanBeSet()
-        {
-            // Arrange
-            var settings = new AzureSettings();
-            var expectedTableName = "CustomTableName";
+    [Fact]
+    public void CompanyProfilePartionKey_CanBeSet()
+    {
+        var settings = new AzureSettings();
+        var expected = "CustomCompanyProfileKey";
+        settings.CompanyProfilePartionKey = expected;
+        Assert.Equal(expected, settings.CompanyProfilePartionKey);
+    }
 
-            // Act
-            settings.AzureTableName = expectedTableName;
+    [Fact]
+    public void JobSummaryPartionKey_ShouldHaveDefaultValue()
+    {
+        var settings = new AzureSettings();
+        Assert.Equal(Defaults.JobSummaryPartionKey, settings.JobSummaryPartionKey);
+    }
 
-            // Assert
-            Assert.Equal(expectedTableName, settings.AzureTableName);
-        }
+    [Fact]
+    public void JobSummaryPartionKey_CanBeSet()
+    {
+        var settings = new AzureSettings();
+        var expected = "CustomJobSummaryKey";
+        settings.JobSummaryPartionKey = expected;
+        Assert.Equal(expected, settings.JobSummaryPartionKey);
+    }
 
-        [Fact]
-        public void CompanyProfileTableName_ShouldHaveDefaultValue()
-        {
-            // Arrange
-            var settings = new AzureSettings();
+    [Fact]
+    public void CompanyProfileTableName_ShouldHaveDefaultValue()
+    {
+        var settings = new AzureSettings();
+        Assert.Equal(Defaults.CompanyProfileTableName, settings.CompanyProfileTableName);
+    }
 
-            // Act
-            var tableName = settings.CompanyProfilePartionKey;
+    [Fact]
+    public void CompanyProfileTableName_CanBeSet()
+    {
+        var settings = new AzureSettings();
+        var expected = "CustomCompanyProfileTable";
+        settings.CompanyProfileTableName = expected;
+        Assert.Equal(expected, settings.CompanyProfileTableName);
+    }
 
-            // Assert
-            Assert.Equal(Application.Constants.Defaults.CompanyProfilePartionKey, tableName);
-        }
+    [Fact]
+    public void JobSummaryTableName_ShouldHaveDefaultValue()
+    {
+        var settings = new AzureSettings();
+        Assert.Equal(Defaults.JobSummaryTableName, settings.JobSummaryTableName);
+    }
 
-        [Fact]
-        public void CompanyProfileTableName_CanBeSet()
-        {
-            // Arrange
-            var settings = new AzureSettings();
-            var expectedTableName = "CustomCompanyProfileTable";
-
-            // Act
-            settings.CompanyProfilePartionKey = expectedTableName;
-
-            // Assert
-            Assert.Equal(expectedTableName, settings.CompanyProfilePartionKey);
-        }
-
-        [Fact]
-        public void JobSummaryTableName_ShouldHaveDefaultValue()
-        {
-            // Arrange
-            var settings = new AzureSettings();
-
-            // Act
-            var tableName = settings.JobSummaryPartionKey;
-
-            // Assert
-            Assert.Equal(Application.Constants.Defaults.AzureTableName, tableName);
-        }
-
-        [Fact]
-        public void JobSummaryTableName_CanBeSet()
-        {
-            // Arrange
-            var settings = new AzureSettings();
-            var expectedTableName = "CustomJobSummaryTable";
-
-            // Act
-            settings.JobSummaryPartionKey = expectedTableName;
-
-            // Assert
-            Assert.Equal(expectedTableName, settings.JobSummaryPartionKey);
-        }
+    [Fact]
+    public void JobSummaryTableName_CanBeSet()
+    {
+        var settings = new AzureSettings();
+        var expected = "CustomJobSummaryTable";
+        settings.JobSummaryTableName = expected;
+        Assert.Equal(expected, settings.JobSummaryTableName);
     }
 }
