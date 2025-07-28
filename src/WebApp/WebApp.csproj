@@ -29,13 +29,8 @@
   <ItemGroup>
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.25.0" />
-    <PackageReference Include="Core" Version="1.0.2" />
+    <PackageReference Include="Core" Version="1.2.4" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Application\Application.csproj" />
-    <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +42,10 @@
   <ItemGroup>
     <Folder Include="App_Data\company_profiles\" />
     <Folder Include="App_Data\job_summaries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
 
 </Project>
