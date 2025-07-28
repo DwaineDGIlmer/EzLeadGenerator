@@ -1,4 +1,4 @@
-using WebApp.Constants;
+using Application.Constants;
 
 namespace UnitTests.Constants
 {

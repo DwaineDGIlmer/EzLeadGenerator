@@ -1,0 +1,19 @@
+{
+  "Id": "cd3e803b-cf8a-46c1-a13a-524d758afd30",
+  "CompanyId": "6341962337428db6199760b5ccd869d6099671734ae5764799ec1d7abf7e921c",
+  "CompanyName": "Motion Recruitment",
+  "HierarchyResults": {
+    "orghierarchy": [
+      {
+        "name": "Benjamin Owusu",
+        "title": "Recruitment Manager"
+      },
+      {
+        "name": "Kelli Jensen",
+        "title": "Vice President, Enterprise Talent Services"
+      }
+    ]
+  },
+  "CreatedAt": "2025-07-27T23:33:15.0636189Z",
+  "UpdatedAt": "0001-01-01T00:00:00.0000000"
+}

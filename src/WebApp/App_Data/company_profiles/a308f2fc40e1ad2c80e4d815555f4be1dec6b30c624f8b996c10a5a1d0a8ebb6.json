@@ -1,0 +1,19 @@
+{
+  "Id": "153d4ebe-bd32-49ae-bb7c-26d2ea9be8ed",
+  "CompanyId": "a308f2fc40e1ad2c80e4d815555f4be1dec6b30c624f8b996c10a5a1d0a8ebb6",
+  "CompanyName": "Insight Global",
+  "HierarchyResults": {
+    "orghierarchy": [
+      {
+        "name": "Chris Sanders",
+        "title": "Consultant - Service Desk Team Lead"
+      },
+      {
+        "name": "Ryan McGinn",
+        "title": "President, Evergeen"
+      }
+    ]
+  },
+  "CreatedAt": "2025-07-27T23:33:17.4536256Z",
+  "UpdatedAt": "0001-01-01T00:00:00.0000000"
+}

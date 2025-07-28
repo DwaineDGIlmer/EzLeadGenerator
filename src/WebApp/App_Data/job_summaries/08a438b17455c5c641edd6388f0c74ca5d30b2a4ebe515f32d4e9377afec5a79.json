@@ -1,0 +1,35 @@
+{
+  "Id": "bf47aaa8-e131-4b63-bcaf-8dfb5dffba33",
+  "PostedDate": "2025-07-27T23:33:00.5074143Z",
+  "JobId": "eyJqb2JfdGl0bGUiOiJJbnNpZ2h0IEdsb2JhbCIsImNvbXBhbnlfbmFtZSI6Ikluc2lnaHQgR2xvYmFsIiwiYWRkcmVzc19jaXR5IjoiQ2hhcmxvdHRlLCBOQyIsImh0aWRvY2lkIjoiNENJaWtoUEQzbGRLS1NMR0FBQUFBQT09IiwidXVsZSI6IncrQ0FJUUlDSWFRMmhoY214dmRIUmxMRTVETEZWdWFYUmxaQ0JUZEdGMFpYTSIsImhsIjoiZW4ifQ==",
+  "CompanyId": "Insight Global",
+  "CompanyName": "Insight Global",
+  "HiringAgency": "Insight Global Jobs",
+  "JobTitle": "Insight Global",
+  "Location": "Charlotte, NC",
+  "JobDescription": "Insight Global is looking for a strong data engineer to join a NEW team with a large financial institution in Charlotte, NC. This role is hybrid onsite- 3 days onsite, 2 remote weekly (no exceptions.)\nThis role is responsible for helping to develop and deliver data solutions to accomplish technology and business goals. Key responsibilities include code design and delivery tasks associated with the integration, cleaning, transformation, and control of data in operational and analytics data systems.\nYou will work with stakeholders, Product Owners, and Software Engineers to aid in the implementation of data requirements, analyze performance, conduct research, and troubleshoot any issues. This individual will be proficient in data engineering practices and have experience in using data design and architectural patterns.\n\nWe are a company committed to creating inclusive environments where people can bring their full, authentic selves to work every day. We are an equal opportunity employer that believes everyone matters. Qualified candidates will receive consideration for employment opportunities without regard to race, religion, sex, age, marital status, national origin, sexual orientation, citizenship status, disability, or any other status or characteristic protected by applicable laws, regulations, and ordinances. If you need assistance and/or a reasonable accommodation due to a disability during the application or recruiting process, please send a request to Human Resources Request Form. The EEOC \u0022Know Your Rights\u0022 Poster is available here.\n\nTo learn more about how we collect, keep, and process your private information, please review Insight Global\u0027s Workforce Privacy Policy: https://insightglobal.com/workforce-privacy-policy/ .",
+  "Division": "Data Engineering and Analytics",
+  "Confidence": 85,
+  "Reasoning": "The job description explicitly mentions responsibilities related to data engineering, delivering data solutions, and working in analytics data systems. These tasks align with roles typically handled by a division focused on Data Engineering and Analytics.",
+  "SourceLink": "https://www.google.com/search?ibp=htl;jobs\u0026q=Data\u002BEngineer\u0026htidocid=4CIikhPD3ldKKSLGAAAAAA%3D%3D\u0026hl=en-US\u0026shndl=37\u0026shmd=H4sIAAAAAAAA_13NMQ7CMAxAUbH2CCz1woJogpBYYOxQwcAVKieykiATR7WHXoB7AyvLn570u_em292qlpQNJpaADAPcJYASLjGDVJhEEtP2ms2aXrxXZZfU0Ep0UV5eKgVZ_VOC_jJrxoUao9F8Oh9X12ra93-PUmH8MhYzOsBj_AAq0pUsiAAAAA\u0026shmds=v1_AdeF8Kgbly3MEwwAZWe4bgRvH8-KAu8x7CPjOGHVlcYVxXRDkA\u0026source=sh/x/job/li/m1/1#fpstate=tldetail\u0026htivrt=jobs\u0026htiq=Data\u002BEngineer\u0026htidocid=4CIikhPD3ldKKSLGAAAAAA%3D%3D",
+  "SourceName": "Google Jobs",
+  "JobHighlights": [
+    {
+      "title": "Qualifications",
+      "items": [
+        "This individual will be proficient in data engineering practices and have experience in using data design and architectural patterns"
+      ]
+    },
+    {
+      "title": "Responsibilities",
+      "items": [
+        "This role is hybrid onsite- 3 days onsite, 2 remote weekly (no exceptions.)",
+        "This role is responsible for helping to develop and deliver data solutions to accomplish technology and business goals",
+        "Key responsibilities include code design and delivery tasks associated with the integration, cleaning, transformation, and control of data in operational and analytics data systems",
+        "You will work with stakeholders, Product Owners, and Software Engineers to aid in the implementation of data requirements, analyze performance, conduct research, and troubleshoot any issues"
+      ]
+    }
+  ],
+  "CreatedAt": "2025-07-27T23:33:00.5074149Z",
+  "UpdatedAt": "2025-07-27T23:33:00.5074150Z"
+}

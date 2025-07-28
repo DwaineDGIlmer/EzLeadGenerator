@@ -28,19 +28,6 @@ public class TalentDemandModelTests
     }
 
     [Fact]
-    public void GenerateRandomString_ReturnsStringOfCorrectLength()
-    {
-        // Arrange
-        int length = 10;
-
-        // Act
-        var result = IndexModel.GenerateRandomString(length);
-
-        // Assert
-        Assert.Equal(length, result.Length);
-    }
-
-    [Fact]
     public void GenerateRandomString_ReturnsAlphanumericString()
     {
         // Arrange

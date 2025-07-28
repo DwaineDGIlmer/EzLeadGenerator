@@ -1,11 +1,11 @@
+using Application.Constants;
+using Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using WebApp.Constants;
-using WebApp.Extensions;
 
 namespace WebApp.Pages;
 
@@ -107,7 +107,7 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         }
 
         var csv = new StringBuilder();
-        csv.AppendLine("Title,Company,Location,Type,Posted,Description,ApplyLink");
+        csv.AppendLine("JobTitle,Company,Location,Type,Posted,JobDescription,ApplyLink");
 
         foreach (var group in GroupedJobResults)
         {
@@ -143,7 +143,8 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         }
         QueryTooShort = false;
 
-        ResultsCacheKey = $"talent:{JobTitle}:{string.Join(",", Location)}:{string.Join(",", SearchJobTitleAsPhrase)}:{IncludeDescriptions}";
+        var hash = $"talent:{JobTitle}:{string.Join(",", Location)}:{string.Join(",", SearchJobTitleAsPhrase)}:{IncludeDescriptions}".GenHashString();
+        ResultsCacheKey = GenCacheKey(nameof(TalentDemandModel), hash);
         if (_cache.TryGetValue(ResultsCacheKey, out Dictionary<string, List<JobPosting>>? cachedResults) &&
             cachedResults.IsNotNull() &&
             cachedResults!.Count > 0)
@@ -277,6 +278,18 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         var random = new Random();
         return new string([.. Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)])]);
+    }
+
+    /// <summary>
+    /// Generates a cache key by combining a prefix, a key, and an optional hash.
+    /// </summary>
+    /// <param name="prepend">The prefix to prepend to the generated cache key.</param>
+    /// <param name="key">The main key component of the cache key.</param>
+    /// <param name="hash">An optional hash to include in the cache key. If not provided, the key is generated without it.</param>
+    /// <returns>A string representing the generated cache key, which includes the prefix, key, and optional hash.</returns>
+    private static string GenCacheKey(string prepend, string key, string? hash = null)
+    {
+        return $"{prepend}_{($"{key}_{hash}").GenHashString()}";
     }
 }
 

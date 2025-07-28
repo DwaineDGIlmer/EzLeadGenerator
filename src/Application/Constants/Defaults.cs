@@ -1,4 +1,4 @@
-﻿namespace WebApp.Constants
+﻿namespace Application.Constants
 {
     /// <summary>
     /// Provides default values and utility methods for configuration and settings management.
@@ -41,6 +41,11 @@
         /// <remarks>This constant can be used to specify or compare the MIME type for JSON data in HTTP
         /// requests or responses.</remarks>
         public const string JsonMimeType = "application/json";
+
+        /// <summary>
+        /// Represents the file name used for job source data.
+        /// </summary>
+        public const string JobsSourceName = "JobsSource";
 
         /// <summary>
         /// Represents the configuration key for EzLeads settings.

@@ -1,0 +1,42 @@
+{
+  "Id": "87bc50ef-0ef1-47b0-95ba-70abe954291c",
+  "PostedDate": "2025-07-27T23:33:04.9045720Z",
+  "JobId": "eyJqb2JfdGl0bGUiOiJEYXRhIEVuZ2luZWVyLCBFbnRyeSBMZXZlbCIsImNvbXBhbnlfbmFtZSI6IkpvYnJpZ2h0LmFpIiwiYWRkcmVzc19jaXR5IjoiUmFsZWlnaCwgTkMiLCJodGlkb2NpZCI6ImpTMkVzT2VNRUxNa3UyUDVBQUFBQUE9PSIsInV1bGUiOiJ3K0NBSVFJQ0lhUTJoaGNteHZkSFJsTEU1RExGVnVhWFJsWkNCVGRHRjBaWE0iLCJobCI6ImVuIn0=",
+  "CompanyId": "Jobright.ai",
+  "CompanyName": "Jobright.ai",
+  "HiringAgency": "LinkedIn",
+  "JobTitle": "Data Engineer, Entry Level",
+  "Location": "Raleigh, NC",
+  "JobDescription": "Verified Job On Employer Career Site\n\nJob Summary:\n\nAzurity Pharmaceuticals is a privately held specialty pharmaceutical company focused on innovative products for underserved patients. The Data Engineer will build and maintain scalable data pipelines and platforms, collaborating with analysts and data scientists to ensure high-quality data availability across the organization.\n\nResponsibilities:\n\n\u2022 Develop and maintain ETL/ELT workflows using SQL, Python, dbt, and Airflow\n\n\u2022 Design and optimize data models in Snowflake and Postgres\n\n\u2022 Collaborate with cross-functional teams to understand and implement data requirements\n\n\u2022 Follow best practices in software development (version control, testing, CI/CD)\n\n\u2022 Operate within an Agile/Scrum development environment\n\n\u2022 Document systems, pipelines, and data flows clearly and concisely\n\nQualifications:\n\nRequired:\n\n\u2022 2\u20134 years of experience in modern data engineering\n\n\u2022 Strong proficiency in SQL, Python, dbt, Airflow\n\n\u2022 Experience with Snowflake and PostgreSQL\n\n\u2022 Understanding of software engineering principles (modular code, testing, version control)\n\n\u2022 Exposure to agile methodologies\n\nPreferred:\n\n\u2022 Experience with Palantir Foundry is a strong plus\n\nCompany:\n\nAzurity Pharmaceuticals is a developer of drug products and technologies to address the needs of patients. Founded in 1998, the company is headquartered in Woburn, Massachusetts, USA, with a team of 501-1000 employees. The company is currently Late Stage. Azurity Pharmaceuticals has a track record of offering H1B sponsorships.",
+  "Division": "Data and Analytics",
+  "Confidence": 85,
+  "Reasoning": "The job revolves around building and maintaining data pipelines and collaborating with analysts and data scientists, which typically falls under a Data and Analytics division.",
+  "SourceLink": "https://www.google.com/search?ibp=htl;jobs\u0026q=Data\u002BEngineer\u0026htidocid=jS2EsOeMELMku2P5AAAAAA%3D%3D\u0026hl=en-US\u0026shndl=37\u0026shmd=H4sIAAAAAAAA_xWMMQoCMRAAsb0nXLW1nIkKNlqqCCIWfuDYHEsSidmQXeT8g482NsNMM9130W1OqAjn7GMmqkMzrR-40ZsSrODKDoSwTgE4w4XZJ-oPQbXI3lqRZLwoapzMxC_LmRzP9slO_hglYKWSUGnc7tazKdkv-7as0Qc1GCFmeGCilgPcjz_IQckLjwAAAA\u0026shmds=v1_AdeF8KgSWHhfXquIKqod8a3rvp4NxvUoeCM0CmER1xb7mYXRkw\u0026source=sh/x/job/li/m1/1#fpstate=tldetail\u0026htivrt=jobs\u0026htiq=Data\u002BEngineer\u0026htidocid=jS2EsOeMELMku2P5AAAAAA%3D%3D",
+  "SourceName": "Google Jobs",
+  "JobHighlights": [
+    {
+      "title": "Qualifications",
+      "items": [
+        "2\u20134 years of experience in modern data engineering",
+        "Strong proficiency in SQL, Python, dbt, Airflow",
+        "Experience with Snowflake and PostgreSQL",
+        "Understanding of software engineering principles (modular code, testing, version control)",
+        "Exposure to agile methodologies"
+      ]
+    },
+    {
+      "title": "Responsibilities",
+      "items": [
+        "The Data Engineer will build and maintain scalable data pipelines and platforms, collaborating with analysts and data scientists to ensure high-quality data availability across the organization",
+        "Develop and maintain ETL/ELT workflows using SQL, Python, dbt, and Airflow",
+        "Design and optimize data models in Snowflake and Postgres",
+        "Collaborate with cross-functional teams to understand and implement data requirements",
+        "Follow best practices in software development (version control, testing, CI/CD)",
+        "Operate within an Agile/Scrum development environment",
+        "Document systems, pipelines, and data flows clearly and concisely"
+      ]
+    }
+  ],
+  "CreatedAt": "2025-07-27T23:33:04.9045725Z",
+  "UpdatedAt": "2025-07-27T23:33:04.9045725Z"
+}

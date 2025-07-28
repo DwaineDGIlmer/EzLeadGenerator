@@ -1,0 +1,58 @@
+{
+  "Id": "e77d4a2f-0fc7-46d1-87cf-68564a71c4b0",
+  "PostedDate": "2025-07-27T23:33:09.5974008Z",
+  "JobId": "eyJqb2JfdGl0bGUiOiJEYXRhIEVuZ2luZWVyIElJIiwiY29tcGFueV9uYW1lIjoiUGVyc29uaWZ5IEhlYWx0aCIsImFkZHJlc3NfY2l0eSI6IlJlbW90ZSwgT1IiLCJodGlkb2NpZCI6IkRaX3FWUnhrd19QMnlLOERBQUFBQUE9PSIsInV1bGUiOiJ3K0NBSVFJQ0lhUTJoaGNteHZkSFJsTEU1RExGVnVhWFJsWkNCVGRHRjBaWE0iLCJobCI6ImVuIn0=",
+  "CompanyId": "Personify Health",
+  "CompanyName": "Personify Health",
+  "HiringAgency": "ICIMS",
+  "JobTitle": "Data Engineer II",
+  "Location": "Remote, OR",
+  "JobDescription": "Overview\n\nNow is the time to join us!\n\nWe\u2019re Personify Health. We\u2019re the first and only personalized health platform company to bring health, wellbeing, and navigation solutions together. Helping businesses optimize investments in their members while empowering people to meaningfully engage with their health. At Personify Health, we believe in offering total rewards, flexible opportunities, and a diverse inclusive community, where every voice matters. Together, we\u2019re shaping a healthier, more engaged future.\n\nResponsibilities\n\nData Engineer II sought by Personify Health for Providence, RI location. Telecommuting permitted.\n\nJob Duties:\n\u2022 Summary: Perform development activities within a data engineering team and help guide, onboard, and train Data Engineer I. Develop data pipelines and enhancements and investigate and troubleshoot issues, working closely with account management, ETL, data warehouse, business intelligence, and reporting teams. Work with multiple data structures, including relational and non-relational models. Do documentation, tech ops, sprints, implementation, monitor, QA, and related tasks.\n\u2022 Extracting, cleansing, and loading data.\n\u2022 Building data pipelines using SQL, Kafka, and other technologies.\n\u2022 Investigation and documentation of new data sets.\n\u2022 Triage incoming bugs and incidents.\n\u2022 Perform technical operation tasks.\n\u2022 Investigate and troubleshoot issues with data and data pipelines.\n\u2022 Participation in sprint refinement, planning, and kick-off to help estimate stories, raise awareness and additional implementation details.\n\u2022 Help monitor areas of the data pipeline and raise awareness to team when issues arise.\n\u2022 Performing and implementing new quality assurance rules to maintain consistent and accurate data.\n\nQualifications\n\nJob Requirements:\n\u2022 Bachelor\u2019s degree in Comp Sci, Comp Engr, Electronics Engr, IT, or related field, or foreign equivalent.\n\u2022 Requires 2 years of relevant experience in data engineering.\n\u2022 Must have skills via 2 years of experience in all of the following:\n\u2022 examining data and code for quality and accuracy;\n\u2022 modern relational and non-relational models;\n\u2022 writing complex SQL, including pivots, window functions, and date calculations;\n\u2022 Excel, Tableau, MicroStrategy, and PowerBI;\n\u2022 REST API and JSON, and ability to parse that data and convert into relational models; and\n\nSalary: $92,352.00 to $95,000.00 per year\n\nPersonify Health is an equal opportunity organization and is committed to diversity, inclusion, equity, and social justice.\n\nWe strive to cultivate a work environment where differences are celebrated, and employees of all backgrounds are empowered to thrive. Personify Health is committed to driving Diversity, Equity, Inclusion and Belonging (DEIB) for all stakeholders: employees (at each organization level), members, clients and the communities in which we operate. Diversity is core to who we are and critical to our work in health and wellbeing.\n\nBeware of Hiring Scams: Personify Health will never ask for payment or sensitive personal information such as social security numbers during the hiring process. All official communication will come from a verified company email address. If you receive suspicious requests or communications, please report them to talent@personifyhealth.com. All of our legitimate openings can be found on the Personify Health Career Site.\n\nApplication Deadline: Open until position is filled.",
+  "Division": "Data Engineering",
+  "Confidence": 95,
+  "Reasoning": "The job description clearly states responsibilities related to data engineering tasks such as developing data pipelines, investigating data issues, and working with multiple data structures. These align with the typical functions of a Data Engineering division.",
+  "SourceLink": "https://www.google.com/search?ibp=htl;jobs\u0026q=Data\u002BEngineer\u0026htidocid=DZ_qVRxkw_P2yK8DAAAAAA%3D%3D\u0026hl=en-US\u0026shndl=37\u0026shmd=H4sIAAAAAAAA_xXEsQrCMBAAUFz7CQ5ymyDaiOBiV0XrovQHyrWcSSS9C7kb6g_43eIbXvVdVOszGsKFfWSiAm0LO7jLAEpYxgDCcBXxiZZNMMt6ck411V4NLY71KJMTpkFm95ZB__UasFBOaNQfjvu5zuw3qycVFY6vD9wIkwWIDB1NYrSFR_cDetaMm4kAAAA\u0026shmds=v1_AdeF8Kh6MbiI868rQBopD-_XQR9s4GeED1oP3lr0CzbBp5asfA\u0026source=sh/x/job/li/m1/1#fpstate=tldetail\u0026htivrt=jobs\u0026htiq=Data\u002BEngineer\u0026htidocid=DZ_qVRxkw_P2yK8DAAAAAA%3D%3D",
+  "SourceName": "Google Jobs",
+  "JobHighlights": [
+    {
+      "title": "Qualifications",
+      "items": [
+        "Bachelor\u2019s degree in Comp Sci, Comp Engr, Electronics Engr, IT, or related field, or foreign equivalent",
+        "Requires 2 years of relevant experience in data engineering",
+        "Must have skills via 2 years of experience in all of the following:",
+        "examining data and code for quality and accuracy;",
+        "modern relational and non-relational models;",
+        "writing complex SQL, including pivots, window functions, and date calculations;",
+        "Excel, Tableau, MicroStrategy, and PowerBI;",
+        "REST API and JSON, and ability to parse that data and convert into relational models; and"
+      ]
+    },
+    {
+      "title": "Benefits",
+      "items": [
+        "Salary: $92,352.00 to $95,000.00 per year"
+      ]
+    },
+    {
+      "title": "Responsibilities",
+      "items": [
+        "Data Engineer II sought by Personify Health for Providence, RI location",
+        "Summary: Perform development activities within a data engineering team and help guide, onboard, and train Data Engineer I",
+        "Develop data pipelines and enhancements and investigate and troubleshoot issues, working closely with account management, ETL, data warehouse, business intelligence, and reporting teams",
+        "Work with multiple data structures, including relational and non-relational models",
+        "Do documentation, tech ops, sprints, implementation, monitor, QA, and related tasks",
+        "Extracting, cleansing, and loading data",
+        "Building data pipelines using SQL, Kafka, and other technologies",
+        "Investigation and documentation of new data sets",
+        "Triage incoming bugs and incidents",
+        "Perform technical operation tasks",
+        "Investigate and troubleshoot issues with data and data pipelines",
+        "Participation in sprint refinement, planning, and kick-off to help estimate stories, raise awareness and additional implementation details",
+        "Help monitor areas of the data pipeline and raise awareness to team when issues arise",
+        "Performing and implementing new quality assurance rules to maintain consistent and accurate data"
+      ]
+    }
+  ],
+  "CreatedAt": "2025-07-27T23:33:09.5974014Z",
+  "UpdatedAt": "2025-07-27T23:33:09.5974015Z"
+}

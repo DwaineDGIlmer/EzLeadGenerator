@@ -1,0 +1,23 @@
+{
+  "Id": "e8dc399b-3793-4c5d-9b17-1bad7f6ceed3",
+  "CompanyId": "4a5cf30db97efcbad3b3e8c56e3d18553e3ba31c5947e994c9e0ce5f0b94aede",
+  "CompanyName": "Jobright.ai",
+  "HierarchyResults": {
+    "orghierarchy": [
+      {
+        "name": "Data Engineering Manager",
+        "title": "Manager, Data Engineering"
+      },
+      {
+        "name": "Director of Data Engineering",
+        "title": "Director, Data Engineering"
+      },
+      {
+        "name": "VP of Technology",
+        "title": "VP, Technology"
+      }
+    ]
+  },
+  "CreatedAt": "2025-07-27T23:33:15.0814048Z",
+  "UpdatedAt": "0001-01-01T00:00:00.0000000"
+}

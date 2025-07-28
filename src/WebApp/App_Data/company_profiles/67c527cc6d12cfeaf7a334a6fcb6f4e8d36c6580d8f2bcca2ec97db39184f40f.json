@@ -1,0 +1,23 @@
+{
+  "Id": "61d20a71-c809-4a70-b1e8-46216fabccfd",
+  "CompanyId": "67c527cc6d12cfeaf7a334a6fcb6f4e8d36c6580d8f2bcca2ec97db39184f40f",
+  "CompanyName": "Driven Brands Inc.",
+  "HierarchyResults": {
+    "orghierarchy": [
+      {
+        "name": "Danny Rivera",
+        "title": "Chief Executive Officer"
+      },
+      {
+        "name": "Director Data Services",
+        "title": "Director"
+      },
+      {
+        "name": "Jonathan Fitzpatrick",
+        "title": "CEO"
+      }
+    ]
+  },
+  "CreatedAt": "2025-07-27T23:33:17.4140914Z",
+  "UpdatedAt": "0001-01-01T00:00:00.0000000"
+}

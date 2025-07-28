@@ -1,0 +1,23 @@
+{
+  "Id": "cf0591f5-2209-4c30-b519-a0dd47634fdb",
+  "CompanyId": "2cae4ad6f0a943e1c02a005d204682864c05024fd4548570f3376af01e7de98f",
+  "CompanyName": "Personify Health",
+  "HierarchyResults": {
+    "orghierarchy": [
+      {
+        "name": "Amit Jain",
+        "title": "Chief Technology Officer"
+      },
+      {
+        "name": "Richard Boylan",
+        "title": "President \u0026 COO"
+      },
+      {
+        "name": "Scott Collison",
+        "title": "President \u0026 CEO"
+      }
+    ]
+  },
+  "CreatedAt": "2025-07-27T23:33:09.7055280Z",
+  "UpdatedAt": "0001-01-01T00:00:00.0000000"
+}

@@ -1,0 +1,59 @@
+{
+  "Id": "9eb2ed41-2584-403e-a49d-339392f97fd1",
+  "PostedDate": "2025-07-27T23:33:02.7868976Z",
+  "JobId": "eyJqb2JfdGl0bGUiOiJTZW5pb3IgRGF0YSBFbmdpbmVlciIsImNvbXBhbnlfbmFtZSI6IkRyaXZlbiBCcmFuZHMgSW5jLiIsImFkZHJlc3NfY2l0eSI6Ik9hayBHcm92ZSwgTkMiLCJodGlkb2NpZCI6Im05R3JoLVpiR0xydGhCY0pBQUFBQUE9PSIsInV1bGUiOiJ3K0NBSVFJQ0lhUTJoaGNteHZkSFJsTEU1RExGVnVhWFJsWkNCVGRHRjBaWE0iLCJobCI6ImVuIn0=",
+  "CompanyId": "Driven Brands Inc",
+  "CompanyName": "Driven Brands Inc.",
+  "HiringAgency": "LinkedIn",
+  "JobTitle": "Senior Data Engineer",
+  "Location": "Oak Grove, NC",
+  "JobDescription": "Company:Driven Brands\n\nDriven Brands\u2122, headquartered in Charlotte, NC, is the largest automotive services company in North America, providing a range of consumer and commercial automotive services, including paint, collision, glass, vehicle repair, oil change, maintenance, and car wash. Driven Brands is the parent company of some of North America\u2019s leading automotive service businesses including Take 5 Oil Change\u00AE, Meineke Car Care Centers\u00AE, Maaco\u00AE, 1-800-Radiator \u0026 A/C\u00AE, Auto Glass Now\u00AE, and CARSTAR\u00AE. Driven Brands has approximately 4,800 locations across the United States and 13 other countries, and services tens of millions of vehicles annually.\n\nJob Description\n\nSenior Data Engineer\n\nLocation: Remote\n\nReports To: Director Data Services\n\nEmployment Type: Full-Time\n\nAbout The Role\n\nWe are seeking a highly skilled and experienced Data Engineer to join our growing data team. In this role, you will be responsible for designing, building, and maintaining scalable data pipelines and models that support our analytics, AI, and business intelligence initiatives. You will work closely with stakeholders to ensure data is accessible, reliable, and optimized for performance.\n\nKey Responsibilities\n\u2022 Design, develop, and maintain robust, scalable, and efficient data pipelines using modern data engineering tools and frameworks.\n\u2022 Architect and implement data models and semantic layers for use by analytics teams\n\u2022 Collaborate with cross-functional teams to understand data requirements and deliver high-quality data solutions.\n\u2022 Optimize data systems for performance, scalability, and cost-efficiency.\n\u2022 Ensure data quality, integrity, and security across all data platforms.\n\u2022 Mentor junior data engineers and contribute to best practices and coding standards.\n\u2022 Monitor and troubleshoot data pipeline issues and implement proactive solutions.\n\u2022 Design and implement effective monitoring capabilities across pipelines and models.\n\u2022 Stay current with emerging technologies and industry trends in data engineering.\n\nRequired Qualifications\n\u2022 Bachelor\u2019s or Master\u2019s degree in Computer Science, Engineering, or a related field.\n\u2022 5\u002B years of experience in data engineering or a similar role.\n\u2022 Proficiency in programming languages such as Python or Java.\n\u2022 Strong experience with SQL and relational databases.\n\u2022 Experience with cloud platforms (e.g., GCP, AWS) and data services (e.g., BigQuery, Snowflake).\n\u2022 Familiarity with data orchestration tools (e.g., Airflow, Composer, DataForm).\n\u2022 Solid understanding of data modeling, ETL/ELT processes, and data warehousing concepts.\n\nPreferred Qualifications\n\u2022 Experience within the Google Big Query environment\n\u2022 Knowledge of CI/CD pipelines and DevOps practices.\n\u2022 Excellent problem-solving skills and attention to detail.\n\u2022 Strong communication and collaboration abilities.\n\n#DBCORP\n\n#REMOTE\n\nPosition Location:\n\nNorth Carolina\n\nCompensation Range\n\n$7.25 - $200,800.00\n\nCompensation Frequency\n\nAnnual\n\nBase pay offered may vary depending on actual location, job-related knowledge, skills, and experience. Supplemental pay types may include commissions or bonus incentives, depending on the role. Driven Brands offers a variety of health and wellness benefits including paid time off and holiday pay. Details regarding our benefits can be found here: https://www.drivenbrandsbenefits.com",
+  "Division": "Data Services",
+  "Confidence": 95,
+  "Reasoning": "The job description specifies that the Senior Data Engineer reports to the Director of Data Services, indicating that the role is part of the Data Services division. The tasks and responsibilities related to data engineering, analytics, and AI support this alignment.",
+  "SourceLink": "https://www.google.com/search?ibp=htl;jobs\u0026q=Data\u002BEngineer\u0026htidocid=m9Grh-ZbGLrthBcJAAAAAA%3D%3D\u0026hl=en-US\u0026shndl=37\u0026shmd=H4sIAAAAAAAA_xXEOwrCQBAAUGxzBKsBOz-7ItiYTiNBCy08QJisw2Y1zoSZJeQWXll8xSu-s2L1IE6iUGFGOHNMTKSwgau0YIQaOhCGWiT2NC-7nAc7eG_Wu2gZcwouyMcLUyuTf0lr_xrrUGnoMVOz228nN3BcLipNIzEcFflpcOHgIDHc8Q21ykhruJ1-HX6P7JIAAAA\u0026shmds=v1_AdeF8KhKSKTQAn25HcrTSVC7d0KQh6d-WZRBM8qydoqNEHgIdg\u0026source=sh/x/job/li/m1/1#fpstate=tldetail\u0026htivrt=jobs\u0026htiq=Data\u002BEngineer\u0026htidocid=m9Grh-ZbGLrthBcJAAAAAA%3D%3D",
+  "SourceName": "Google Jobs",
+  "JobHighlights": [
+    {
+      "title": "Qualifications",
+      "items": [
+        "Bachelor\u2019s or Master\u2019s degree in Computer Science, Engineering, or a related field",
+        "5\u002B years of experience in data engineering or a similar role",
+        "Proficiency in programming languages such as Python or Java",
+        "Strong experience with SQL and relational databases",
+        "Experience with cloud platforms (e.g., GCP, AWS) and data services (e.g., BigQuery, Snowflake)",
+        "Familiarity with data orchestration tools (e.g., Airflow, Composer, DataForm)",
+        "Solid understanding of data modeling, ETL/ELT processes, and data warehousing concepts"
+      ]
+    },
+    {
+      "title": "Benefits",
+      "items": [
+        "$7.25 - $200,800.00",
+        "Compensation Frequency",
+        "Annual",
+        "Base pay offered may vary depending on actual location, job-related knowledge, skills, and experience",
+        "Supplemental pay types may include commissions or bonus incentives, depending on the role",
+        "Driven Brands offers a variety of health and wellness benefits including paid time off and holiday pay"
+      ]
+    },
+    {
+      "title": "Responsibilities",
+      "items": [
+        "In this role, you will be responsible for designing, building, and maintaining scalable data pipelines and models that support our analytics, AI, and business intelligence initiatives",
+        "You will work closely with stakeholders to ensure data is accessible, reliable, and optimized for performance",
+        "Design, develop, and maintain robust, scalable, and efficient data pipelines using modern data engineering tools and frameworks",
+        "Architect and implement data models and semantic layers for use by analytics teams",
+        "Collaborate with cross-functional teams to understand data requirements and deliver high-quality data solutions",
+        "Optimize data systems for performance, scalability, and cost-efficiency",
+        "Ensure data quality, integrity, and security across all data platforms",
+        "Mentor junior data engineers and contribute to best practices and coding standards",
+        "Monitor and troubleshoot data pipeline issues and implement proactive solutions",
+        "Design and implement effective monitoring capabilities across pipelines and models",
+        "Stay current with emerging technologies and industry trends in data engineering"
+      ]
+    }
+  ],
+  "CreatedAt": "2025-07-27T23:33:02.7868983Z",
+  "UpdatedAt": "2025-07-27T23:33:02.7868983Z"
+}

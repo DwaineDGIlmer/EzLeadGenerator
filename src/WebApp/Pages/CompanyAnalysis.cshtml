@@ -1,0 +1,43 @@
+﻿@page
+@model WebApp.Pages.CompanyAnalysisPage
+@{
+    ViewData["Company Summaries"] = "Company Summaries";
+}
+
+@if (Model.CompanySummaries == null)
+{
+    <div class="alert alert-danger">Company summaries is null.</div>
+}
+else if (!Model.CompanySummaries.Any())
+{
+    <div class="alert alert-info">No recent company information found.</div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var company in Model.CompanySummaries)
+        {
+            <div class="list-group-item">
+                <h3>CompanyName: @company.CompanyName</h3>
+                <h4>Possible Contacts</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var division in company.HierarchyResults.OrgHierarchy)
+                        {
+                            <tr>
+                                <td>@division.Title</td>
+                                <td>@division.Name</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+}

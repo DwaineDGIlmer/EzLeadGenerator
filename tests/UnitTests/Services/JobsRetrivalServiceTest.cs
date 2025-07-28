@@ -1,0 +1,52 @@
+using Application.Models;
+using Application.Services;
+using Core.Caching;
+using Core.Configuration;
+using Core.Contracts;
+using Core.Extensions;
+using Core.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
+using System.Net;
+using System.Text;
+using System.Text.Json;
+
+namespace UnitTests.Services;
+
+public class JobsRetrivalServiceTest : UnitTestsBase
+{
+    private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
+    private readonly Mock<ICacheService> _cacheServiceMock;
+    private readonly Mock<ILogger<SerpApiSearchJobsService>> _loggerMock;
+    private readonly IOptions<SerpApiSettings> _options;
+    private readonly SerpApiSearchJobsService _service;
+
+    public JobsRetrivalServiceTest()
+    {
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        _cacheServiceMock = new Mock<ICacheService>();
+        _loggerMock = new Mock<ILogger<SerpApiSearchJobsService>>();
+        _options = Options.Create(new SerpApiSettings
+        {
+            ApiKey = "test-api-key",
+            HttpClientName = "test-client",
+            Endpoint = "https://api.example.com/search"
+        });
+
+        _service = new SerpApiSearchJobsService(_options, _cacheServiceMock.Object, _httpClientFactoryMock.Object, _loggerMock.Object);
+    }
+
+    [Fact]
+    public void Constructor_ThrowsIfArgumentsAreNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new SerpApiSearchJobsService(null!, _cacheServiceMock.Object, _httpClientFactoryMock.Object, _loggerMock.Object));
+        Assert.Throws<ArgumentNullException>(() =>
+            new SerpApiSearchJobsService(_options, null!, _httpClientFactoryMock.Object, _loggerMock.Object));
+        Assert.Throws<ArgumentNullException>(() =>
+            new SerpApiSearchJobsService(_options, _cacheServiceMock.Object, null!, _loggerMock.Object));
+        Assert.Throws<ArgumentNullException>(() =>
+            new SerpApiSearchJobsService(_options, _cacheServiceMock.Object, _httpClientFactoryMock.Object, null!));
+    }
+}

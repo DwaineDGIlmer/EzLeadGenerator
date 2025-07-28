@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>AIEventing.snk</AssemblyOriginatorKeyFile>
+		<Authors>dwaine.gilmer@protonmail.com</Authors>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Title>Application: The application layer for supporting a clean architecture foundation.</Title>
+		<Description>Used to provide Leads for companies with job openings.</Description>
+		<Copyright>Copyright © 2025 Dwain Gilmer - All rights reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/DwaineDGIlmer/AIEventing</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/DwaineDGIlmer/AIEventing</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>logging</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Core" Version="1.0.2" />
+	  <PackageReference Include="Loggers" Version="1.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+</Project>
