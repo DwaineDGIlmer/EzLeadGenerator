@@ -1,4 +1,5 @@
-﻿using Core.Helpers;
+﻿using Application.Extensions;
+using Core.Helpers;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.Models;
@@ -116,7 +117,7 @@ public class JobSummary
     public JobSummary(JobResult jobResult)
     {
         CompanyName = jobResult.CompanyName;
-        CompanyId = FileSystemHelpers.SanitizeForFileSystem(jobResult.CompanyName);
+        CompanyId = jobResult.CompanyName.FileSystemName();
         JobTitle = jobResult.Title;
         Location = jobResult.Location;
         JobDescription = jobResult.Description;

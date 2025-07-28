@@ -48,6 +48,31 @@
         public const string JobsSourceName = "JobsSource";
 
         /// <summary>
+        /// Represents the name of the Azure Table used for storing application data.
+        /// </summary>
+        public const string AzureTableName = "appdata";
+
+        /// <summary>
+        /// Represents the name of the table used to store job summaries in the database.
+        /// </summary>
+        public const string JobSummaryTableName = "jobsummaries";
+
+        /// <summary>
+        /// Represents the name of the table used to store company profiles in the database.
+        /// </summary>
+        public const string CompanyProfileTableName = "companyprofiles";
+
+        /// <summary>
+        /// Represents the partition key used for storing company profile data.
+        /// </summary>
+        public const string CompanyProfilePartionKey = "companyprofile";
+
+        /// <summary>
+        /// Represents the partition key used for job summary entries in a data store.
+        /// </summary>
+        public const string JobSummaryPartionKey = "jobsummary";
+
+        /// <summary>
         /// Represents the configuration key for EzLeads settings.
         /// </summary>
         /// <remarks>This constant can be used to reference the EzLeads settings key in configuration

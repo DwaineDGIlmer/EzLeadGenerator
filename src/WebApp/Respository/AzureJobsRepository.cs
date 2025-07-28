@@ -1,8 +1,12 @@
-﻿using Application.Contracts;
+﻿using Application.Configurations;
+using Application.Constants;
+using Application.Contracts;
 using Application.Models;
 using Azure;
 using Azure.Data.Tables;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace WebApp.Respository;
 
@@ -14,9 +18,14 @@ namespace WebApp.Respository;
 /// client, blob container client, and logger.
 /// </remarks>
 /// <param name="tableClient">The <see cref="TableClient"/> used to interact with the Azure Table storage.</param>
+/// <param name="options">Configuration settings for Azure services, including connection strings and other relevant settings.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
-public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepository> logger) : IJobsRepository
+public class AzureJobsRepository(
+    TableClient tableClient, 
+    IOptions<AzureSettings> options,
+    ILogger<AzureJobsRepository> logger) : IJobsRepository
 {
+    private readonly string _partionKey =  options?.Value.JobSummaryPartionKey ?? Defaults.JobSummaryPartionKey;
     private readonly TableClient _tableClient = tableClient ?? throw new ArgumentNullException(nameof(tableClient));
     private readonly ILogger<AzureJobsRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly JsonSerializerOptions _options = new()
@@ -40,7 +49,7 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
         try
         {
             _logger.LogDebug("Retrieving job for {JobId}", jobId);
-            var response = await _tableClient.GetEntityAsync<TableEntity>("job", jobId);
+            var response = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, jobId);
             var json = response.Value.GetString("Data");
 
             if (string.IsNullOrEmpty(json))
@@ -52,7 +61,7 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
         catch (RequestFailedException ex) when (ex.Status == 404)
         {
             _logger.LogWarning("Job not found for {JobId}", jobId);
-            throw new InvalidOperationException($"Job not found for ID: {jobId}", ex);
+            return null;
         }
         catch (RequestFailedException ex)
         {
@@ -72,7 +81,7 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
     {
         _logger.LogDebug("Retrieving jobs posted since {FromDate}", fromDate);
 
-        var queryResults = _tableClient.QueryAsync<TableEntity>(filter: "PartitionKey eq 'job'");
+        var queryResults = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partionKey}'");
         var jobs = new List<JobSummary>();
 
         await foreach (var entity in queryResults)
@@ -93,8 +102,6 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
                 _logger.LogError(ex, "Failed to parse job from Azure Table for entity with RowKey: {RowKey}", entity.RowKey);
             }
         }
-
-        // Fix: Actually return the sorted list
         return [.. jobs.OrderByDescending(j => j.PostedDate)];
     }
 
@@ -115,11 +122,20 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
         {
             _logger.LogDebug("Adding job for {JobId}", job.JobId);
 
-            var entity = new TableEntity("job", job.JobId)
+            var entity = new TableEntity(_partionKey, job.JobId)
             {
                 {"Data", JsonSerializer.Serialize(job, _options)},
+                {"Id", job.Id ?? string.Empty},
                 {"JobTitle", job.JobTitle ?? string.Empty},
                 {"CompanyId", job.CompanyId ?? string.Empty},
+                {"CompanyName", job.CompanyName ?? string.Empty},
+                {"HiringAgency", job.HiringAgency ?? string.Empty},
+                {"Location", job.Location ?? string.Empty},
+                {"Division", job.Division ?? string.Empty},
+                {"Confidence", job.Confidence},
+                {"Reasoning", job.Reasoning ?? string.Empty},
+                {"SourceLink", job.SourceLink ?? string.Empty},
+                {"SourceName", job.SourceName ?? string.Empty},
                 {"PostedDate", job.PostedDate.ToString("o")},
                 {"UpdatedAt", DateTime.UtcNow.ToString("o")},
                 {"CreatedAt", DateTime.UtcNow.ToString("o")}
@@ -152,11 +168,20 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
         {
             _logger.LogDebug("Updating job for {JobId}", job.JobId);
 
-            var entity = new TableEntity("job", job.JobId)
+            var entity = new TableEntity(_partionKey, job.JobId)
             {
                 {"Data", JsonSerializer.Serialize(job, _options)},
+                {"Id", job.Id ?? string.Empty},
                 {"JobTitle", job.JobTitle ?? string.Empty},
                 {"CompanyId", job.CompanyId ?? string.Empty},
+                {"CompanyName", job.CompanyName ?? string.Empty},
+                {"HiringAgency", job.HiringAgency ?? string.Empty},
+                {"Location", job.Location ?? string.Empty},
+                {"Division", job.Division ?? string.Empty},
+                {"Confidence", job.Confidence},
+                {"Reasoning", job.Reasoning ?? string.Empty},
+                {"SourceLink", job.SourceLink ?? string.Empty},
+                {"SourceName", job.SourceName ?? string.Empty},
                 {"PostedDate", job.PostedDate.ToString("o")},
                 {"UpdatedAt", DateTime.UtcNow.ToString("o")}
             };
@@ -164,7 +189,7 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
             // Get the existing entity to preserve CreatedAt
             try
             {
-                var existing = await _tableClient.GetEntityAsync<TableEntity>("job", job.JobId);
+                var existing = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, job.JobId);
                 entity["CreatedAt"] = existing.Value.GetString("CreatedAt") ?? DateTime.UtcNow.ToString("o");
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
@@ -205,7 +230,7 @@ public class AzureJobsRepository(TableClient tableClient, ILogger<AzureJobsRepos
         {
             _logger.LogDebug("Deleting job for {JobId}", job.JobId);
 
-            await _tableClient.DeleteEntityAsync("job", job.JobId, ETag.All);
+            await _tableClient.DeleteEntityAsync(_partionKey, job.JobId, ETag.All);
             _logger.LogInformation("Successfully deleted job for {JobId}", job.JobId);
         }
         catch (RequestFailedException ex) when (ex.Status == 404)

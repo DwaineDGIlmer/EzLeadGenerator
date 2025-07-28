@@ -37,7 +37,7 @@ public class CompanyProfile
     /// <summary>
     /// Timestamp of the most recent job data pull or analysis for this company.
     /// </summary>
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CompanyProfile"/> class.

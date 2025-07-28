@@ -1,13 +1,15 @@
-﻿using Application.Contracts;
+﻿using Application.Configurations;
+using Application.Constants;
+using Application.Contracts;
 using Application.Models;
 using Application.Services;
 using Core.Caching;
 using Core.Configuration;
-using Core.Constants;
 using Core.Contracts;
 using Core.Extensions;
 using Core.Services;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using WebApp.Respository;
 
@@ -23,10 +25,16 @@ namespace WebApp.Extensions
         /// Adds a local company profile store to the service collection.
         /// </summary>
         /// <param name="services">The service collection to add the store to.</param>
+        /// <param name="configuration">Configuration settings for the application, used to retrieve Azure settings and connection strings.</param>
         /// <returns>The updated service collection.</returns>
         public static IServiceCollection AddCompanyProfileStore(
-            this IServiceCollection services)
+            this IServiceCollection services, 
+            IConfiguration configuration)
         {
+            var settingsSection = configuration.GetSection(nameof(AzureSettings));
+            var settings = new AzureSettings();
+            settingsSection.Bind(settings);
+            services.Configure<AzureSettings>(configuration.GetSection(nameof(AzureSettings)));
 
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
             if (!env.Equals("Production"))
@@ -42,7 +50,17 @@ namespace WebApp.Extensions
             }
             else
             {
-                services.AddSingleton<ICompanyRepository, AzureCompanyRepository>();
+                services.AddSingleton<ICompanyRepository>(sp =>
+                {
+                    var logger = sp.GetRequiredService<ILogger<AzureCompanyRepository>>();
+                    var options = sp.GetRequiredService<IOptions<AzureSettings>>();
+                    var connectionString = configuration.GetConnectionString("AzureTableStorage");
+                    var tableName = string.IsNullOrEmpty(settings.CompanyProfileTableName) ?
+                    Defaults.CompanyProfileTableName : settings.CompanyProfileTableName;
+                    var tabl = new Azure.Data.Tables.TableClient(connectionString, tableName);
+
+                    return new AzureCompanyRepository(tabl, options, logger);
+                });
             }
             return services;
         }
@@ -53,10 +71,15 @@ namespace WebApp.Extensions
         /// <remarks>In non-production environments, a local jobs repository store is added. In
         /// production, an Azure company repository is used.</remarks>
         /// <param name="services">The service collection to which the jobs profile store will be added.</param>
+        /// <param name="configuration">Configuration settings for the application, used to retrieve Azure settings and connection strings.</param>
         /// <returns>The updated service collection with the jobs profile store configured.</returns>
         public static IServiceCollection AddJobsProfileStore(
-           this IServiceCollection services)
+           this IServiceCollection services, IConfiguration configuration)
         {
+            var settingsSection = configuration.GetSection(nameof(AzureSettings));
+            var settings = new AzureSettings();
+            settingsSection.Bind(settings);
+            services.Configure<AzureSettings>(configuration.GetSection(nameof(AzureSettings)));
 
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
             if (!env.Equals("Production"))
@@ -72,7 +95,16 @@ namespace WebApp.Extensions
             }
             else
             {
-                services.AddSingleton<IJobsRepository, AzureJobsRepository>();
+                services.AddSingleton<IJobsRepository>(sp =>
+                {
+                    var logger = sp.GetRequiredService<ILogger<AzureJobsRepository>>();
+                    var options = sp.GetRequiredService<IOptions<AzureSettings>>();
+                    var connectionString = configuration.GetConnectionString("AzureTableStorage");
+                    var tableName = string.IsNullOrEmpty(settings.JobSummaryTableName) ?
+                    Defaults.JobSummaryTableName : settings.JobSummaryTableName;
+                    var tbl = new Azure.Data.Tables.TableClient(connectionString, tableName);
+                    return new AzureJobsRepository(tbl, options, logger);
+                });
             }
             return services;
         }
@@ -100,7 +132,7 @@ namespace WebApp.Extensions
                 // Apply environment variable and default overrides
                 if (options.IsEnabled)
                 {
-                    options.BaseAddress = string.IsNullOrEmpty(options.BaseAddress) ? Defaults.SerpApiBaseAddress : options.BaseAddress;
+                    options.BaseAddress = string.IsNullOrEmpty(options.BaseAddress) ? Core.Constants.Defaults.SerpApiBaseAddress : options.BaseAddress;
                     options.Endpoint = string.IsNullOrEmpty(options.BaseAddress) ? Defaults.SearchEndpoint : options.Endpoint;
                     options.ApiKey = Environment.GetEnvironmentVariable("SEARCH_SERPAPI_API_KEY") ?? options.ApiKey ?? string.Empty;
                 }

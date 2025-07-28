@@ -19,6 +19,8 @@
 	  <PackageTags>logging</PackageTags>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	  <UserSecretsId>9fed5ab1-ca9a-48ca-ba98-02198f96fcb1</UserSecretsId>
+	  <Version>1.2.4</Version>
   </PropertyGroup>
 	
 	<ItemGroup>
@@ -46,6 +48,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

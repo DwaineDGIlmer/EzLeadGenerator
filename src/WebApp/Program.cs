@@ -8,8 +8,8 @@ builder.Services.InitializeServices(builder.Configuration);
 builder.Services.AddResilientHttpClient(builder.Configuration, nameof(EzLeadGenerator));
 builder.Services.AddJobsRetrivalService(builder.Configuration);
 builder.Services.AddCacheService(builder.Configuration);
-builder.Services.AddCompanyProfileStore();
-builder.Services.AddJobsProfileStore();
+builder.Services.AddCompanyProfileStore(builder.Configuration);
+builder.Services.AddJobsProfileStore(builder.Configuration);
 builder.Services.AddDisplayRepository();
 builder.Services.AddJobSourceService();
 builder.Services.AddSearchService();
@@ -36,6 +36,6 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-//app.UseJobSourceService();
+app.UseJobSourceService();
 
 app.Run();

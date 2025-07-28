@@ -1,16 +1,9 @@
-using Application.Models;
 using Application.Services;
-using Core.Caching;
 using Core.Configuration;
 using Core.Contracts;
-using Core.Extensions;
-using Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Net;
-using System.Text;
-using System.Text.Json;
 
 namespace UnitTests.Services;
 

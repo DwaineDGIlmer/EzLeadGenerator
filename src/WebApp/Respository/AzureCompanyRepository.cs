@@ -1,7 +1,10 @@
-﻿using Application.Contracts;
+﻿using Application.Configurations;
+using Application.Constants;
+using Application.Contracts;
 using Application.Models;
 using Azure;
 using Azure.Data.Tables;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace WebApp.Respository;
@@ -14,9 +17,11 @@ namespace WebApp.Respository;
 /// client, blob container client, and logger.
 /// </remarks>
 /// <param name="tableClient">The <see cref="TableClient"/> used to interact with the Azure Table storage.</param>
+/// <param name="options">Configuration options for Azure settings, including the table name.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
-public class AzureCompanyRepository(TableClient tableClient, ILogger<AzureCompanyRepository> logger) : ICompanyRepository
+public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSettings> options, ILogger<AzureCompanyRepository> logger) : ICompanyRepository
 {
+    private readonly string _partionKey = options?.Value?.CompanyProfilePartionKey ?? Defaults.CompanyProfilePartionKey;
     private readonly TableClient _tableClient = tableClient ?? throw new ArgumentNullException(nameof(tableClient));
     private readonly ILogger<AzureCompanyRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly JsonSerializerOptions _options = new()
@@ -27,36 +32,39 @@ public class AzureCompanyRepository(TableClient tableClient, ILogger<AzureCompan
     /// <summary>
     /// Asynchronously retrieves the company profile for the specified company ID.
     /// </summary>
-    /// <param name="CompanyName">The unique identifier of the company whose profile is to be retrieved. Cannot be null or empty.</param>
+    /// <param name="CompanyId">The unique identifier of the company whose profile is to be retrieved. Cannot be null or empty.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="CompanyProfile"/>
     /// of the specified company.</returns>
-    /// <exception cref="ArgumentException">Thrown when CompanyName is null or empty.</exception>
+    /// <exception cref="ArgumentException">Thrown when CompanyId is null or empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the deserialized profile is null.</exception>
-    public async Task<CompanyProfile?> GetCompanyProfileAsync(string CompanyName)
+    public async Task<CompanyProfile?> GetCompanyProfileAsync(string CompanyId)
     {
-        if (string.IsNullOrWhiteSpace(CompanyName))
-            throw new ArgumentException("Company ID cannot be null or empty.", nameof(CompanyName));
+        if (string.IsNullOrWhiteSpace(CompanyId))
+            throw new ArgumentException("Company ID cannot be null or empty.", nameof(CompanyId));
 
         try
         {
-            _logger.LogDebug("Retrieving company profile for {CompanyName}", CompanyName);
-            var response = await _tableClient.GetEntityAsync<TableEntity>("profile", CompanyName);
+            _logger.LogDebug("Retrieving company profile for {CompanyId}", CompanyId);
+            var response = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, CompanyId);
             var json = response.Value.GetString("Data");
 
             if (string.IsNullOrEmpty(json))
-                throw new InvalidOperationException($"No data found for company name: {CompanyName}");
+            {
+                _logger.LogInformation("No data found for company name: {CompanyId}", CompanyId);
+                return null;
+            }
 
             var profile = JsonSerializer.Deserialize<CompanyProfile>(json, _options);
             return profile ?? null;
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
         {
-            _logger.LogWarning("Company profile not found for {CompanyName}", CompanyName);
-            throw new InvalidOperationException($"Company profile not found for name: {CompanyName}", ex);
+            _logger.LogInformation("Company profile not found for {CompanyId}", CompanyId);
+            return null;
         }
         catch (RequestFailedException ex)
         {
-            _logger.LogError(ex, "Error retrieving profile for {CompanyName}", CompanyName);
+            _logger.LogError(ex, "Error retrieving profile for {CompanyId}", CompanyId);
             throw;
         }
     }
@@ -71,7 +79,7 @@ public class AzureCompanyRepository(TableClient tableClient, ILogger<AzureCompan
     {
         _logger.LogDebug("Retrieving company profiles updated since {FromDate}", fromDate);
 
-        var queryResults = _tableClient.QueryAsync<TableEntity>(filter: "PartitionKey eq 'profile'");
+        var queryResults = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partionKey}'");
         var companies = new List<CompanyProfile>();
 
         await foreach (var entity in queryResults)
@@ -113,12 +121,15 @@ public class AzureCompanyRepository(TableClient tableClient, ILogger<AzureCompan
         {
             _logger.LogDebug("Adding company profile for {CompanyId}", profile.CompanyId);
 
-            var entity = new TableEntity("profile", profile.CompanyId)
+            var entity = new TableEntity(_partionKey, profile.CompanyId)
             {
                 {"Data", JsonSerializer.Serialize(profile, _options)},
+                {"Id", profile.Id ?? string.Empty},
+                {"CompanyId", profile.CompanyId ?? string.Empty},
                 {"CompanyName", profile.CompanyName ?? string.Empty},
-                {"UpdatedAt", profile.UpdatedAt.ToString("o")},
-                {"CreatedAt", profile.CreatedAt.ToString("o")}
+                {"HierarchyResults", JsonSerializer.Serialize(profile.HierarchyResults, _options)},
+                {"CreatedAt", profile.CreatedAt.ToString("o")},
+                {"UpdatedAt", profile.UpdatedAt.ToString("o")}
             };
 
             await _tableClient.UpsertEntityAsync(entity);
@@ -150,10 +161,10 @@ public class AzureCompanyRepository(TableClient tableClient, ILogger<AzureCompan
             // Update the UpdatedAt timestamp
             profile.UpdatedAt = DateTime.UtcNow;
 
-            var entity = new TableEntity("profile", profile.CompanyId)
+            var entity = new TableEntity(_partionKey, profile.CompanyId)
             {
                 {"Data", JsonSerializer.Serialize(profile, _options)},
-                {"CompanyName", profile.CompanyName ?? string.Empty},
+                {"CompanyId", profile.CompanyName ?? string.Empty},
                 {"UpdatedAt", profile.UpdatedAt.ToString("o")},
                 {"CreatedAt", profile.CreatedAt.ToString("o")}
             };
@@ -189,7 +200,7 @@ public class AzureCompanyRepository(TableClient tableClient, ILogger<AzureCompan
         {
             _logger.LogDebug("Deleting company profile for {CompanyId}", profile.CompanyId);
 
-            await _tableClient.DeleteEntityAsync("profile", profile.CompanyId, ETag.All);
+            await _tableClient.DeleteEntityAsync(_partionKey, profile.CompanyId, ETag.All);
             _logger.LogInformation("Successfully deleted company profile for {CompanyId}", profile.CompanyId);
         }
         catch (RequestFailedException ex) when (ex.Status == 404)

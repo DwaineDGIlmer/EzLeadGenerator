@@ -120,6 +120,13 @@ public class SearpApiSourceService : IJobSourceService
                 string sanitizedJson = string.Empty;
                 _logger.LogInformation("Processing hierarchy response for company: {CompanyName}", job.CompanyName);
 
+                var companyProfile = await _companyRepository.GetCompanyProfileAsync(job.CompanyId);
+                if (companyProfile is not null)
+                {
+                    _logger.LogInformation("Company profile already exists for company: {CompanyName}", job.CompanyName);
+                    continue;
+                }
+
                 var prompt = $"{job.CompanyName} official site";
                 var googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
                 if (googleResults is null || !googleResults.Any())
@@ -142,7 +149,7 @@ public class SearpApiSourceService : IJobSourceService
                 {
                     prompt = $"{job.CompanyName.Replace(" ", string.Empty).ToLower()} organizational structure leadership team";
                 }
-                
+
                 googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
                 if (googleResults is null || !googleResults.Any())
                 {
@@ -161,11 +168,6 @@ public class SearpApiSourceService : IJobSourceService
                 {
                     try
                     {
-                        var companyProfile = await _companyRepository.GetCompanyProfileAsync(job.CompanyName);
-                        if (companyProfile is not null)
-                        {
-                            await _companyRepository.DeleteCompanyProfileAsync(companyProfile);
-                        }
                         await _companyRepository.AddCompanyProfileAsync(new CompanyProfile(job, clientResult));
                     }
                     catch (JsonException jsonEx)
@@ -185,12 +187,6 @@ public class SearpApiSourceService : IJobSourceService
 
         var results = await _companyRepository.GetCompanyProfileAsync(timeStamp);
         return jobs.Count() == results.Count();
-    }
-
-    private static bool IsValidLink(string link)
-    {
-        // Check if the link ends with any invalid extension
-        return _validExtensions.Any(ext => link.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
     }
 
     private async Task<HierarchyResults?> GetSearchResults(JobSummary job, string organicResults)
@@ -261,6 +257,12 @@ public class SearpApiSourceService : IJobSourceService
         {
             try
             {
+                if(_jobsRepository.GetJobsAsync(job.JobId).Result is not null)
+                {
+                    _logger.LogInformation("Job with ID {JobId} already exists, skipping.", job.JobId);
+                    continue;
+                }
+
                 var prompt = Prompts.DivisionMessage.Replace("{CompanyName}", job.CompanyName).Replace("{Description}", job.Description);
                 var divisionResults = await _aiChatService.GetChatCompletion<DivisionInference>(Prompts.DivisionSystem, prompt);
                 var summary = new JobSummary(job)

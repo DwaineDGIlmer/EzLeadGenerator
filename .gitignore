@@ -22,3 +22,5 @@ obj/
 # Ignore other files
 *.DS_Store
 Thumbs.db
+secrets.json
+.env

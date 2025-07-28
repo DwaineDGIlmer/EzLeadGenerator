@@ -90,7 +90,7 @@ public class SerpApiSearchService : ISearch<OrganicResult>
     /// object with the search results, or <see langword="null"/> if no results are found or if an error occurs.</returns>
     public async Task<IEnumerable<OrganicResult>?> FetchOrganicResults(string query, string location = "United States")
     {
-        var cacheKey = CachingHelper.GenCacheKey(nameof(SerpApiSearchService),query, location.GenHashString());
+        var cacheKey = CachingHelper.GenCacheKey(nameof(SerpApiSearchService), query, location.GenHashString());
 
         // Try to get cached search first
         var cachedSearch = await GetCachedOrganicSearchResults(cacheKey);
