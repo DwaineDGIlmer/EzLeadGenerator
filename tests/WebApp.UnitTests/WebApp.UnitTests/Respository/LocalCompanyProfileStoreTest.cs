@@ -13,11 +13,6 @@ namespace WebApp.UnitTests.Respository;
 public class LocalCompanyProfileStoreTest
 {
     private readonly string _testDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-    private readonly JsonSerializerOptions _options = new()
-    {
-        IncludeFields = true,
-        Converters = { new JsonStringEnumConverter(), new DateTimeConverter() }
-    };
 
     private LocalCompanyProfileStore CreateStore(out Mock<ILogger<LocalCompanyProfileStore>> loggerMock)
     {
@@ -117,8 +112,8 @@ public class LocalCompanyProfileStoreTest
 
         await store.DeleteCompanyProfileAsync(profile);
 
-        string path = Path.Combine(_testDirectory, $"{profile.CompanyId}.json");
-        Assert.False(File.Exists(path));
+        var result = await store.GetCompanyProfileAsync(profile.CompanyName);
+        Assert.Null(result);
     }
 
     [Fact]

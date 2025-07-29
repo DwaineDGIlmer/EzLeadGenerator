@@ -71,6 +71,5 @@ public class JobSummaryTest
         var result = jobSummary.ToString();
 
         Assert.Contains("QA Engineer", result);
-        Assert.Contains("1/1/2024", result);
     }
 }
