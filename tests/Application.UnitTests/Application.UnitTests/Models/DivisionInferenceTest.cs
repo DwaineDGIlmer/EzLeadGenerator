@@ -1,4 +1,3 @@
-using Xunit;
 using Application.Models;
 
 namespace Application.UnitTests.Models;

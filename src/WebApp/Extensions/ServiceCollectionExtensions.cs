@@ -1,5 +1,4 @@
 ﻿using Application.Configurations;
-using Application.Constants;
 using Application.Contracts;
 using Application.Models;
 using Application.Services;
@@ -10,7 +9,6 @@ using Core.Contracts;
 using Core.Extensions;
 using Core.Services;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using WebApp.Respository;
 

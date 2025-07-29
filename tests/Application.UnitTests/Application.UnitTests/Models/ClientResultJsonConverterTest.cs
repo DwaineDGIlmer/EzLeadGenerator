@@ -1,8 +1,5 @@
 using Application.Models;
-using System;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Xunit;
 
 namespace Application.UnitTests.Models;
 

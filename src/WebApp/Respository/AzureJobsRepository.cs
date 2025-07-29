@@ -6,7 +6,6 @@ using Azure;
 using Azure.Data.Tables;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
-using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace WebApp.Respository;
 
@@ -21,11 +20,11 @@ namespace WebApp.Respository;
 /// <param name="options">Configuration settings for Azure services, including connection strings and other relevant settings.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
 public class AzureJobsRepository(
-    TableClient tableClient, 
+    TableClient tableClient,
     IOptions<AzureSettings> options,
     ILogger<AzureJobsRepository> logger) : IJobsRepository
 {
-    private readonly string _partionKey =  options?.Value.JobSummaryPartionKey ?? Defaults.JobSummaryPartionKey;
+    private readonly string _partionKey = options?.Value.JobSummaryPartionKey ?? Defaults.JobSummaryPartionKey;
     private readonly TableClient _tableClient = tableClient ?? throw new ArgumentNullException(nameof(tableClient));
     private readonly ILogger<AzureJobsRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly JsonSerializerOptions _options = new()

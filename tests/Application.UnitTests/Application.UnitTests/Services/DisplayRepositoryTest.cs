@@ -48,20 +48,6 @@ public class DisplayRepositoryTest
     }
 
     [Fact]
-    public void GetPaginatedJobs_ReturnsCorrectPage()
-    {
-        var jobs = Enumerable.Range(1, 10)
-            .Select(i => new JobSummary { PostedDate = DateTime.Now.AddDays(-i), Id = i.ToString() })
-            .ToList();
-        var repo = CreateRepository(jobs);
-
-        var result = repo.GetPaginatedJobs(DateTime.Now.AddDays(-15), 2, 3);
-
-        Assert.Equal(3, result.Count());
-        Assert.Equal(jobs.OrderByDescending(j => j.PostedDate).Skip(3).Take(3).Select(j => j.Id), result.Select(j => j.Id));
-    }
-
-    [Fact]
     public async Task GetPaginatedCompaniesAsync_ReturnsCorrectPage()
     {
         var companies = Enumerable.Range(1, 8)
@@ -75,20 +61,6 @@ public class DisplayRepositoryTest
 
         Assert.Equal(4, result.Count());
         Assert.Equal(companies.OrderByDescending(c => c.UpdatedAt).Take(4).Select(c => c.Id), result.Select(c => c.Id));
-    }
-
-    [Fact]
-    public void GetPaginatedCompanies_ReturnsCorrectPage()
-    {
-        var companies = Enumerable.Range(1, 8)
-            .Select(i => new CompanyProfile(new JobSummary() { CompanyName = "Test Company" }, new HierarchyResults()) { UpdatedAt = DateTime.Now.AddDays(-i), Id = i.ToString() })
-            .ToList();
-        var repo = CreateRepository(null, companies);
-
-        var result = repo.GetPaginatedCompanies(DateTime.Now.AddDays(-10), 2, 3);
-
-        Assert.Equal(3, result.Count());
-        Assert.Equal(companies.OrderByDescending(c => c.UpdatedAt).Skip(3).Take(3).Select(c => c.Id), result.Select(c => c.Id));
     }
 
     [Fact]

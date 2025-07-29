@@ -1,20 +1,16 @@
 using Application.Contracts;
 using Application.Models;
-using Application.Services;
 using Core.Configuration;
 using Core.Contracts;
 using Core.Enums;
-using Core.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using OpenAI;
 using WebApp.Extensions;
 using WebApp.Respository;
-using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace WebApp.UnitTests.Extensions;
 

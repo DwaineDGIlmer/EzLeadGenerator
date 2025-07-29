@@ -1,8 +1,6 @@
-using System;
-using Xunit;
+using Application.Extensions;
 using Application.Models;
 using Application.Services;
-using Application.Extensions;
 
 namespace Application.UnitTests.Models;
 

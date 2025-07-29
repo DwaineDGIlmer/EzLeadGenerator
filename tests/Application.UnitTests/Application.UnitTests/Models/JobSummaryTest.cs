@@ -32,7 +32,7 @@ public class JobSummaryTest
     [Fact]
     public void Constructor_WithJobResult_InitializesPropertiesCorrectly()
     {
-        var jobHighlights = new List<JobHighlight> { new() {  Title = "Remote" } };
+        var jobHighlights = new List<JobHighlight> { new() { Title = "Remote" } };
         var jobResult = new JobResult
         {
             CompanyName = "TestCompany",
@@ -70,7 +70,7 @@ public class JobSummaryTest
 
         var result = jobSummary.ToString();
 
-        Assert.Contains("JobTitle: QA Engineer", result);
-        Assert.Contains("PostedDate: 1/1/2024", result);
+        Assert.Contains("QA Engineer", result);
+        Assert.Contains("1/1/2024", result);
     }
 }

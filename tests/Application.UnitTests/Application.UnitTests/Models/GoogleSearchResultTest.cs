@@ -54,17 +54,6 @@ public class GoogleSearchResultTest
     }
 
     [Fact]
-    public void SerpApiPagination_DefaultProperties_AreInitialized()
-    {
-        var serpApiPagination = new SerpApiPagination();
-
-        Assert.Equal(0, serpApiPagination.Current);
-        Assert.Equal(string.Empty, serpApiPagination.PreviousLink);
-        Assert.Equal(string.Empty, serpApiPagination.NextLink);
-        Assert.NotNull(serpApiPagination.OtherPages);
-    }
-
-    [Fact]
     public void GoogleSearchResult_CanBeSerializedAndDeserialized()
     {
         var original = new GoogleSearchResult

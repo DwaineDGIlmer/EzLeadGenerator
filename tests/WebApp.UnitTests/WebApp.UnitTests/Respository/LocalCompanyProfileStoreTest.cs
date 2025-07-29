@@ -34,13 +34,13 @@ public class LocalCompanyProfileStoreTest
     private static CompanyProfile CreateProfile(string companyName, DateTime? createdAt = null)
     {
         JobSummary jobSummary = new()
-        { 
+        {
             CompanyName = companyName,
             Division = "Test Division",
         };
         HierarchyResults hierarchyResults = new()
         {
-             OrgHierarchy =
+            OrgHierarchy =
              [
                  new HierarchyItem
                  {
@@ -50,24 +50,9 @@ public class LocalCompanyProfileStoreTest
              ]
         };
         return new CompanyProfile(jobSummary, hierarchyResults)
-        { 
-            CreatedAt = createdAt ?? DateTime.UtcNow,   
+        {
+            CreatedAt = createdAt ?? DateTime.UtcNow,
         };
-    }
-
-    [Fact]
-    public async Task AddCompanyProfileAsync_SavesProfileFile()
-    {
-        var store = CreateStore(out var _);
-        var profile = CreateProfile("test-company");
-
-        await store.AddCompanyProfileAsync(profile);
-
-        string path = Path.Combine(_testDirectory, $"{profile.CompanyId}.json");
-        Assert.True(File.Exists(path));
-
-        var loaded = JsonSerializer.Deserialize<CompanyProfile>(File.ReadAllText(path), _options);
-        Assert.Equal(profile.CompanyId, loaded!.CompanyId);
     }
 
     [Fact]

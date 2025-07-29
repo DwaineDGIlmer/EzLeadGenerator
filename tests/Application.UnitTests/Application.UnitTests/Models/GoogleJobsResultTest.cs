@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Text.Json;
 using Application.Models;
-using Xunit;
+using System.Text.Json;
 
 namespace Application.UnitTests.Models;
 

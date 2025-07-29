@@ -1,5 +1,4 @@
 ﻿using Application.Contracts;
-using Application.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WebApp.Pages;
@@ -18,7 +17,7 @@ public class IndexTest
         // Setup mock for GetPaginatedJobs to return an empty list
         _mockDisplayRepository
             .Setup(repo => repo.GetPaginatedJobs(It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>()))
-            .Returns(new List<JobSummary>());
+            .Returns([]);
     }
 
     [Fact]
