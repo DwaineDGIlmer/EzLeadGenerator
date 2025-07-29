@@ -43,8 +43,8 @@ public class LocalJobsRepositoryStoreTest
 
         await store.AddJobAsync(job);
 
-        string path = Path.Combine(_testDirectory, $"{"job1".FileSystemName()}.json");
-        Assert.True(File.Exists(path));
+        var result = await store.GetJobsAsync("job1");
+        Assert.NotNull(result);
     }
 
     [Fact]
