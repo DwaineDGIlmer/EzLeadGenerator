@@ -39,6 +39,7 @@ namespace Application.Services
             {
                 await LoadAllJobsAsync(jobsRepository);
                 await LoadAllCompaniesAsync(companyRepository);
+                await Task.Delay(1000);
             });
         }
 
@@ -57,7 +58,7 @@ namespace Application.Services
         /// objects for the specified page.</returns>
         public Task<IEnumerable<JobSummary>> GetPaginatedJobsAsync(DateTime fromDate, int page, int pageSize)
         {
-            return Task.Run(() => GetPaginatedJobsAsync(fromDate, page, pageSize));
+            return Task.Run(() => GetPaginatedJobs(fromDate, page, pageSize));
         }
 
         /// <summary>

@@ -4,9 +4,11 @@ using Application.Models;
 using Core.Configuration;
 using Core.Helpers;
 using Microsoft.Extensions.Options;
+using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApp.Respository;
 
@@ -19,7 +21,6 @@ public class LocalCompanyProfileStore : ICompanyRepository
     private readonly ILogger<LocalCompanyProfileStore> _logger;
     private readonly JsonSerializerOptions _options = new()
     {
-        WriteIndented = true,
         Converters = { new JsonStringEnumConverter(), new DateTimeConverter() }
     };
 
@@ -162,34 +163,16 @@ public class LocalCompanyProfileStore : ICompanyRepository
                 return;
             }
 
-            using FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
-            var jsonProfile = await JsonSerializer.DeserializeAsync<CompanyProfile>(stream);
-            var properties = typeof(CompanyProfile).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (var property in properties)
+            // Should not happen, but just in case
+            var jsonProfile = await UpdateProperties(path, profile);
+            if (jsonProfile == null)
             {
-                // Skip read-only properties
-                if (!property.CanWrite || !property.CanRead)
-                    continue;
-
-                var incomingValue = property.GetValue(profile);
-                var existingValue = property.GetValue(jsonProfile);
-
-                // Skip if incoming value should be ignored
-                if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
-                    continue;
-
-                // Update the property
-                property.SetValue(profile, incomingValue);
+                _logger.LogWarning("Profile not found for update: {CompanyId}", profile.CompanyId);
+                return;
             }
 
-            // Always update the UpdatedAt timestamp if the property exists
-            var updatedAtProperty = typeof(CompanyProfile).GetProperty(nameof(CompanyProfile.UpdatedAt));
-            if (updatedAtProperty != null && updatedAtProperty.CanWrite)
-            {
-                updatedAtProperty.SetValue(profile, DateTime.UtcNow);
-            }
-
+            // Update the profile with the properties from the existing JSON profile
+            await AddCompanyProfileAsync(jsonProfile);
             _logger.LogInformation("Profile updated: {Id}", profile.Id);
         }
         catch (Exception ex)
@@ -197,6 +180,37 @@ public class LocalCompanyProfileStore : ICompanyRepository
             _logger.LogError(ex, "Failed to save profile: {Id}", profile.Id);
             throw;
         }
+    }
+
+    private static async Task<CompanyProfile?> UpdateProperties(string path, CompanyProfile profile)
+    {
+        using FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+        var jsonProfile = await JsonSerializer.DeserializeAsync<CompanyProfile>(stream);
+        var properties = typeof(CompanyProfile).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var property in properties)
+        {
+            // Skip read-only properties
+            if (!property.CanWrite || !property.CanRead)
+                continue;
+
+            var incomingValue = property.GetValue(profile);
+            var existingValue = property.GetValue(jsonProfile);
+
+            // Skip if incoming value should be ignored
+            if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
+                continue;
+
+            // Update the property
+            property.SetValue(profile, incomingValue);
+        }
+
+        // Always update the UpdatedAt timestamp if the property exists
+        var updatedAtProperty = typeof(CompanyProfile).GetProperty(nameof(CompanyProfile.UpdatedAt));
+        if (updatedAtProperty != null && updatedAtProperty.CanWrite)
+        {
+            updatedAtProperty.SetValue(profile, DateTime.UtcNow);
+        }
+        return jsonProfile ?? null;
     }
 
     /// <summary>

@@ -12,7 +12,7 @@ public class CompanyProfile
     /// <summary>
     /// A unique identifier for the company, used for routing and storage (e.g., "pwc").
     /// </summary>
-    public string Id { get; } = Guid.NewGuid().ToString();
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// A unique identifier for the company, used for routing and storage (e.g., "pwc").
@@ -32,7 +32,7 @@ public class CompanyProfile
     /// <summary>
     /// Gets or sets the date and time when the entity was created.
     /// </summary>
-    public DateTime CreatedAt { get; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Timestamp of the most recent job data pull or analysis for this company.

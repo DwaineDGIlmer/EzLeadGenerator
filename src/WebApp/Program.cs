@@ -10,9 +10,9 @@ builder.Services.AddJobsRetrivalService(builder.Configuration);
 builder.Services.AddCacheService(builder.Configuration);
 builder.Services.AddCompanyProfileStore(builder.Configuration);
 builder.Services.AddJobsProfileStore(builder.Configuration);
+builder.Services.AddSearchService(builder.Configuration);
 builder.Services.AddDisplayRepository();
 builder.Services.AddJobSourceService();
-builder.Services.AddSearchService();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

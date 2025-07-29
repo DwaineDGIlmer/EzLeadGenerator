@@ -257,7 +257,7 @@ public class SearpApiSourceService : IJobSourceService
         {
             try
             {
-                if(_jobsRepository.GetJobsAsync(job.JobId).Result is not null)
+                if (_jobsRepository.GetJobsAsync(job.JobId).Result is not null)
                 {
                     _logger.LogInformation("Job with ID {JobId} already exists, skipping.", job.JobId);
                     continue;

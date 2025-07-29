@@ -116,15 +116,23 @@ public class SerpApiSearchService : ISearch<OrganicResult>
             return default;
         }
 
-        var googleSearch = JsonSerializer.Deserialize<GoogleSearchResult>(content, _options);
-        if (googleSearch is null)
+        try
         {
-            _logger.LogWarning("Deserialized search result for query: {Query} and location: {Location}", query, location);
+            var googleSearch = JsonSerializer.Deserialize<GoogleSearchResult>(content, _options);
+            if (googleSearch is null)
+            {
+                _logger.LogWarning("Deserialized search result for query: {Query} and location: {Location}", query, location);
+                return default;
+            }
+
+            await _cacheService.CreateEntryAsync(cacheKey, googleSearch.OrganicResults, TimeSpan.FromMinutes(CacheExpirationInMinutes));
+            return googleSearch.OrganicResults;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Error deserializing search result for query: {Query} and location: {Location}", query, location);
             return default;
         }
-
-        await _cacheService.CreateEntryAsync(cacheKey, googleSearch.OrganicResults, TimeSpan.FromMinutes(CacheExpirationInMinutes));
-        return googleSearch.OrganicResults;
     }
 
     private async Task<IEnumerable<OrganicResult>?> GetCachedOrganicSearchResults(string cacheKey)
