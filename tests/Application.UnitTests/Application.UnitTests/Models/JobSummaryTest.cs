@@ -10,7 +10,7 @@ public class JobSummaryTest
         var jobSummary = new JobSummary();
 
         Assert.False(string.IsNullOrEmpty(jobSummary.Id));
-        Assert.True((DateTime.UtcNow - jobSummary.PostedDate).TotalSeconds < 5);
+        Assert.True((DateTime.Now - jobSummary.PostedDate).TotalSeconds < 5);
         Assert.Equal(string.Empty, jobSummary.JobId);
         Assert.Equal(string.Empty, jobSummary.CompanyId);
         Assert.Equal(string.Empty, jobSummary.CompanyName);
@@ -25,8 +25,8 @@ public class JobSummaryTest
         Assert.Equal(string.Empty, jobSummary.SourceName);
         Assert.NotNull(jobSummary.JobHighlights);
         Assert.Empty(jobSummary.JobHighlights);
-        Assert.True((DateTime.UtcNow - jobSummary.CreatedAt).TotalSeconds < 5);
-        Assert.True((DateTime.UtcNow - jobSummary.UpdatedAt).TotalSeconds < 5);
+        Assert.True((DateTime.Now - jobSummary.CreatedAt).TotalSeconds < 5);
+        Assert.True((DateTime.Now - jobSummary.UpdatedAt).TotalSeconds < 5);
     }
 
     [Fact]

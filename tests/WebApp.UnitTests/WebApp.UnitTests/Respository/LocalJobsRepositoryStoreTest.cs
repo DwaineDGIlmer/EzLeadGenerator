@@ -61,10 +61,11 @@ public class LocalJobsRepositoryStoreTest
     }
 
     [Fact]
-    public async Task GetJobsAsync_ById_ThrowsIfNotFound()
+    public async Task GetJobsAsync_ById_retuns_Null()
     {
         var store = CreateStore();
-        await Assert.ThrowsAsync<InvalidOperationException>(() => store.GetJobsAsync("missing"));
+        var result = await store.GetJobsAsync("missing");
+        Assert.Null(result);
     }
 
     [Fact]
