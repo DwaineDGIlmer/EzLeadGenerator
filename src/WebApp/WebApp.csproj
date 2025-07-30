@@ -7,7 +7,7 @@
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>AIEventing.snk</AssemblyOriginatorKeyFile>
-	  <Authors>dwaing@outlook.com</Authors>
+	  <Authors>dwaine.gilmer@protonmail.com</Authors>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <Title>AI-Assisted .NET Lead Generator</Title>

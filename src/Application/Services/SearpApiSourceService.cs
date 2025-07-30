@@ -32,7 +32,6 @@ public class SearpApiSourceService : IJobSourceService
         "data",
         "engineer",
     ];
-    private static readonly string[] _validExtensions = [".com", ".org", ".net", ".io", ".ai", ".dev", "en", "/"];
     private readonly ILogger _logger;
     private readonly ICacheService _cacheService;
     private readonly ISearch<OrganicResult> _searchService;

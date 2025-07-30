@@ -67,7 +67,7 @@ Copyright © 2025 Dwain Gilmer
 
 ## Author
 
-[Dwain Gilmer](mailto:dwaing@outlook.com)
+[Dwain Gilmer](mailto:dwaine.gilmer@protonmail.com)
 
 ## Links
 

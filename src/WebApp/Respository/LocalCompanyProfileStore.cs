@@ -49,16 +49,16 @@ public class LocalCompanyProfileStore : ICompanyRepository
     /// <remarks>This method reads the company profile from a JSON file located in a predefined
     /// directory. If the file is not found or the data cannot be deserialized, appropriate exceptions are
     /// thrown.</remarks>
-    /// <param name="companyName">The unique identifier of the company whose profile is to be retrieved. Cannot be null or empty.</param>
+    /// <param name="CompanyId">The unique identifier of the company whose profile is to be retrieved. Cannot be null or empty.</param>
     /// <returns>A <see cref="CompanyProfile"/> object representing the company's profile.</returns>
-    /// <exception cref="FileNotFoundException">Thrown if the profile file for the specified <paramref name="companyName"/> does not exist.</exception>
-    public async Task<CompanyProfile?> GetCompanyProfileAsync(string companyName)
+    /// <exception cref="FileNotFoundException">Thrown if the profile file for the specified <paramref name="CompanyId"/> does not exist.</exception>
+    public async Task<CompanyProfile?> GetCompanyProfileAsync(string CompanyId)
     {
 
-        string path = Path.Combine(_companyProfileDirectory, $"{companyName.FileSystemName()}.json");
+        string path = Path.Combine(_companyProfileDirectory, $"{CompanyId}.json");
         if (!File.Exists(path))
         {
-            _logger.LogWarning("Profile not found for companyName: {companyName}", companyName);
+            _logger.LogWarning("Profile not found for CompanyId: {CompanyId}", CompanyId);
             return null;
         }
 
@@ -70,7 +70,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load profile for companyName: {CompanyId}", companyName);
+            _logger.LogError(ex, "Failed to load profile for CompanyId: {CompanyId}", CompanyId);
             throw;
         }
     }

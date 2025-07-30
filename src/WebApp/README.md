@@ -53,7 +53,7 @@ This project is licensed under the MIT License.
 
 ## Author
 
-[Dwain Gilmer](mailto:dwaing@outlook.com)
+[Dwain Gilmer](mailto:dwaine.gilmer@protonmail.com)
 
 ## Links
 
