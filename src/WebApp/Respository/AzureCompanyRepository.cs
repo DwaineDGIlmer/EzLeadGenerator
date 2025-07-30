@@ -163,8 +163,11 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
 
             var entity = new TableEntity(_partionKey, profile.CompanyId)
             {
+                {"Id", profile.Id},
                 {"Data", JsonSerializer.Serialize(profile, _options)},
-                {"CompanyId", profile.CompanyName ?? string.Empty},
+                {"CompanyName", profile.CompanyName ?? string.Empty},
+                {"CompanyId", profile.CompanyId ?? string.Empty},
+                {"HierarchyResults", JsonSerializer.Serialize(profile.HierarchyResults, _options)},
                 {"UpdatedAt", profile.UpdatedAt.ToString("o")},
                 {"CreatedAt", profile.CreatedAt.ToString("o")}
             };
