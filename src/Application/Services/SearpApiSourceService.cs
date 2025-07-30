@@ -120,6 +120,13 @@ public class SearpApiSourceService : IJobSourceService
                 string sanitizedJson = string.Empty;
                 _logger.LogInformation("Processing hierarchy response for company: {CompanyName}", job.CompanyName);
 
+                var companyProfile = await _companyRepository.GetCompanyProfileAsync(job.CompanyId);
+                if (companyProfile is not null && companyProfile.UpdatedAt >= DateTime.Now.AddDays(-1))
+                {
+                    _logger.LogInformation("Company profile does not need updating: {CompanyName}", job.CompanyName);
+                    continue;
+                }
+
                 var prompt = $"{job.CompanyName} official site";
                 var googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
                 if (googleResults is null || !googleResults.Any())
@@ -161,7 +168,6 @@ public class SearpApiSourceService : IJobSourceService
                 {
                     try
                     {
-                        var companyProfile = await _companyRepository.GetCompanyProfileAsync(job.CompanyId);
                         if (companyProfile is not null)
                         {
                           await _companyRepository.UpdateCompanyProfileAsync(new CompanyProfile(job, clientResult));

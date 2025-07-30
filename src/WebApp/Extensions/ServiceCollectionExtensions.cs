@@ -51,9 +51,14 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<ICompanyRepository>(sp =>
             {
+                // Keeping the configuration builder to add user secrets
+                var builder = new ConfigurationBuilder();
+                builder.AddConfiguration(configuration);
+                var config = builder.AddUserSecrets<Program>().Build();
+
                 var logger = sp.GetRequiredService<ILogger<AzureCompanyRepository>>();
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
-                var connectionString = configuration.GetConnectionString("AzureTableStorage");
+                var connectionString = config.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.CompanyProfileTableName) ?
                 Defaults.CompanyProfileTableName : settings.CompanyProfileTableName;
                 var tabl = new Azure.Data.Tables.TableClient(connectionString, tableName);
@@ -96,9 +101,14 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<IJobsRepository>(sp =>
             {
+                // Keeping the configuration builder to add user secrets
+                var builder = new ConfigurationBuilder();
+                builder.AddConfiguration(configuration);
+                var config = builder.AddUserSecrets<Program>().Build();
+
                 var logger = sp.GetRequiredService<ILogger<AzureJobsRepository>>();
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
-                var connectionString = configuration.GetConnectionString("AzureTableStorage");
+                var connectionString = config.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.JobSummaryTableName) ?
                 Defaults.JobSummaryTableName : settings.JobSummaryTableName;
                 var tbl = new Azure.Data.Tables.TableClient(connectionString, tableName);
