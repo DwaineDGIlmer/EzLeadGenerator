@@ -57,7 +57,7 @@ public class LocalCompanyProfileStoreTest
         var profile = CreateProfile("get-company");
         await store.AddCompanyProfileAsync(profile);
 
-        var result = await store.GetCompanyProfileAsync(profile.CompanyName);
+        var result = await store.GetCompanyProfileAsync(profile.CompanyId);
 
         Assert.NotNull(result);
         Assert.Equal(profile.CompanyId, result.CompanyId);
@@ -98,7 +98,7 @@ public class LocalCompanyProfileStoreTest
         profile.UpdatedAt = DateTime.Now.AddMinutes(5);
         await store.UpdateCompanyProfileAsync(profile);
 
-        var updated = await store.GetCompanyProfileAsync(profile.CompanyName);
+        var updated = await store.GetCompanyProfileAsync(profile.CompanyId);
         Assert.NotNull(updated);
         Assert.NotEqual(updated.UpdatedAt, profile.CreatedAt);
     }
