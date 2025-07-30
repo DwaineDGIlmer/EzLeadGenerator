@@ -35,12 +35,32 @@ namespace Application.Services
             ArgumentNullException.ThrowIfNull(jobsRepository, nameof(jobsRepository));
 
             _logger = logger;
-            Task.Run(async () =>
-            {
-                await LoadAllJobsAsync(jobsRepository);
-                await LoadAllCompaniesAsync(companyRepository);
-                await Task.Delay(1000);
-            });
+            LoadAllJobs(jobsRepository);
+            LoadAllCompanies(companyRepository);
+        }
+
+        /// <summary>
+        /// Gets the count of jobs posted on or after the specified date.
+        /// </summary>
+        /// <param name="fromDate">The date from which to start counting jobs. Only jobs posted on or after this date are included in the
+        /// count.</param>
+        /// <returns>The number of jobs posted on or after the specified date.</returns>
+        public int GetJobCount(DateTime fromDate)
+        {
+            return _allJobs
+                    .Count(j => j.CreatedAt >= fromDate);
+        }
+
+        /// <summary>
+        /// Gets the count of companies created on or after the specified date.
+        /// </summary>
+        /// <param name="fromDate">The date from which to start counting companies. Only companies created on or after this date are included
+        /// in the count.</param>
+        /// <returns>The number of companies created on or after the specified date.</returns>
+        public int GetCompanyCount(DateTime fromDate)
+        {
+            return _allCompanies
+                    .Count(c => c.CreatedAt >= fromDate);
         }
 
         /// <summary>
@@ -125,11 +145,11 @@ namespace Application.Services
         /// operation.</remarks>
         /// <param name="jobsRepository">The repository from which to retrieve job profiles. Cannot be null.</param>
         /// <returns></returns>
-        private async Task LoadAllJobsAsync(IJobsRepository jobsRepository)
+        private void LoadAllJobs(IJobsRepository jobsRepository)
         {
             try
             {
-                var jobs = await jobsRepository.GetJobsAsync(DateTime.Now.AddDays(-30));
+                var jobs = jobsRepository.GetJobsAsync(DateTime.Now.AddDays(-30)).Result;
                 _allJobs.AddRange(jobs);
                 _logger.LogInformation("Successfully loaded {CompanyCount} company profiles", jobs.Count());
             }
@@ -147,11 +167,11 @@ namespace Application.Services
         /// profiles loaded. If an error occurs during the loading process, it logs the error.</remarks>
         /// <param name="companyRepository">The repository from which to retrieve company profiles. Cannot be null.</param>
         /// <returns></returns>
-        private async Task LoadAllCompaniesAsync(ICompanyRepository companyRepository)
+        private void LoadAllCompanies(ICompanyRepository companyRepository)
         {
             try
             {
-                var companyProfiles = await companyRepository.GetCompanyProfileAsync(DateTime.Now.AddDays(-30));
+                var companyProfiles = companyRepository.GetCompanyProfileAsync(DateTime.Now.AddDays(-30)).Result;
                 _allCompanies.AddRange(companyProfiles);
                 _logger.LogInformation("Successfully loaded {CompanyCount} company profiles", companyProfiles.Count());
             }

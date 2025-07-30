@@ -11,6 +11,20 @@ namespace Application.Contracts
     public interface IDisplayRepository
     {
         /// <summary>
+        /// Retrieves the count of jobs that have been processed since the specified date.
+        /// </summary>
+        /// <param name="fromDate">The starting date from which to count the jobs. Must be a valid <see cref="DateTime"/> value.</param>
+        /// <returns>The number of jobs processed since the specified <paramref name="fromDate"/>.</returns>
+        int GetJobCount(DateTime fromDate);
+
+        /// <summary>
+        /// Retrieves the number of companies created since the specified date.
+        /// </summary>
+        /// <param name="fromDate">The starting date from which to count the companies. Must be a valid date.</param>
+        /// <returns>The total number of companies created on or after the specified <paramref name="fromDate"/>.</returns>
+        int GetCompanyCount(DateTime fromDate);
+
+        /// <summary>
         /// Retrieves a paginated list of companies associated with recent Data Engineer job postings.
         /// </summary>
         /// <param name="fromDate">The date from which to start retrieving job summaries. Only jobs created on or after this date will be

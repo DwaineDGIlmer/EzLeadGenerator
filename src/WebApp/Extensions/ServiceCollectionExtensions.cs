@@ -1,10 +1,10 @@
 ﻿using Application.Configurations;
+using Application.Constants;
 using Application.Contracts;
 using Application.Models;
 using Application.Services;
 using Core.Caching;
 using Core.Configuration;
-using Core.Constants;
 using Core.Contracts;
 using Core.Extensions;
 using Core.Services;
@@ -55,7 +55,7 @@ public static class ServiceCollectionExtensions
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
                 var connectionString = configuration.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.CompanyProfileTableName) ?
-                Application.Constants.Defaults.CompanyProfileTableName : settings.CompanyProfileTableName;
+                Defaults.CompanyProfileTableName : settings.CompanyProfileTableName;
                 var tabl = new Azure.Data.Tables.TableClient(connectionString, tableName);
 
                 return new AzureCompanyRepository(tabl, options, logger);
@@ -100,8 +100,9 @@ public static class ServiceCollectionExtensions
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
                 var connectionString = configuration.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.JobSummaryTableName) ?
-                Application.Constants.Defaults.JobSummaryTableName : settings.JobSummaryTableName;
+                Defaults.JobSummaryTableName : settings.JobSummaryTableName;
                 var tbl = new Azure.Data.Tables.TableClient(connectionString, tableName);
+
                 return new AzureJobsRepository(tbl, options, logger);
             });
         }
@@ -132,8 +133,8 @@ public static class ServiceCollectionExtensions
             if (options.IsEnabled)
             {
                 options.BaseAddress = string.IsNullOrEmpty(options.BaseAddress) ? Core.Constants.Defaults.SerpApiBaseAddress : options.BaseAddress;
-                options.Endpoint = string.IsNullOrEmpty(options.BaseAddress) ? Application.Constants.Defaults.SearchEndpoint : options.Endpoint;
-                options.ApiKey = Environment.GetEnvironmentVariable("SEARCH_SERPAPI_API_KEY") ?? options.ApiKey ?? string.Empty;
+                options.Endpoint = string.IsNullOrEmpty(options.BaseAddress) ? Defaults.SearchEndpoint : options.Endpoint;
+                options.ApiKey = Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey) ?? options.ApiKey;
             }
         });
         services.AddResilientHttpClient(configuration, settings.HttpClientName, null, client =>
@@ -233,7 +234,7 @@ public static class ServiceCollectionExtensions
         services.Configure<SerpApiSettings>(options =>
         {
             configuration.GetSection(nameof(SerpApiSettings)).Bind(options);
-            options.ApiKey = Environment.GetEnvironmentVariable(DefaultConstants.QDRANT_SERVICE_API_KEY) ?? options.ApiKey;
+            options.ApiKey = Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey) ?? options.ApiKey;
         });
         services.AddSingleton<ISearch<OrganicResult>, SerpApiSearchService>();
         return services;

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
 using System.Net.Http.Headers;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Json;
 
@@ -42,7 +43,13 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
     public string Location { get; set; } = string.Empty;
 
     /// <summary>
-    ///     
+    /// Gets or sets the inclusions as a comma-separated string.
+    /// </summary>
+    [BindProperty]
+    public string Inclusions { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether keywords in descriptions should be included in the output.
     /// </summary>
     [BindProperty]
     public bool IncludeDescriptions { get; set; } = false;
@@ -141,6 +148,14 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
             QueryTooShort = true;
             return;
         }
+
+        var includeWords = !string.IsNullOrWhiteSpace(Inclusions);
+        if (includeWords && Inclusions.Length <= 3)
+        {
+            QueryTooShort = true;
+            return;
+        }
+
         QueryTooShort = false;
 
         var hash = $"talent:{JobTitle}:{string.Join(",", Location)}:{string.Join(",", SearchJobTitleAsPhrase)}:{IncludeDescriptions}".GenHashString();
@@ -170,6 +185,16 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         string query = SearchJobTitleAsPhrase
             ? $"\"{JobTitle}\" \"{Location}\""
             : $"{JobTitle} \"{Location}\"";
+
+        if (includeWords)
+        {
+            var inclusions = Inclusions.Split(',').Select(i => i.Trim()).Where(i => !string.IsNullOrWhiteSpace(i));
+            foreach (var inclusion in inclusions)
+            {
+                query += $" \"{inclusion}\"";
+            }
+        }
+
         string url = $"{baseEndpoint}?engine=google_jobs&q={Uri.EscapeDataString(query)}&api_key={apiKey}";
 
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Defaults.JsonMimeType));
@@ -197,7 +222,11 @@ public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpC
         }
 
         var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        if (!json.RootElement.TryGetProperty("jobs_results", out var jobs) || jobs.ValueKind != JsonValueKind.Array) return;
+        if (!json.RootElement.TryGetProperty("jobs_results", out var jobs) || jobs.ValueKind != JsonValueKind.Array)
+        {
+            _logger.LogWarning("No job results found for query: {SearchQuery}", query);
+            return;
+        }
 
         foreach (var job in jobs.EnumerateArray())
         {

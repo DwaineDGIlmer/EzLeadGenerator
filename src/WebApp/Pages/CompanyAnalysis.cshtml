@@ -4,6 +4,36 @@
     ViewData["Company Summaries"] = "Company Summaries";
 }
 
+<head>
+    <style>
+        body {
+            background-color: #f4f6fb;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+        }
+
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+
+            .navbar-brand:hover, .nav-link:hover {
+                color: #ffd700 !important;
+            }
+
+        .footer {
+            background-color: #2b5876;
+            color: #fff;
+        }
+
+            .footer a {
+                color: #ffd700;
+            }
+    </style>
+</head>
+
+<h2 class="mt-4 mb-3">Possible Contacts</h2>
 @if (Model.CompanySummaries == null)
 {
     <div class="alert alert-danger">Company summaries is null.</div>
@@ -40,4 +70,27 @@ else
             </div>
         }
     </div>
+
+    <nav aria-label="Company pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @if (Model.PageNumber > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(Model.PageNumber - 1)">Previous</a>
+                </li>
+            }
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
+            }
+            @if (Model.PageNumber < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(Model.PageNumber + 1)">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
 }

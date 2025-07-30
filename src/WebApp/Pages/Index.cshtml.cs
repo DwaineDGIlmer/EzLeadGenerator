@@ -1,5 +1,6 @@
 using Application.Contracts;
 using Application.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp.Pages
@@ -11,6 +12,26 @@ namespace WebApp.Pages
     {
         private readonly IDisplayRepository _displayRepository;
         private readonly ILogger<IndexModel> _logger;
+
+        /// <summary>
+        /// Gets the current page number in a paginated list or document.
+        /// </summary>
+        public int PageNumber { get; private set; } = 1;
+
+        /// <summary>
+        /// Gets the number of items to display per page.
+        /// </summary>
+        public int PageSize { get; private set; } = 4;
+
+        /// <summary>
+        /// Gets the total number of pages available.
+        /// </summary>
+        public int TotalPages { get; private set; }
+
+        /// <summary>
+        /// Gets the total count of items processed.
+        /// </summary>
+        public int TotalCount { get; private set; }
 
         /// <summary>
         /// Gets the collection of job summaries.
@@ -38,17 +59,22 @@ namespace WebApp.Pages
         /// Asynchronously retrieves and sets a paginated list of job summaries from the repository.
         /// </summary>
         /// <remarks>This method fetches job summaries from the past 30 days, starting from the current
-        /// UTC date. The results are limited to the first page with a maximum of 25 entries.</remarks>
+        /// date. The results are limited to the first page with a maximum of 25 entries.</remarks>
         /// <returns></returns>
-        public async Task OnGetAsync()
+        public async Task OnGetAsync([FromQuery] int page = 1)
         {
-            var jobSummaries = _displayRepository.GetPaginatedJobs(DateTime.UtcNow.AddDays(-30), 0, 25);
-            JobSummaries.AddRange(jobSummaries);
+            PageNumber = page < 1 ? 1 : page;
+            TotalCount = _displayRepository.GetJobCount(DateTime.UtcNow.AddDays(-30));
+            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
+            JobSummaries = [.. _displayRepository.GetPaginatedJobs(DateTime.Now.AddDays(-30), PageNumber, PageSize)];
+
             if (JobSummaries == null || JobSummaries.Count == 0)
             {
                 _logger.LogWarning("No job summaries found.");
+                return;
             }
-            await Task.Delay(1000);
+            _logger.LogInformation("Retrieved {Count} job summaries for page {PageNumber}.", JobSummaries.Count, PageNumber);
+            await Task.CompletedTask;
         }
     }
 }

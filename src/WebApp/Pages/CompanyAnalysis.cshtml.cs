@@ -1,5 +1,6 @@
 using Application.Contracts;
 using Application.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp.Pages
@@ -15,6 +16,26 @@ namespace WebApp.Pages
     {
         private readonly IDisplayRepository _displayRepository;
         private readonly ILogger<CompanyAnalysisPage> _logger;
+
+        /// <summary>
+        /// Gets the current page number in a paginated list or document.
+        /// </summary>
+        public int PageNumber { get; private set; } = 1;
+
+        /// <summary>
+        /// Gets the number of items to display per page.
+        /// </summary>
+        public int PageSize { get; private set; } = 4;
+
+        /// <summary>
+        /// Gets the total number of pages available.
+        /// </summary>
+        public int TotalPages { get; private set; }
+
+        /// <summary>
+        /// Gets the total count of items processed.
+        /// </summary>
+        public int TotalCount { get; private set; }
 
         /// <summary>
         /// Gets the collection of job summaries.
@@ -38,14 +59,20 @@ namespace WebApp.Pages
         /// <remarks>This method fetches the first page of company summaries with a fixed page size of
         /// 25.</remarks>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public async Task OnGetAsync()
+        public async Task OnGetAsync([FromQuery] int page = 1)
         {
-            var companySummaries = await _displayRepository.GetPaginatedCompaniesAsync(DateTime.UtcNow.AddDays(-30), 0, 25);
-            CompanySummaries.AddRange(companySummaries);
+            PageNumber = page < 1 ? 1 : page;
+            TotalCount = _displayRepository.GetJobCount(DateTime.Now.AddDays(-30));
+            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
+            CompanySummaries = [.. _displayRepository.GetPaginatedCompanies(DateTime.Now.AddDays(-30), PageNumber, PageSize)];
+
             if (CompanySummaries == null || CompanySummaries.Count == 0)
             {
                 _logger.LogWarning("No company summaries found.");
+                return;
             }
+            _logger.LogInformation("Retrieved {Count} company summaries for page {PageNumber}.", CompanySummaries.Count, PageNumber);
+            await Task.CompletedTask; 
         }
     }
 }

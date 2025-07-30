@@ -98,7 +98,7 @@ public class SearpApiSourceService : IJobSourceService
     }
 
     /// <summary>
-    /// Updates company profiles based on recent job data.
+    /// Updates or adds company profiles based on recent job data.
     /// </summary>
     /// <remarks>This method retrieves jobs from the past 30 days and updates the company profiles
     /// accordingly. If a company profile does not exist for a job, it attempts to create one using AI-generated
@@ -106,7 +106,7 @@ public class SearpApiSourceService : IJobSourceService
     /// <returns><see langword="true"/> if the company profiles were successfully updated; otherwise, <see langword="false"/>.</returns>
     public async Task<bool> UpdateCompanyProfilesAsync()
     {
-        var timeStamp = DateTime.UtcNow.AddDays(-30);
+        var timeStamp = DateTime.Now.AddDays(-30);
         var jobs = await _jobsRepository.GetJobsAsync(timeStamp);
         if (jobs is null || !jobs.Any())
         {
@@ -119,13 +119,6 @@ public class SearpApiSourceService : IJobSourceService
             {
                 string sanitizedJson = string.Empty;
                 _logger.LogInformation("Processing hierarchy response for company: {CompanyName}", job.CompanyName);
-
-                var companyProfile = await _companyRepository.GetCompanyProfileAsync(job.CompanyId);
-                if (companyProfile is not null)
-                {
-                    _logger.LogInformation("Company profile already exists for company: {CompanyName}", job.CompanyName);
-                    continue;
-                }
 
                 var prompt = $"{job.CompanyName} official site";
                 var googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
@@ -168,7 +161,17 @@ public class SearpApiSourceService : IJobSourceService
                 {
                     try
                     {
-                        await _companyRepository.AddCompanyProfileAsync(new CompanyProfile(job, clientResult));
+                        var companyProfile = await _companyRepository.GetCompanyProfileAsync(job.CompanyId);
+                        if (companyProfile is not null)
+                        {
+                          await _companyRepository.UpdateCompanyProfileAsync(new CompanyProfile(job, clientResult));
+                            _logger.LogInformation("Updated existing company profile for: {CompanyName}", job.CompanyName);
+                        }
+                        else
+                        {
+                            await _companyRepository.AddCompanyProfileAsync(new CompanyProfile(job, clientResult));
+                            _logger.LogInformation("Added new company profile for: {CompanyName}", job.CompanyName);
+                        }
                     }
                     catch (JsonException jsonEx)
                     {

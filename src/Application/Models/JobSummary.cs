@@ -16,7 +16,7 @@ public class JobSummary
     /// <summary>
     /// Gets or sets the date and time when the post was created.
     /// </summary>
-    public DateTime PostedDate { get; set; } = DateTime.UtcNow;
+    public DateTime PostedDate { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Gets or sets the unique identifier for the job, typically generated as a hash of the company, title, and date.
@@ -94,12 +94,12 @@ public class JobSummary
     /// <summary>
     /// Gets or sets the date and time when the entity was created.
     /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Gets or sets the date and time when the post was last updated.
     /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JobSummary"/> class.

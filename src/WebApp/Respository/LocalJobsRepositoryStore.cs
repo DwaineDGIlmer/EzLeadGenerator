@@ -68,7 +68,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
         if (!File.Exists(path))
         {
             _logger.LogWarning("Profile not found for job: {JobId}", jobId);
-            throw new InvalidOperationException($"Job not found for ID: {jobId}");
+            return null;
         }
 
         try

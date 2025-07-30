@@ -1,6 +1,7 @@
 # Ignore build outputs
 bin/
 obj/
+src/WebApp/App_Data
 
 # Ignore user-specific files
 *.user
@@ -13,6 +14,7 @@ obj/
 *.log
 *.vspscc
 *.vssscc
+*.cache
 
 # Ignore IDE-specific files
 .vscode/
