@@ -4,8 +4,6 @@ using Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using WebApp.Respository;
 
 namespace WebApp.UnitTests.Respository;

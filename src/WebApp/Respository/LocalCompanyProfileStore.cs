@@ -1,5 +1,4 @@
 ﻿using Application.Contracts;
-using Application.Extensions;
 using Application.Models;
 using Core.Configuration;
 using Core.Helpers;

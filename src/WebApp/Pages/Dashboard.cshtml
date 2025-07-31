@@ -1,0 +1,264 @@
+﻿@page
+@using System.Text.Json
+@using WebApp.Pages;
+@model DashboardModel
+@{
+    ViewData["Dashboard"] = "Overall metrics and insights";
+}
+
+<style>
+    /* Dashboard Styles */
+    body {
+        background-color: #f4f6fb;
+    }
+
+    .navbar {
+        background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+    }
+
+    .navbar-brand, .nav-link {
+        color: #fff !important;
+    }
+
+    .navbar-brand:hover, .nav-link:hover {
+        color: #ffd700 !important;
+    }
+
+    body {
+        background-color: #f4f6fb;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .kpi-dashboard {
+        display: flex;
+        justify-content: space-between;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+    }
+
+    .kpi-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+        padding: 1.5rem 2rem;
+        flex: 1 1 180px;
+        min-width: 180px;
+        text-align: center;
+    }
+
+    .kpi-value {
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: #2b5876;
+        margin-bottom: 0.5rem;
+    }
+
+    .kpi-label {
+        font-size: 1rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .dashboard-row {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+        padding: 1.5rem;
+        flex: 1 1 320px;
+        min-width: 320px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2b5876;
+        margin-bottom: 1rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+    }
+
+    th, td {
+        padding: 0.6rem 0.8rem;
+        text-align: left;
+    }
+
+    th {
+        background: #f4f6fb;
+        color: #2b5876;
+        font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    tr:nth-child(odd) {
+        background: #fff;
+    }
+
+    .footer {
+        background-color: #2b5876;
+        color: #fff;
+        text-align: center;
+        padding: 1.2rem 0;
+        margin-top: 3rem;
+    }
+
+    .footer a {
+        color: #ffd700;
+        text-decoration: underline;
+    }
+
+    /* Responsive */
+    @@media (max-width: 900px) {
+        .dashboard-row {
+            flex-direction: column;
+        }
+
+        .kpi-dashboard {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }    
+</style>
+
+<h2 class="mt-4 mb-3">Job Metrics Dashboard</h2>
+
+<!-- Main Dashboard -->
+<div class="dashboard-container">
+    <!-- KPI Cards -->
+    <div class="kpi-dashboard">
+        <div class="kpi-card">
+            <div class="kpi-value">@Model.TotalJobs</div>
+            <div class="kpi-label">Total Jobs</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">@Model.TotalCompanies</div>
+            <div class="kpi-label">Companies</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">@Model.TotalAgencies</div>
+            <div class="kpi-label">Agencies</div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="dashboard-row">
+        <!-- Company/Agency Table -->
+        <div class="dashboard-section">
+            <div class="section-title">Company & Hiring Agency</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Agency</th>
+                        <th>Job Count</th>
+                        <th>Latest Posting</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.CompanyAgencyTable)
+                    {
+                        <tr>
+                            <td>@row.CompanyName</td>
+                            <td>@row.HiringAgency</td>
+                            <td>@row.JobCount</td>
+                            <td>@row.LatestPosting.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Top Companies Bar Chart -->
+    <div class="dashboard-section">
+        <div class="section-title">Top Companies by Job Openings</div>
+        <canvas id="companiesBarChart" width="320" height="180"></canvas>
+    </div>
+
+    <p/>
+    <!-- Job Title Distribution Bar Chart -->
+    <div class="dashboard-section">
+        <div class="section-title">Job Title Distribution</div>
+        <canvas id="jobTitlesBarChart" width="320" height="180"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Data for Top Companies Bar Chart
+        const companiesLabels = @Html.Raw(JsonSerializer.Serialize(Model.TopCompanies.Select(c => c.CompanyName)));
+        const companiesData = @Html.Raw(JsonSerializer.Serialize(Model.TopCompanies.Select(c => c.JobCount)));
+
+        const ctxCompanies = document.getElementById('companiesBarChart').getContext('2d');
+        new Chart(ctxCompanies, {
+            type: 'bar',
+            data: {
+                labels: companiesLabels,
+                datasets: [{
+                    label: 'Job Openings',
+                    data: companiesData,
+                    backgroundColor: '#2b5876'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Data for Job Title Distribution Bar Chart
+        const jobTitlesLabels = @Html.Raw(JsonSerializer.Serialize(Model.JobTitleDistribution.Select(j => j.JobTitle)));
+        const jobTitlesData = @Html.Raw(JsonSerializer.Serialize(Model.JobTitleDistribution.Select(j => j.Count)));
+
+        const ctxJobTitles = document.getElementById('jobTitlesBarChart').getContext('2d');
+        new Chart(ctxJobTitles, {
+            type: 'bar',
+            data: {
+                labels: jobTitlesLabels,
+                datasets: [{
+                    label: 'Count',
+                    data: jobTitlesData,
+                    backgroundColor: '#4e4376'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}

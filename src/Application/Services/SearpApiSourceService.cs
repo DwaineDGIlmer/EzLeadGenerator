@@ -120,7 +120,7 @@ public class SearpApiSourceService : IJobSourceService
                 _logger.LogInformation("Processing hierarchy response for company: {CompanyName}", job.CompanyName);
 
                 var companyProfile = await _companyRepository.GetCompanyProfileAsync(job.CompanyId);
-                if (companyProfile is not null && companyProfile.UpdatedAt >= DateTime.Now.AddDays(-1))
+                if (companyProfile is not null && companyProfile.UpdatedAt >= DateTime.Now.AddDays(-3))
                 {
                     _logger.LogInformation("Company profile does not need updating: {CompanyName}", job.CompanyName);
                     continue;

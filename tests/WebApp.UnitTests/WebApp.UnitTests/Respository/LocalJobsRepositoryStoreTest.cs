@@ -1,4 +1,3 @@
-using Application.Extensions;
 using Application.Models;
 using Core.Configuration;
 using Microsoft.Extensions.Logging;

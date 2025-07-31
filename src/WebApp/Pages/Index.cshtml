@@ -3,55 +3,108 @@
 @{
     ViewData["JobTitle"] = "Job Summaries";
 }
-<head>
-    <style>
-        body {
-            background-color: #f4f6fb;
-        }
-        .navbar {
-            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
-        }
-        .navbar-brand, .nav-link {
-            color: #fff !important;
-        }
-        .navbar-brand:hover, .nav-link:hover {
-            color: #ffd700 !important;
-        }
-        .footer {
-            background-color: #2b5876;
-            color: #fff;
-        }
-        .footer a {
-            color: #ffd700;
-        }
-    </style>
-</head>
 
-<h2 class="mt-4 mb-3">Recent Job Listings</h2>
+<style>
+    body {
+        background-color: #f4f6fb;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+        margin-bottom: 30px;
+        padding: 24px 32px;
+    }
+
+    .alert-info, .alert-danger {
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+        border-left: 5px solid #2b5876;
+        background-color: #e3f2fd;
+        color: #2b5876;
+    }
+
+    .company-highlight {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 1.1em;
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    .job-row {
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+        padding: 18px 20px;
+        margin-bottom: 24px;
+        transition: box-shadow 0.2s;
+        background: #eef3f7 !important;
+    }
+
+    .job-row-even {
+        background: #eeeff7 !important;
+    }
+
+    .job-description {
+        white-space: pre-line;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f6fafd;
+        border-radius: 4px;
+        padding: 8px 10px;
+        margin-top: 4px;
+        font-size: 1em;
+        color: #222;
+        font-weight: 400;
+        display: block;
+    }
+
+    h5 {
+        color: #2b5876;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+</style>
+
+<h2 class="mt-3 mb-2">Recent Job Listings</h2>
+
+@if (Model.TotalCount > 0)
+{
+    <div class="alert alert-info d-flex align-items-center mb-4">
+        <span class="me-2"><i class="bi bi-briefcase-fill"></i></span>
+        <strong>@Model.TotalCount</strong>&nbsp;Data Engineer jobs found in the last 30 days
+    </div>
+}
 @if (Model.JobSummaries == null)
 {
-    <div class="alert alert-danger">JobSummaries is null.</div>
+    <div class="alert alert-danger mb-4">JobSummaries is null.</div>
 }
 else if (!Model.JobSummaries.Any())
 {
-    <div class="alert alert-info">No recent jobs found.</div>
+    <div class="alert alert-info mb-4">No recent jobs found.</div>
 }
 else
 {
-    <div class="list-group">
-        @foreach (var job in Model.JobSummaries)
-        {
-            <div class="list-group-item mb-3 shadow-sm">
-                <h5 class="mb-1">@job.JobTitle</h5>
-                <p class="mb-1"><strong>Company:</strong> @job.CompanyName</p>
-                <p class="mb-1"><strong>HiringAgency:</strong> @job.HiringAgency</p>
-                <p class="mb-1"><strong>Published:</strong> @job.PostedDate.ToString("MMM dd, yyyy")</p>
-                <p class="mb-1"><strong>Location:</strong> @job.Location</p>
-                <p class="mb-1"><strong>Division:</strong> @job.Division</p>
-                <p class="mb-1"><strong>SourceLink:</strong> <a href="@job.SourceLink" target="_blank">@(new Uri(job.SourceLink).GetLeftPart(UriPartial.Authority))</a></p>
-                <p class="text-muted small">@job.JobDescription</p>
-            </div>
-        }
+    <div class="card">
+        <div class="list-group">
+            @foreach (var job in Model.JobSummaries)
+            {
+                <div class="job-row">
+                    <h3 class="mb-3">@job.CompanyName</h3>
+                    <p class="mb-1"><strong>Job Title:</strong> @job.JobTitle</p>
+                    <p class="mb-1"><strong>HiringAgency:</strong> @job.HiringAgency</p>
+                    <p class="mb-1"><strong>Published:</strong> @job.PostedDate.ToString("MMM dd, yyyy")</p>
+                    <p class="mb-1"><strong>Location:</strong> @job.Location</p>
+                    <p class="mb-1"><strong>Division:</strong> @job.Division</p>
+                    <p class="mb-1"><strong>SourceLink:</strong> <a href="@job.SourceLink" target="_blank">@(new Uri(job.SourceLink).GetLeftPart(UriPartial.Authority))</a></p>
+                    <p class="mb-3">
+                        <strong>Job Description:</strong>
+                        <span class="job-description">@job.JobDescription</span>
+                    </p>
+                </div>
+            }
+        </div>
     </div>
 
     <nav aria-label="Job pagination" class="mt-4">
