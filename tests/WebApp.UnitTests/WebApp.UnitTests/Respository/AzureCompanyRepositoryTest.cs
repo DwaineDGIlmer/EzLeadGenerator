@@ -3,6 +3,7 @@ using Application.Models;
 using Application.Services;
 using Azure;
 using Azure.Data.Tables;
+using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -16,13 +17,8 @@ public class AzureCompanyRepositoryTest
     private readonly Mock<TableClient> _tableClientMock = new();
     private readonly Mock<IOptions<AzureSettings>> _optionsMock = new();
     private readonly Mock<ILogger<AzureCompanyRepository>> _loggerMock = new();
+    private readonly Mock<ICacheService> _cacheServiceMock = new(); // Add cache service mock
     private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
-
-    private AzureCompanyRepository CreateRepository(string partitionKey = "TestPartition")
-    {
-        _optionsMock.Setup(o => o.Value).Returns(new AzureSettings { CompanyProfilePartionKey = partitionKey });
-        return new AzureCompanyRepository(_tableClientMock.Object, _optionsMock.Object, _loggerMock.Object);
-    }
 
     [Fact]
     public async Task GetCompanyProfileAsync_ThrowsArgumentException_WhenCompanyIdIsNullOrEmpty()
@@ -36,12 +32,28 @@ public class AzureCompanyRepositoryTest
     public async Task GetCompanyProfileAsync_ReturnsNull_WhenEntityNotFound()
     {
         var repo = CreateRepository();
+        _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>(It.IsAny<string>())).ReturnsAsync((CompanyProfile?)null);
         _tableClientMock
             .Setup(x => x.GetEntityAsync<TableEntity>(It.IsAny<string>(), It.IsAny<string>(), null, default))
             .ThrowsAsync(new RequestFailedException(404, "Not found"));
 
         var result = await repo.GetCompanyProfileAsync("company1");
         Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetCompanyProfileAsync_ReturnsProfile_FromCache()
+    {
+        var repo = CreateRepository();
+        var cachedProfile = new CompanyProfile(new JobSummary() { CompanyName = "CachedCompany" }, new HierarchyResults()) { CompanyId = "company1" };
+        _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>("company1")).ReturnsAsync(cachedProfile);
+
+        var result = await repo.GetCompanyProfileAsync("company1");
+
+        Assert.NotNull(result);
+        Assert.Equal("company1", result.CompanyId);
+        Assert.Equal("CachedCompany", result.CompanyName);
+        _tableClientMock.Verify(x => x.GetEntityAsync<TableEntity>(It.IsAny<string>(), It.IsAny<string>(), null, default), Times.Never);
     }
 
     [Fact]
@@ -146,24 +158,14 @@ public class AzureCompanyRepositoryTest
         _tableClientMock.Verify(x => x.DeleteEntityAsync(It.IsAny<string>(), It.IsAny<string>(), ETag.All, default), Times.Once);
     }
 
-    // Custom AsyncPageable implementation for testing
-    private class TestAsyncPageable<T>(IAsyncEnumerable<T> enumerable) : AsyncPageable<T> where T : notnull
+    private AzureCompanyRepository CreateRepository(string partitionKey = "TestPartition")
     {
-        private readonly IAsyncEnumerable<T> _enumerable = enumerable;
-
-        public IAsyncEnumerable<T> AsAsyncEnumerable()
-        {
-            return _enumerable;
-        }
-
-        public override async IAsyncEnumerable<Page<T>> AsPages(string? continuationToken = null, int? pageSizeHint = null)
-        {
-            var items = new List<T>();
-            await foreach (var item in _enumerable)
-            {
-                items.Add(item);
-            }
-            yield return Page<T>.FromValues(items, null, Mock.Of<Response>());
-        }
+        _optionsMock.Setup(o => o.Value).Returns(new AzureSettings { CompanyProfilePartionKey = partitionKey });
+        return new AzureCompanyRepository(
+            _tableClientMock.Object,
+            _cacheServiceMock.Object, // Pass cache service mock
+            _optionsMock.Object,
+            _loggerMock.Object
+        );
     }
 }

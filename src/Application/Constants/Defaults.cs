@@ -73,6 +73,13 @@
         public const string JobSummaryPartionKey = "jobsummary";
 
         /// <summary>
+        /// Represents the default cache expiration time, in minutes.
+        /// </summary>
+        /// <remarks>This constant defines the duration for which cached items are considered valid. It
+        /// can be used to configure caching mechanisms or as a default value for cache expiration.</remarks>
+        public const int CacheExpirationInMinutes = 60;
+
+        /// <summary>
         /// Represents the configuration key for EzLeads settings.
         /// </summary>
         /// <remarks>This constant can be used to reference the EzLeads settings key in configuration

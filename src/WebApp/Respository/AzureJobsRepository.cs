@@ -4,8 +4,10 @@ using Application.Contracts;
 using Application.Models;
 using Azure;
 using Azure.Data.Tables;
+using Core.Contracts;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using WebApp.Extensions;
 
 namespace WebApp.Respository;
 
@@ -17,15 +19,19 @@ namespace WebApp.Respository;
 /// client, blob container client, and logger.
 /// </remarks>
 /// <param name="tableClient">The <see cref="TableClient"/> used to interact with the Azure Table storage.</param>
+/// <param name="cachingService">The <see cref="ICacheService"/> used for caching company profiles.</param>
 /// <param name="options">Configuration settings for Azure services, including connection strings and other relevant settings.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
 public class AzureJobsRepository(
     TableClient tableClient,
+    ICacheService cachingService,
     IOptions<AzureSettings> options,
     ILogger<AzureJobsRepository> logger) : IJobsRepository
 {
-    private readonly string _partionKey = options?.Value.JobSummaryPartionKey ?? Defaults.JobSummaryPartionKey;
+    private readonly ICacheService _cachingService = cachingService ?? throw new ArgumentNullException(nameof(cachingService));
     private readonly TableClient _tableClient = tableClient ?? throw new ArgumentNullException(nameof(tableClient));
+    private readonly string _partionKey = options?.Value.JobSummaryPartionKey ?? Defaults.JobSummaryPartionKey;
+    private readonly int _cacheExpirationInMinutes = options?.Value?.CacheExpirationInMinutes ?? Defaults.CacheExpirationInMinutes;
     private readonly ILogger<AzureJobsRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly JsonSerializerOptions _options = new()
     {
@@ -45,16 +51,31 @@ public class AzureJobsRepository(
         if (string.IsNullOrWhiteSpace(jobId))
             throw new ArgumentException("Job ID cannot be null or empty.", nameof(jobId));
 
+        _logger.LogInformation("Retrieving job for {JobId}", jobId);
+
+        var cachedJob = await _cachingService.GetJobAsync(jobId, _logger);
+        if (cachedJob != null)
+        {
+            return cachedJob;
+        }
+
         try
         {
-            _logger.LogDebug("Retrieving job for {JobId}", jobId);
             var response = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, jobId);
             var json = response.Value.GetString("Data");
 
             if (string.IsNullOrEmpty(json))
-                throw new InvalidOperationException($"No data found for job ID: {jobId}");
+            {
+                _logger.LogInformation("Job data is empty for {JobId}", jobId);
+                return null;
+            }
 
             var job = JsonSerializer.Deserialize<JobSummary>(json, _options);
+            if (job is not null)
+            {
+                _logger.LogInformation("Retrieved job from cache for {JobId}", jobId);
+                await _cachingService.CreateEntryAsync(jobId, job, TimeSpan.FromMinutes(_cacheExpirationInMinutes));
+            }
             return job ?? null;
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
@@ -67,6 +88,11 @@ public class AzureJobsRepository(
             _logger.LogError(ex, "Error retrieving job for {JobId}", jobId);
             throw;
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error retrieving job for {JobId}", jobId);
+            throw new InvalidOperationException($"An error occurred while retrieving the job with ID: {jobId}", ex);
+        }
     }
 
     /// <summary>
@@ -78,7 +104,13 @@ public class AzureJobsRepository(
     /// objects for the specified date range.</returns>
     public async Task<IEnumerable<JobSummary>> GetJobsAsync(DateTime fromDate)
     {
-        _logger.LogDebug("Retrieving jobs posted since {FromDate}", fromDate);
+        _logger.LogInformation("Retrieving jobs posted since {FromDate}", fromDate);
+
+        var cachedJobs = await _cachingService.GetJobsAsync(fromDate, _logger);
+        if (cachedJobs != null)
+        {
+            return cachedJobs;
+        }
 
         var queryResults = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partionKey}'");
         var jobs = new List<JobSummary>();
@@ -101,6 +133,12 @@ public class AzureJobsRepository(
                 _logger.LogError(ex, "Failed to parse job from Azure Table for entity with RowKey: {RowKey}", entity.RowKey);
             }
         }
+
+        if (jobs.Count != 0)
+        {
+            _logger.LogInformation("Found {JobCount} jobs posted since {FromDate}", jobs.Count, fromDate);
+            await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes, _logger);
+        }
         return [.. jobs.OrderByDescending(j => j.PostedDate)];
     }
 
@@ -121,25 +159,8 @@ public class AzureJobsRepository(
         {
             _logger.LogDebug("Adding job for {JobId}", job.JobId);
 
-            var entity = new TableEntity(_partionKey, job.JobId)
-            {
-                {"Data", JsonSerializer.Serialize(job, _options)},
-                {"Id", job.Id ?? string.Empty},
-                {"JobTitle", job.JobTitle ?? string.Empty},
-                {"CompanyId", job.CompanyId ?? string.Empty},
-                {"CompanyName", job.CompanyName ?? string.Empty},
-                {"HiringAgency", job.HiringAgency ?? string.Empty},
-                {"Location", job.Location ?? string.Empty},
-                {"Division", job.Division ?? string.Empty},
-                {"Confidence", job.Confidence},
-                {"Reasoning", job.Reasoning ?? string.Empty},
-                {"SourceLink", job.SourceLink ?? string.Empty},
-                {"SourceName", job.SourceName ?? string.Empty},
-                {"PostedDate", job.PostedDate.ToString("o")},
-                {"UpdatedAt", DateTime.UtcNow.ToString("o")},
-                {"CreatedAt", DateTime.UtcNow.ToString("o")}
-            };
 
+            var entity = CreateTableEntity(job, _partionKey, _options);
             await _tableClient.UpsertEntityAsync(entity);
             _logger.LogInformation("Successfully added job for {JobId}", job.JobId);
         }
@@ -147,6 +168,11 @@ public class AzureJobsRepository(
         {
             _logger.LogError(ex, "Error adding job for {JobId}", job.JobId);
             throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error adding job for {JobId}", job.JobId);
+            throw new InvalidOperationException($"An error occurred while adding the job with ID: {job.JobId}", ex);
         }
     }
 
@@ -166,26 +192,8 @@ public class AzureJobsRepository(
         try
         {
             _logger.LogDebug("Updating job for {JobId}", job.JobId);
+            var entity = CreateTableEntity(job, _partionKey, _options);
 
-            var entity = new TableEntity(_partionKey, job.JobId)
-            {
-                {"Data", JsonSerializer.Serialize(job, _options)},
-                {"Id", job.Id ?? string.Empty},
-                {"JobTitle", job.JobTitle ?? string.Empty},
-                {"CompanyId", job.CompanyId ?? string.Empty},
-                {"CompanyName", job.CompanyName ?? string.Empty},
-                {"HiringAgency", job.HiringAgency ?? string.Empty},
-                {"Location", job.Location ?? string.Empty},
-                {"Division", job.Division ?? string.Empty},
-                {"Confidence", job.Confidence},
-                {"Reasoning", job.Reasoning ?? string.Empty},
-                {"SourceLink", job.SourceLink ?? string.Empty},
-                {"SourceName", job.SourceName ?? string.Empty},
-                {"PostedDate", job.PostedDate.ToString("o")},
-                {"UpdatedAt", DateTime.UtcNow.ToString("o")}
-            };
-
-            // Get the existing entity to preserve CreatedAt
             try
             {
                 var existing = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, job.JobId);
@@ -209,6 +217,11 @@ public class AzureJobsRepository(
         {
             _logger.LogError(ex, "Error updating job for {JobId}", job.JobId);
             throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error updating job for {JobId}", job.JobId);
+            throw new InvalidOperationException($"An error occurred while updating the job with ID: {job.JobId}", ex);
         }
     }
 
@@ -242,5 +255,43 @@ public class AzureJobsRepository(
             _logger.LogError(ex, "Error deleting job for {JobId}", job.JobId);
             throw;
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error deleting job for {JobId}", job.JobId);
+            throw new InvalidOperationException($"An error occurred while deleting the job with ID: {job.JobId}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Creates a <see cref="TableEntity"/> instance representing the specified job summary.
+    /// </summary>
+    /// <remarks>The returned <see cref="TableEntity"/> includes key-value pairs representing the job
+    /// summary's properties, such as job title, company name, location, and other relevant details. The "Data" field
+    /// contains the serialized job object, and timestamps for creation and update are automatically added.</remarks>
+    /// <param name="job">The job summary object containing details about the job.</param>
+    /// <param name="partionKey">The partition key to associate with the table entity. Cannot be null or empty.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions"/> used to serialize the job data.</param>
+    /// <returns>A <see cref="TableEntity"/> populated with the job summary data, including serialized job details and additional
+    /// metadata such as timestamps.</returns>
+    public static TableEntity CreateTableEntity(JobSummary job, string partionKey, JsonSerializerOptions options)
+    {
+        return new TableEntity(partionKey, job.JobId)
+        {
+            {"Data", JsonSerializer.Serialize(job, options)},
+            {"Id", job.Id ?? string.Empty},
+            {"JobTitle", job.JobTitle ?? string.Empty},
+            {"CompanyId", job.CompanyId ?? string.Empty},
+            {"CompanyName", job.CompanyName ?? string.Empty},
+            {"HiringAgency", job.HiringAgency ?? string.Empty},
+            {"Location", job.Location ?? string.Empty},
+            {"Division", job.Division ?? string.Empty},
+            {"Confidence", job.Confidence},
+            {"Reasoning", job.Reasoning ?? string.Empty},
+            {"SourceLink", job.SourceLink ?? string.Empty},
+            {"SourceName", job.SourceName ?? string.Empty},
+            {"PostedDate", job.PostedDate.ToString("o")},
+            {"UpdatedAt", DateTime.UtcNow.ToString("o")},
+            {"CreatedAt", DateTime.UtcNow.ToString("o")}
+        };
     }
 }

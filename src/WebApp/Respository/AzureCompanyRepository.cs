@@ -4,8 +4,10 @@ using Application.Contracts;
 using Application.Models;
 using Azure;
 using Azure.Data.Tables;
+using Core.Contracts;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using WebApp.Extensions;
 
 namespace WebApp.Respository;
 
@@ -17,13 +19,20 @@ namespace WebApp.Respository;
 /// client, blob container client, and logger.
 /// </remarks>
 /// <param name="tableClient">The <see cref="TableClient"/> used to interact with the Azure Table storage.</param>
+/// <param name="cachingService">The <see cref="ICacheService"/> used for caching company profiles.</param>
 /// <param name="options">Configuration options for Azure settings, including the table name.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
-public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSettings> options, ILogger<AzureCompanyRepository> logger) : ICompanyRepository
+public class AzureCompanyRepository(
+    TableClient tableClient,
+    ICacheService cachingService,
+    IOptions<AzureSettings> options,
+    ILogger<AzureCompanyRepository> logger) : ICompanyRepository
 {
-    private readonly string _partionKey = options?.Value?.CompanyProfilePartionKey ?? Defaults.CompanyProfilePartionKey;
     private readonly TableClient _tableClient = tableClient ?? throw new ArgumentNullException(nameof(tableClient));
+    private readonly ICacheService _cachingService = cachingService ?? throw new ArgumentNullException(nameof(cachingService));
     private readonly ILogger<AzureCompanyRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly string _partionKey = options?.Value?.CompanyProfilePartionKey ?? Defaults.CompanyProfilePartionKey;
+    private readonly int _cacheExpirationInMinutes = options?.Value?.CacheExpirationInMinutes ?? Defaults.CacheExpirationInMinutes;
     private readonly JsonSerializerOptions _options = new()
     {
         PropertyNameCaseInsensitive = true
@@ -42,9 +51,16 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
         if (string.IsNullOrWhiteSpace(CompanyId))
             throw new ArgumentException("Company ID cannot be null or empty.", nameof(CompanyId));
 
+        _logger.LogInformation("Retrieving company profile for {CompanyId}", CompanyId);
+
+        var cachedProfile = await _cachingService.GetCompanyAsync(CompanyId, _logger);
+        if (cachedProfile != null)
+        {
+            return cachedProfile;
+        }
+
         try
         {
-            _logger.LogDebug("Retrieving company profile for {CompanyId}", CompanyId);
             var response = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, CompanyId);
             var json = response.Value.GetString("Data");
 
@@ -55,6 +71,13 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
             }
 
             var profile = JsonSerializer.Deserialize<CompanyProfile>(json, _options);
+            if (profile is not null)
+            {
+                _logger.LogInformation("Successfully retrieved company profile for {CompanyId}", CompanyId);
+
+                await _cachingService.CreateEntryAsync(CompanyId, profile, TimeSpan.FromMinutes(_cacheExpirationInMinutes));
+                _logger.LogDebug("Added company profile for {CompanyId} to cache", CompanyId);
+            }
             return profile ?? null;
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
@@ -67,6 +90,11 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
             _logger.LogError(ex, "Error retrieving profile for {CompanyId}", CompanyId);
             throw;
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error retrieving company profile for {CompanyId}", CompanyId);
+            throw new InvalidOperationException($"An error occurred while retrieving the company profile for ID: {CompanyId}", ex);
+        }
     }
 
     /// <summary>
@@ -77,7 +105,14 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
     /// cref="CompanyProfile"/> objects that match the specified criteria.</returns>
     public async Task<IEnumerable<CompanyProfile>> GetCompanyProfileAsync(DateTime fromDate)
     {
-        _logger.LogDebug("Retrieving company profiles updated since {FromDate}", fromDate);
+        _logger.LogInformation("Retrieving company profiles updated since {FromDate}", fromDate);
+
+        var cachedProfiles = await _cachingService.GetCompaniesAsync(fromDate, _logger);
+        if (cachedProfiles != null)
+        {
+            _logger.LogInformation("Retrieved company profiles from cache");
+            return cachedProfiles.Where(c => c.UpdatedAt >= fromDate).OrderByDescending(c => c.CreatedAt);
+        }
 
         var queryResults = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partionKey}'");
         var companies = new List<CompanyProfile>();
@@ -94,14 +129,21 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
                 {
                     companies.Add(profile);
                 }
+
+                if (companies.Count != 0)
+                {
+                    _logger.LogDebug("Caching company profiles for partition key: {PartitionKey}", _partionKey);
+                    await _cachingService.AddCompaniesAsync(companies, fromDate, _cacheExpirationInMinutes, _logger);
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to parse company profile from Azure Table for entity with RowKey: {RowKey}", entity.RowKey);
+                throw new InvalidOperationException($"An error occurred while parsing the company profile for RowKey: {entity.RowKey}", ex);
             }
         }
 
-        // Fix: Actually apply the ordering and return the sorted list
+        _logger.LogInformation("Successfully retrieved {Count} company profiles updated since {FromDate}", companies.Count, fromDate);
         return [.. companies.OrderByDescending(c => c.CreatedAt)];
     }
 
@@ -119,7 +161,7 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
 
         try
         {
-            _logger.LogDebug("Adding company profile for {CompanyId}", profile.CompanyId);
+            _logger.LogInformation("Adding company profile for {CompanyId}", profile.CompanyId);
 
             var entity = new TableEntity(_partionKey, profile.CompanyId)
             {
@@ -139,6 +181,11 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
         {
             _logger.LogError(ex, "Error adding company profile for {CompanyId}", profile.CompanyId);
             throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error adding company profile for {CompanyId}", profile.CompanyId);
+            throw new InvalidOperationException($"An error occurred while adding the company profile for ID: {profile.CompanyId}", ex);
         }
     }
 
@@ -185,6 +232,11 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
             _logger.LogError(ex, "Error updating company profile for {CompanyId}", profile.CompanyId);
             throw;
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error updating company profile for {CompanyId}", profile.CompanyId);
+            throw new InvalidOperationException($"An error occurred while updating the company profile for ID: {profile.CompanyId}", ex);
+        }
     }
 
     /// <summary>
@@ -216,6 +268,11 @@ public class AzureCompanyRepository(TableClient tableClient, IOptions<AzureSetti
         {
             _logger.LogError(ex, "Error deleting company profile for {CompanyId}", profile.CompanyId);
             throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error deleting company profile for {CompanyId}", profile.CompanyId);
+            throw new InvalidOperationException($"An error occurred while deleting the company profile for ID: {profile.CompanyId}", ex);
         }
     }
 }

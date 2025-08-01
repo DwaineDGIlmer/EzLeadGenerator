@@ -1,5 +1,6 @@
 using Core.Extensions;
 using WebApp.Extensions;
+using WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,10 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// the first request to the application will trigger the loading of job sources and company profiles
+// Load the job source service and update job sources and company profiles
+await DataLoadService.LoadAppSourceService(app);
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -34,7 +38,5 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
-//app.UseJobSourceService();
 
 app.Run();

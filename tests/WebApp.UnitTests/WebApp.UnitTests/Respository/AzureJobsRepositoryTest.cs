@@ -2,6 +2,7 @@ using Application.Configurations;
 using Application.Models;
 using Azure;
 using Azure.Data.Tables;
+using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -13,10 +14,10 @@ public class AzureJobsRepositoryTest
 {
     private readonly Mock<TableClient> _tableClientMock = new();
     private readonly Mock<ILogger<AzureJobsRepository>> _loggerMock = new();
+    private readonly Mock<ICacheService> _cacheServiceMock = new(); // Add cache service mock
     private readonly IOptions<AzureSettings> _options = Options.Create(new AzureSettings { JobSummaryPartionKey = "TestPartition" });
-
     private AzureJobsRepository CreateRepository()
-        => new(_tableClientMock.Object, _options, _loggerMock.Object);
+    => new(_tableClientMock.Object, _cacheServiceMock.Object, _options, _loggerMock.Object);
 
     [Fact]
     public async Task GetJobsAsync_ById_ReturnsJob_WhenFound()
@@ -29,6 +30,7 @@ public class AzureJobsRepositoryTest
         };
         var responseMock = Response.FromValue(entity, null!);
 
+        _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(jobId)).ReturnsAsync((JobSummary?)null);
         _tableClientMock
             .Setup(c => c.GetEntityAsync<TableEntity>(_options.Value.JobSummaryPartionKey, jobId, null, default))
             .ReturnsAsync(responseMock);
@@ -38,6 +40,21 @@ public class AzureJobsRepositoryTest
 
         Assert.NotNull(result);
         Assert.Equal(jobId, result!.JobId);
+    }
+
+    [Fact]
+    public async Task GetJobsAsync_ById_ReturnsJob_FromCache()
+    {
+        var jobId = "cachedJob";
+        var cachedJob = new JobSummary { JobId = jobId, PostedDate = DateTime.UtcNow };
+        _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(jobId)).ReturnsAsync(cachedJob);
+
+        var repo = CreateRepository();
+        var result = await repo.GetJobsAsync(jobId);
+
+        Assert.NotNull(result);
+        Assert.Equal(jobId, result!.JobId);
+        _tableClientMock.Verify(x => x.GetEntityAsync<TableEntity>(It.IsAny<string>(), It.IsAny<string>(), null, default), Times.Never);
     }
 
     [Fact]
@@ -77,6 +94,8 @@ public class AzureJobsRepositoryTest
         _tableClientMock
             .Setup(c => c.QueryAsync<TableEntity>(It.IsAny<string>(), null, null, default))
             .Returns(asyncEnumerable);
+        _cacheServiceMock.Setup(x => x.TryGetAsync<IEnumerable<JobSummary>>(It.IsAny<string>()))
+            .ReturnsAsync((IEnumerable<JobSummary>?)null);
 
         var repo = CreateRepository();
         var result = await repo.GetJobsAsync(fromDate);

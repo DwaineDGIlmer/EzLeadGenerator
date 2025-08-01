@@ -21,7 +21,7 @@ namespace WebApp.Pages
         /// <summary>
         /// Gets the number of items to display per page.
         /// </summary>
-        public int PageSize { get; private set; } = 2;
+        public int PageSize { get; private set; } = 3;
 
         /// <summary>
         /// Gets the total number of pages available.

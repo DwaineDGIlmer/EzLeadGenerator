@@ -1,5 +1,6 @@
 using Application.Models;
 using Core.Configuration;
+using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -12,6 +13,7 @@ public class LocalJobsRepositoryStoreTest
     private readonly string _testDirectory;
     private readonly Mock<ILogger<LocalJobsRepositoryStore>> _loggerMock;
     private readonly IOptions<SerpApiSettings> _options;
+    private readonly Mock<ICacheService> _cacheServiceMock = new(); // Add cache service mock
 
     public LocalJobsRepositoryStoreTest()
     {
@@ -23,16 +25,21 @@ public class LocalJobsRepositoryStoreTest
         _options = Options.Create(settings);
     }
 
-    private LocalJobsRepositoryStore CreateStore() =>
-        new(_options, _loggerMock.Object);
+    [Fact]
+    public async Task GetJobsAsync_ById_ReturnsJob_FromCache()
+    {
+        var store = CreateStore();
+        var jobId = "cachedJob";
+        var cachedJob = CreateJob(jobId);
 
-    private JobSummary CreateJob(string id, DateTime? postedDate = null) =>
-        new()
-        {
-            JobId = id,
-            PostedDate = postedDate ?? DateTime.UtcNow,
-            // Add other required properties if needed
-        };
+        _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(jobId)).ReturnsAsync(cachedJob);
+
+        var result = await store.GetJobsAsync(jobId);
+
+        Assert.NotNull(result);
+        Assert.Equal(jobId, result.JobId);
+        _cacheServiceMock.Verify(x => x.TryGetAsync<JobSummary>(jobId), Times.Once);
+    }
 
     [Fact]
     public async Task AddJobAsync_SavesJobProfile()
@@ -73,6 +80,9 @@ public class LocalJobsRepositoryStoreTest
         var store = CreateStore();
         var jobOld = CreateJob("jobOld", DateTime.UtcNow.AddDays(-10));
         var jobNew = CreateJob("jobNew", DateTime.UtcNow);
+
+        _cacheServiceMock.Setup(x => x.TryGetAsync<IEnumerable<JobSummary>>(It.IsAny<string>()))
+        .ReturnsAsync((IEnumerable<JobSummary>?)null);
 
         await store.AddJobAsync(jobOld);
         await store.AddJobAsync(jobNew);
@@ -126,7 +136,15 @@ public class LocalJobsRepositoryStoreTest
         var store = CreateStore();
         var job = CreateJob("job6");
         await store.DeleteJobAsync(job);
-
-        // Should not throw
     }
+
+    private LocalJobsRepositoryStore CreateStore() =>
+        new(_cacheServiceMock.Object, _options, _loggerMock.Object);
+
+    private static JobSummary CreateJob(string id, DateTime? postedDate = null) =>
+        new()
+        {
+            JobId = id,
+            PostedDate = postedDate ?? DateTime.UtcNow,
+        };
 }

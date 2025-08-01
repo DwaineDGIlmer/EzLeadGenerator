@@ -38,6 +38,7 @@ public class ServiceCollectionExtensionsTest
 
         services.AddLogging();
         services.AddSingleton(Mock.Of<IWebHostEnvironment>());
+        services.AddSingleton(Mock.Of<ICacheService>());
         services.Configure<SerpApiSettings>(option =>
         {
             option = new SerpApiSettings();
@@ -65,6 +66,7 @@ public class ServiceCollectionExtensionsTest
 
         services.AddLogging();
         services.AddCompanyProfileStore(configuration);
+        services.AddSingleton(Mock.Of<ICacheService>());
 
         var provider = services.BuildServiceProvider();
         var repo = provider.GetService<ICompanyRepository>();
@@ -122,6 +124,7 @@ public class ServiceCollectionExtensionsTest
 
         services.AddLogging();
         services.AddJobsProfileStore(configuration);
+        services.AddSingleton(Mock.Of<ICacheService>());
 
         var provider = services.BuildServiceProvider();
         var repo = provider.GetService<IJobsRepository>();
