@@ -49,12 +49,16 @@ public class SerpApiSearchJobsService : IJobsRetrieval<JobResult>
     /// Initializes a new instance of the <see cref="SerpApiSearchJobsService"/> class with the specified configuration
     /// settings and HTTP client factory.
     /// </summary>
-    /// <param name="options">The configuration settings for the service, including API key, base address, and endpoint. Cannot be null, and
-    /// must contain valid values for <c>ApiKey</c>, <c>BaseAddress</c>, and <c>Endpoint</c>.</param>
     /// <param name="cacheService">The cache service used for caching job listings. Cannot be null.</param>
     /// <param name="clientFactory">The factory used to create HTTP client instances. Cannot be null.</param>
+    /// <param name="options">The configuration settings for the service, including API key, base address, and endpoint. Cannot be null, and
+    /// must contain valid values for <c>ApiKey</c>, <c>BaseAddress</c>, and <c>Endpoint</c>.</param>
     /// <param name="logger">The logger used for logging service operations. Cannot be null.</param>
-    public SerpApiSearchJobsService(IOptions<SerpApiSettings> options, ICacheService cacheService, IHttpClientFactory clientFactory, ILogger<SerpApiSearchJobsService> logger)
+    public SerpApiSearchJobsService(
+        ICacheService cacheService,
+        IHttpClientFactory clientFactory,
+        IOptions<SerpApiSettings> options,
+        ILogger<SerpApiSearchJobsService> logger)
     {
         ArgumentNullException.ThrowIfNull(clientFactory, nameof(clientFactory));
         ArgumentNullException.ThrowIfNull(cacheService, nameof(cacheService));
@@ -82,42 +86,31 @@ public class SerpApiSearchJobsService : IJobsRetrieval<JobResult>
     {
         var cacheKey = CachingHelper.GenCacheKey(query, location.GenHashString());
 
-        // Try to get cached jobs first
         var cachedJobs = await GetCachedJobs(cacheKey);
         if (cachedJobs is not null)
         {
             return cachedJobs.JobsResults;
         }
-
-        // Make HTTP request - Fixed to use proper Google Jobs API format
-        var request = $"{Endpoint}?engine=google_jobs&q={Uri.EscapeDataString(query)}&location={Uri.EscapeDataString(location)}&api_key={ApiKey}&hl=en";
-
-        var httpClient = _clientFactory.CreateClient(ClientName);
-        var response = await httpClient.GetAsync(request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            _logger.LogError("Failed to retrieve job listings for query: {Query} and location: {Location}. Status: {StatusCode}", query, location, response.StatusCode);
-            return [];
-        }
-
-        var content = await response.Content.ReadAsStringAsync();
-        if (string.IsNullOrWhiteSpace(content))
-        {
-            _logger.LogWarning("No job listings found for query: {Query} and location: {Location}", query, location);
-            return [];
-        }
-
         try
         {
-            var googleJobs = JsonSerializer.Deserialize<GoogleJobsResult>(content, _options);
+            var request = $"{Endpoint}?engine=google_jobs&q={Uri.EscapeDataString(query)}&location={Uri.EscapeDataString(location)}&api_key={ApiKey}&hl=en";
+            var googleJobs = await GoogleJobsResultAsync(request, location);
+
             if (googleJobs is null || googleJobs.JobsResults is null || googleJobs.JobsResults.Count == 0)
             {
                 _logger.LogWarning("Deserialized job listings are empty for query: {Query} and location: {Location}", query, location);
                 return [];
             }
 
-            // Cache the parsed results as IList<JobResult> to match test expectations
+            if (!string.IsNullOrEmpty(googleJobs.SerpapiPagination.NextPageToken))
+            {
+                var nextPage = await GoogleJobsResultAsync($"{request}&next_page_token={googleJobs.SerpapiPagination.NextPageToken}", location);
+                if (nextPage is not null && nextPage.JobsResults is not null && nextPage.JobsResults.Count > 0)
+                {
+                    googleJobs.JobsResults.AddRange(nextPage.JobsResults);
+                }
+            }
+
             await _cacheService.CreateEntryAsync(cacheKey, googleJobs, TimeSpan.FromMinutes(CacheExpirationInMinutes));
             return googleJobs.JobsResults;
         }
@@ -126,6 +119,34 @@ public class SerpApiSearchJobsService : IJobsRetrieval<JobResult>
             _logger.LogError(ex, "Error deserializing job listings for query: {Query} and location: {Location}", query, location);
         }
         return [];
+    }
+
+    private async Task<GoogleJobsResult?> GoogleJobsResultAsync(string request, string location)
+    {
+        try
+        {
+            var httpClient = _clientFactory.CreateClient(ClientName);
+            var response = await httpClient.GetAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to retrieve job listings for query: {request}, Status: {StatusCode}", request, response.StatusCode);
+                return null;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                _logger.LogWarning("No job listings found for query: {Query} and location: {Location}", request, location);
+                return null;
+            }
+            return JsonSerializer.Deserialize<GoogleJobsResult>(content, _options);
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Error deserializing job listings for request: {Request} and location: {Location}", request, location);
+            return null;
+        }
     }
 
     private async Task<GoogleJobsResult?> GetCachedJobs(string cacheKey)

@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace WebApp.UnitTests.Services;
+namespace Application.UnitTests.Services;
 
-public class JobsRetrivalServiceTest : UnitTestsBase
+public class JobsRetrivalServiceTest
 {
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
     private readonly Mock<ICacheService> _cacheServiceMock;
@@ -27,19 +27,19 @@ public class JobsRetrivalServiceTest : UnitTestsBase
             Endpoint = "https://api.example.com/search"
         });
 
-        _service = new SerpApiSearchJobsService(_options, _cacheServiceMock.Object, _httpClientFactoryMock.Object, _loggerMock.Object);
+        _service = new SerpApiSearchJobsService(_cacheServiceMock.Object, _httpClientFactoryMock.Object, _options, _loggerMock.Object);
     }
 
     [Fact]
     public void Constructor_ThrowsIfArgumentsAreNull()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new SerpApiSearchJobsService(null!, _cacheServiceMock.Object, _httpClientFactoryMock.Object, _loggerMock.Object));
+            new SerpApiSearchJobsService(_cacheServiceMock.Object, _httpClientFactoryMock.Object, null!, _loggerMock.Object));
         Assert.Throws<ArgumentNullException>(() =>
-            new SerpApiSearchJobsService(_options, null!, _httpClientFactoryMock.Object, _loggerMock.Object));
+            new SerpApiSearchJobsService(null!, _httpClientFactoryMock.Object, _options, _loggerMock.Object));
         Assert.Throws<ArgumentNullException>(() =>
-            new SerpApiSearchJobsService(_options, _cacheServiceMock.Object, null!, _loggerMock.Object));
+            new SerpApiSearchJobsService(_cacheServiceMock.Object, null!, _options, _loggerMock.Object));
         Assert.Throws<ArgumentNullException>(() =>
-            new SerpApiSearchJobsService(_options, _cacheServiceMock.Object, _httpClientFactoryMock.Object, null!));
+            new SerpApiSearchJobsService(_cacheServiceMock.Object, _httpClientFactoryMock.Object, _options, null!));
     }
 }

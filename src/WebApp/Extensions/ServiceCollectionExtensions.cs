@@ -43,8 +43,12 @@ public static class ServiceCollectionExtensions
                 var env = sp.GetRequiredService<IWebHostEnvironment>();
                 var logger = sp.GetRequiredService<ILogger<LocalCompanyProfileStore>>();
                 var options = sp.GetRequiredService<IOptions<SerpApiSettings>>();
+                var cachingService = sp.GetRequiredService<ICacheService>();
 
-                return new LocalCompanyProfileStore(options, logger);
+                // Use Azure settings to configure cache expiration
+                options.Value.CacheExpirationInMinutes = settings.CacheExpirationInMinutes;
+
+                return new LocalCompanyProfileStore(cachingService, options, logger);
             });
         }
         else
@@ -57,13 +61,14 @@ public static class ServiceCollectionExtensions
                 var config = builder.AddUserSecrets<Program>().Build();
 
                 var logger = sp.GetRequiredService<ILogger<AzureCompanyRepository>>();
+                var cachingService = sp.GetRequiredService<ICacheService>();
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
                 var connectionString = config.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.CompanyProfileTableName) ?
                 Defaults.CompanyProfileTableName : settings.CompanyProfileTableName;
                 var tabl = new Azure.Data.Tables.TableClient(connectionString, tableName);
 
-                return new AzureCompanyRepository(tabl, options, logger);
+                return new AzureCompanyRepository(tabl, cachingService, options, logger);
             });
         }
         return services;
@@ -93,8 +98,12 @@ public static class ServiceCollectionExtensions
                 var env = sp.GetRequiredService<IWebHostEnvironment>();
                 var logger = sp.GetRequiredService<ILogger<LocalJobsRepositoryStore>>();
                 var options = sp.GetRequiredService<IOptions<SerpApiSettings>>();
+                var cachingService = sp.GetRequiredService<ICacheService>();
 
-                return new LocalJobsRepositoryStore(options, logger);
+                // Use Azure settings to configure cache expiration
+                options.Value.CacheExpirationInMinutes = settings.CacheExpirationInMinutes;
+
+                return new LocalJobsRepositoryStore(cachingService, options, logger);
             });
         }
         else
@@ -104,8 +113,9 @@ public static class ServiceCollectionExtensions
                 // Keeping the configuration builder to add user secrets
                 var builder = new ConfigurationBuilder();
                 builder.AddConfiguration(configuration);
-                var config = builder.AddUserSecrets<Program>().Build();
 
+                var config = builder.AddUserSecrets<Program>().Build();
+                var cachingService = sp.GetRequiredService<ICacheService>();
                 var logger = sp.GetRequiredService<ILogger<AzureJobsRepository>>();
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
                 var connectionString = config.GetConnectionString("AzureTableStorage");
@@ -113,7 +123,7 @@ public static class ServiceCollectionExtensions
                 Defaults.JobSummaryTableName : settings.JobSummaryTableName;
                 var tbl = new Azure.Data.Tables.TableClient(connectionString, tableName);
 
-                return new AzureJobsRepository(tbl, options, logger);
+                return new AzureJobsRepository(tbl, cachingService, options, logger);
             });
         }
         return services;
@@ -158,9 +168,9 @@ public static class ServiceCollectionExtensions
             var clientFactory = sp.GetRequiredService<IHttpClientFactory>();
             var logger = sp.GetRequiredService<ILogger<SerpApiSearchJobsService>>();
             return new SerpApiSearchJobsService(
-                options,
                 cacheService,
                 clientFactory,
+                options,
                 logger);
         });
         return services;
@@ -248,22 +258,5 @@ public static class ServiceCollectionExtensions
         });
         services.AddSingleton<ISearch<OrganicResult>, SerpApiSearchService>();
         return services;
-    }
-
-    /// <summary>
-    /// Configures the application to use the job source service.
-    /// </summary>
-    /// <remarks>This method ensures that the job source service is registered and performs initial
-    /// updates to the job source and company profiles. It throws an exception if the service is not
-    /// available.</remarks>
-    /// <param name="app">The application builder used to configure the application's request pipeline.</param>
-    /// <returns>The <see cref="IApplicationBuilder"/> instance for further configuration.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if the job source service is not registered in the application's service collection.</exception>
-    public static IApplicationBuilder UseJobSourceService(this IApplicationBuilder app)
-    {
-        var job = app.ApplicationServices.GetService<IJobSourceService>() ?? throw new InvalidOperationException("Job source service is not registered.");
-        job.UpdateJobSourceAsync().GetAwaiter().GetResult();
-        job.UpdateCompanyProfilesAsync().GetAwaiter().GetResult();
-        return app;
     }
 }

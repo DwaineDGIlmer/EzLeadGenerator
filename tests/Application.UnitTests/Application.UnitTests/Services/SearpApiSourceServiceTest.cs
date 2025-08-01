@@ -48,7 +48,7 @@ public class SearpApiSourceServiceTest
     {
         var jobs = new List<JobResult>
         {
-            new() { JobId = "1", CompanyName = "TestCo", Description = "desc" }
+            new() { JobId = "1", CompanyName = "TestCo", Description = "desc", Location = "Charlotte, NC" }
         };
         _jobsRetrievalMock.Setup(j => j.FetchJobs(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(jobs);
@@ -64,6 +64,49 @@ public class SearpApiSourceServiceTest
 
         var service = CreateService();
         var result = await service.UpdateJobSourceAsync();
+
+        Assert.True(result);
+    }
+
+
+    [Fact]
+    public async Task UpdateJobSourceAsync_ReturnsFalse_WhenJobsAreNotInArea()
+    {
+        var jobResult = new JobResult
+        {
+            JobId = "1",
+            CompanyName = "TestCo",
+            Description = "desc",
+            Location = "New York, NY"
+        };
+        var jobs = new List<JobResult>
+        {
+           jobResult
+        };
+
+        _jobsRetrievalMock.Setup(j => j.FetchJobs(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(jobs);
+
+        _jobsRepositoryMock.Setup(r => r.GetJobsAsync(It.IsAny<string>()))
+            .ReturnsAsync((JobSummary?)null);
+
+        _aiChatServiceMock.Setup(a => a.GetChatCompletion<DivisionInference>(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(new DivisionInference { Division = "Division", Reasoning = "Reason", Confidence = 1 });
+
+        _jobsRepositoryMock.Setup(r => r.AddJobAsync(It.IsAny<JobSummary>()))
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService();
+        var result = await service.UpdateJobSourceAsync();
+
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
 
         Assert.True(result);
     }

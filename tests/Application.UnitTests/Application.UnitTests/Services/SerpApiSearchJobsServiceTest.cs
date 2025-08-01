@@ -35,7 +35,7 @@ public class SerpApiSearchJobsServiceTest
             .Setup(c => c.TryGetAsync<GoogleJobsResult>(It.IsAny<string>()))
             .ReturnsAsync(cachedResult);
 
-        return new SerpApiSearchJobsService(options, _cacheServiceMock.Object, _httpClientFactoryMock.Object, _loggerMock.Object);
+        return new SerpApiSearchJobsService(_cacheServiceMock.Object, _httpClientFactoryMock.Object, options, _loggerMock.Object);
     }
 
     [Fact]

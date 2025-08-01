@@ -1,6 +1,7 @@
 using Application.Models;
 using Application.Services;
 using Core.Configuration;
+using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -11,41 +12,13 @@ namespace WebApp.UnitTests.Respository;
 public class LocalCompanyProfileStoreTest
 {
     private readonly string _testDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    private readonly Mock<ICacheService> _cacheServiceMock = new();
 
-    private LocalCompanyProfileStore CreateStore(out Mock<ILogger<LocalCompanyProfileStore>> loggerMock)
+    public LocalCompanyProfileStoreTest()
     {
-        var optionsMock = new Mock<IOptions<SerpApiSettings>>();
-        optionsMock.Setup(o => o.Value).Returns(new SerpApiSettings
-        {
-            FileCompanyProfileDirectory = _testDirectory
-        });
-
-        loggerMock = new Mock<ILogger<LocalCompanyProfileStore>>();
-        return new LocalCompanyProfileStore(optionsMock.Object, loggerMock.Object);
-    }
-
-    private static CompanyProfile CreateProfile(string companyName, DateTime? createdAt = null)
-    {
-        JobSummary jobSummary = new()
-        {
-            CompanyName = companyName,
-            Division = "Test Division",
-        };
-        HierarchyResults hierarchyResults = new()
-        {
-            OrgHierarchy =
-             [
-                 new HierarchyItem
-                 {
-                      Name = "Test Department",
-                      Title = "test-department",
-                 }
-             ]
-        };
-        return new CompanyProfile(jobSummary, hierarchyResults)
-        {
-            CreatedAt = createdAt ?? DateTime.UtcNow,
-        };
+        if (Directory.Exists(_testDirectory))
+            Directory.Delete(_testDirectory, true);
+        Directory.CreateDirectory(_testDirectory);
     }
 
     [Fact]
@@ -78,6 +51,7 @@ public class LocalCompanyProfileStoreTest
         var oldProfile = CreateProfile("old", DateTime.Now.AddDays(-1));
         var newProfile = CreateProfile("new", DateTime.Now);
 
+        _cacheServiceMock.Setup(x => x.TryGetAsync<IEnumerable<CompanyProfile>>(It.IsAny<string>())).ReturnsAsync((IEnumerable<CompanyProfile>?)null);
         await store.AddCompanyProfileAsync(oldProfile);
         await store.AddCompanyProfileAsync(newProfile);
 
@@ -126,11 +100,53 @@ public class LocalCompanyProfileStoreTest
         Assert.False(File.Exists(path));
     }
 
-    // Cleanup test directory after each test
-    public LocalCompanyProfileStoreTest()
+    [Fact]
+    public async Task GetCompanyProfileAsync_ReturnsProfile_FromCache()
     {
-        if (Directory.Exists(_testDirectory))
-            Directory.Delete(_testDirectory, true);
-        Directory.CreateDirectory(_testDirectory);
+        var store = CreateStore(out var _);
+        var profile = CreateProfile("cached-company");
+        _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>(profile.CompanyId)).ReturnsAsync(profile);
+
+        var result = await store.GetCompanyProfileAsync(profile.CompanyId);
+
+        Assert.NotNull(result);
+        Assert.Equal(profile.CompanyId, result.CompanyId);
     }
+
+    private LocalCompanyProfileStore CreateStore(out Mock<ILogger<LocalCompanyProfileStore>> loggerMock)
+    {
+        var optionsMock = new Mock<IOptions<SerpApiSettings>>();
+        optionsMock.Setup(o => o.Value).Returns(new SerpApiSettings
+        {
+            FileCompanyProfileDirectory = _testDirectory
+        });
+
+        loggerMock = new Mock<ILogger<LocalCompanyProfileStore>>();
+        return new LocalCompanyProfileStore(_cacheServiceMock.Object, optionsMock.Object, loggerMock.Object);
+    }
+
+    private static CompanyProfile CreateProfile(string companyName, DateTime? createdAt = null)
+    {
+        JobSummary jobSummary = new()
+        {
+            CompanyName = companyName,
+            Division = "Test Division",
+        };
+        HierarchyResults hierarchyResults = new()
+        {
+            OrgHierarchy =
+             [
+                 new HierarchyItem
+                 {
+                      Name = "Test Department",
+                      Title = "test-department",
+                 }
+             ]
+        };
+        return new CompanyProfile(jobSummary, hierarchyResults)
+        {
+            CreatedAt = createdAt ?? DateTime.UtcNow,
+        };
+    }
+
 }

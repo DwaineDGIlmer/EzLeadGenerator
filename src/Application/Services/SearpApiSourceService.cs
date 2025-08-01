@@ -169,7 +169,7 @@ public class SearpApiSourceService : IJobSourceService
                     {
                         if (companyProfile is not null)
                         {
-                          await _companyRepository.UpdateCompanyProfileAsync(new CompanyProfile(job, clientResult));
+                            await _companyRepository.UpdateCompanyProfileAsync(new CompanyProfile(job, clientResult));
                             _logger.LogInformation("Updated existing company profile for: {CompanyName}", job.CompanyName);
                         }
                         else
@@ -245,14 +245,14 @@ public class SearpApiSourceService : IJobSourceService
     }
 
     /// <summary>
-    /// Updates the job source by retrieving job data and processing it for storage.
+    /// Updates the job source by retrieving jobs, validating their data, and adding them to the repository.
     /// </summary>
-    /// <remarks>This method fetches job listings based on the configured query and location settings. It
-    /// processes each job to infer division information using an AI chat service and stores the summarized job data in
-    /// the repository. If no jobs are retrieved or an error occurs during processing, the method returns <see
-    /// langword="false"/>. Otherwise, it returns <see langword="true"/> upon successful completion.</remarks>
-    /// <returns><see langword="true"/> if the job source is successfully updated; otherwise,  <see langword="false"/> if no jobs
-    /// are found or an error occurs.</returns>
+    /// <remarks>This method fetches jobs based on the configured query and location settings, validates each
+    /// job's data, and adds valid jobs to the repository. Jobs are skipped if they already exist, lack required
+    /// information, are remote, or are outside the specified geographic area. The method uses AI-based inference to
+    /// determine the division of each job before adding it to the repository.</remarks>
+    /// <returns><see langword="true"/> if the job source was successfully updated with at least one valid job; otherwise, <see
+    /// langword="false"/>.</returns>
     public async Task<bool> UpdateJobSourceAsync()
     {
         var jobs = await _jobsRetrieval.FetchJobs(_settings.Query, _settings.Location);
@@ -268,6 +268,24 @@ public class SearpApiSourceService : IJobSourceService
                 if (_jobsRepository.GetJobsAsync(job.JobId).Result is not null)
                 {
                     _logger.LogInformation("Job with ID {JobId} already exists, skipping.", job.JobId);
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(job.CompanyName) || string.IsNullOrWhiteSpace(job.Description))
+                {
+                    _logger.LogWarning("Job with ID {JobId} has missing company name or description, skipping.", job.JobId);
+                    continue;
+                }
+
+                if (job.Location.ToLower().Contains("remote"))
+                {
+                    _logger.LogWarning("Job with ID {JobId} is remote, skipping.", job.JobId);
+                    continue;
+                }
+
+                if (!job.Location.ToLower().Contains(", nc") && !job.Location.ToLower().Contains(", sc"))
+                {
+                    _logger.LogWarning("Job with ID {JobId} is not in area, skipping.", job.JobId);
                     continue;
                 }
 
