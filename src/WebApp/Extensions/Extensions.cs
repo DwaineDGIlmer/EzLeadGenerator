@@ -61,10 +61,10 @@ public static class Extensions
         var cachedJobs = await cacheService.TryGetAsync<IEnumerable<JobSummary>>(cacheKey);
         if (cachedJobs is not null)
         {
-            logger.LogInformation("Retrieved companies list from cache");
+            logger.LogInformation("Retrieved jobs list from cache");
             return [.. cachedJobs.OrderByDescending(j => j.PostedDate)];
         }
-        logger.LogDebug("No companies found in cache for key: {Key}", cacheKey);
+        logger.LogDebug("No jobs found in cache for key: {Key}", cacheKey);
         return null;
     }
 
@@ -151,7 +151,7 @@ public static class Extensions
             logger.LogInformation("Retrieved company list from cache");
             return [.. cacheCompanies.OrderByDescending(c => c.CreatedAt)];
         }
-        logger.LogDebug("Company list found in cache for key: {Key}", cacheKey);
+        logger.LogDebug("Company list not found in cache for key: {Key}", cacheKey);
         return null;
     }
 

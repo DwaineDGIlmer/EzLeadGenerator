@@ -87,12 +87,6 @@ public class LocalCompanyProfileStore : ICompanyRepository
             var profile = await JsonSerializer.DeserializeAsync<CompanyProfile>(stream, _options);
             if (profile is not null)
             {
-                _logger.LogDebug("Added profile for companyId: {companyId} to the cache.", companyId);
-                await _cachingService.CreateEntryAsync(companyId, profile, TimeSpan.FromMinutes(_cacheExpirationMinutes));
-            }
-
-            if (profile is not null)
-            {
                 _logger.LogInformation("Successfully retrieved company profile for {companyId}", companyId);
 
                 await _cachingService.CreateEntryAsync(companyId, profile, TimeSpan.FromMinutes(_cacheExpirationMinutes));
