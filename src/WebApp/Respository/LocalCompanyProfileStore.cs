@@ -74,7 +74,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             return cacheProfile;
         }
 
-        string path = Path.Combine(_companyProfileDirectory, $"{companyId}.json");
+        string path = GetFilePath(companyId);
         if (!File.Exists(path))
         {
             _logger.LogWarning("Profile not found for companyId: {companyId}", companyId);
@@ -163,7 +163,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
     public async Task AddCompanyProfileAsync(CompanyProfile profile)
     {
         ArgumentNullException.ThrowIfNull(profile, nameof(profile));
-        string path = Path.Combine(_companyProfileDirectory, $"{profile.CompanyId}.json");
+        string path = GetFilePath(profile.CompanyId);
 
         try
         {
@@ -191,7 +191,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
     public async Task UpdateCompanyProfileAsync(CompanyProfile profile)
     {
         ArgumentNullException.ThrowIfNull(profile, nameof(profile));
-        string path = Path.Combine(_companyProfileDirectory, $"{profile.CompanyId}.json");
+        string path = GetFilePath(profile.CompanyId);
         try
         {
             if (!File.Exists(path))
@@ -201,7 +201,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             }
 
             // Should not happen, but just in case
-            var jsonProfile = await UpdateProperties(path, profile);
+            var jsonProfile = await UpdateProperties(profile, _companyProfileDirectory, _logger);
             if (jsonProfile == null)
             {
                 _logger.LogWarning("Profile not found for update: {companyId}", profile.CompanyId);
@@ -217,37 +217,6 @@ public class LocalCompanyProfileStore : ICompanyRepository
             _logger.LogError(ex, "Failed to save profile: {Id}", profile.Id);
             throw new IOException($"Failed to save profile for companyId: {profile.CompanyId}", ex);
         }
-    }
-
-    private static async Task<CompanyProfile?> UpdateProperties(string path, CompanyProfile profile)
-    {
-        using FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
-        var jsonProfile = await JsonSerializer.DeserializeAsync<CompanyProfile>(stream);
-        var properties = typeof(CompanyProfile).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        foreach (var property in properties)
-        {
-            // Skip read-only properties
-            if (!property.CanWrite || !property.CanRead)
-                continue;
-
-            var incomingValue = property.GetValue(profile);
-            var existingValue = property.GetValue(jsonProfile);
-
-            // Skip if incoming value should be ignored
-            if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
-                continue;
-
-            // Update the property
-            property.SetValue(profile, incomingValue);
-        }
-
-        // Always update the UpdatedAt timestamp if the property exists
-        var updatedAtProperty = typeof(CompanyProfile).GetProperty(nameof(CompanyProfile.UpdatedAt));
-        if (updatedAtProperty != null && updatedAtProperty.CanWrite)
-        {
-            updatedAtProperty.SetValue(profile, DateTime.UtcNow);
-        }
-        return jsonProfile ?? null;
     }
 
     /// <summary>
@@ -282,5 +251,99 @@ public class LocalCompanyProfileStore : ICompanyRepository
                 throw new IOException($"Failed to delete profile for companyId: {profile.CompanyId}", ex);
             }
         });
+    }
+
+    /// <summary>
+    /// Retrieves the file path associated with the specified company ID.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company. Cannot be null or empty.</param>
+    /// <returns>The file path corresponding to the given company ID.</returns>
+    public string GetFilePath(string companyId)
+    {
+        return GetFilePath(companyId, _companyProfileDirectory);
+    }
+
+    /// <summary>
+    /// Constructs the file path for a company's profile based on its identifier.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company. Must not be null or empty.</param>
+    /// <param name="profileDirectory">The directory where the profile files are stored. Must not be null or empty.</param>
+    /// <returns>The full file path to the company's profile JSON file.</returns>
+    public static string GetFilePath(string companyId, string profileDirectory)
+    {
+        ArgumentNullException.ThrowIfNull(companyId, nameof(companyId));
+        ArgumentNullException.ThrowIfNull(profileDirectory, nameof(profileDirectory));
+
+        return Path.Combine(profileDirectory, $"{companyId.FileSystemName()}.json");
+    }
+
+    /// <summary>
+    /// Updates the properties of a <see cref="CompanyProfile"/> instance based on the values from an existing profile.
+    /// </summary>
+    /// <remarks>This method updates writable properties of the provided <paramref name="profile"/> based on
+    /// the corresponding values in the existing profile loaded from the specified file. Properties marked for ignoring,
+    /// as determined by the  <see cref="ReflectionHelper.ShouldIgnoreProperty"/> method, will not be updated.
+    /// Additionally, the <c>UpdatedAt</c>  property of the <paramref name="profile"/> is always set to the current UTC
+    /// timestamp if it exists and is writable.</remarks>
+    /// <param name="profile">The <see cref="CompanyProfile"/> instance whose properties will be updated.</param>
+    /// <param name="profileDirectory">The directory where the profile file is located. Must not be null or empty.</param>  
+    /// <param name="logger">The logger instance used for logging errors and information. Cannot be <see langword="null"/>.</param>
+    /// <returns>The original <see cref="CompanyProfile"/> instance deserialized from the file, or <see langword="null"/> if the
+    /// file does not contain valid data.</returns>
+    public static async Task<CompanyProfile?> UpdateProperties(CompanyProfile profile, string profileDirectory, ILogger logger)
+    {
+        ArgumentNullException.ThrowIfNull(profile, nameof(profile));
+        ArgumentNullException.ThrowIfNull(profileDirectory, nameof(profileDirectory));
+
+        if (!Directory.Exists(profileDirectory))
+        {
+            throw new DirectoryNotFoundException($"The directory '{profileDirectory}' does not exist.");
+        }
+
+        CompanyProfile? jsonProfile = null;
+        try
+        {
+            var path = GetFilePath(profile.CompanyId, profileDirectory);
+            using FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+
+            jsonProfile = await JsonSerializer.DeserializeAsync<CompanyProfile>(stream);
+            var properties = typeof(CompanyProfile).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var property in properties)
+            {
+                // Skip read-only properties
+                if (!property.CanWrite || !property.CanRead)
+                    continue;
+
+                var incomingValue = property.GetValue(profile);
+                var existingValue = property.GetValue(jsonProfile);
+
+                // Skip if incoming value should be ignored
+                if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
+                    continue;
+
+                // Update the property
+                property.SetValue(profile, incomingValue);
+            }
+        }
+        catch (JsonException jsonEx)
+        {
+            // Log the error and return null if deserialization fails
+            logger.LogError(jsonEx, "JSON deserialization error: {Message}", jsonEx.Message);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            // Log any other errors that occur
+            logger.LogError(ex, "Error reading company profile file: {Message}", ex.Message);
+            throw new IOException($"Error reading company profile file: {profile.CompanyId}", ex);
+        }
+
+        // Always update the UpdatedAt timestamp if the property exists
+        var updatedAtProperty = typeof(CompanyProfile).GetProperty(nameof(CompanyProfile.UpdatedAt));
+        if (updatedAtProperty != null && updatedAtProperty.CanWrite)
+        {
+            updatedAtProperty.SetValue(profile, DateTime.UtcNow);
+        }
+        return jsonProfile;
     }
 }

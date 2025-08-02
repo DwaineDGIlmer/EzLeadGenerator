@@ -1,11 +1,13 @@
 using Core.Extensions;
 using WebApp.Extensions;
-using WebApp.Services;
+using WebApp.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Initialize the logging services
 builder.Services.InitializeServices(builder.Configuration);
+// Configure the application settings first
+builder.Services.ConfigureSerpApiSettings(builder.Configuration);    
 builder.Services.AddResilientHttpClient(builder.Configuration, nameof(EzLeadGenerator));
 builder.Services.AddJobsRetrivalService(builder.Configuration);
 builder.Services.AddCacheService(builder.Configuration);
@@ -19,10 +21,6 @@ builder.Services.AddJobSourceService();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
-
-// the first request to the application will trigger the loading of job sources and company profiles
-// Load the job source service and update job sources and company profiles
-await DataLoadService.LoadAppSourceService(app);
 
 if (!app.Environment.IsDevelopment())
 {
@@ -38,5 +36,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.UseMiddleware<JobServicesMiddleware>();
 
 app.Run();

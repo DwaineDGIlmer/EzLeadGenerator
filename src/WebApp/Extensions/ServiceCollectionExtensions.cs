@@ -10,6 +10,7 @@ using Core.Extensions;
 using Core.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using WebApp.Middleware;
 using WebApp.Respository;
 
 namespace WebApp.Extensions;
@@ -44,9 +45,6 @@ public static class ServiceCollectionExtensions
                 var logger = sp.GetRequiredService<ILogger<LocalCompanyProfileStore>>();
                 var options = sp.GetRequiredService<IOptions<SerpApiSettings>>();
                 var cachingService = sp.GetRequiredService<ICacheService>();
-
-                // Use Azure settings to configure cache expiration
-                options.Value.CacheExpirationInMinutes = settings.CacheExpirationInMinutes;
 
                 return new LocalCompanyProfileStore(cachingService, options, logger);
             });
@@ -100,9 +98,6 @@ public static class ServiceCollectionExtensions
                 var options = sp.GetRequiredService<IOptions<SerpApiSettings>>();
                 var cachingService = sp.GetRequiredService<ICacheService>();
 
-                // Use Azure settings to configure cache expiration
-                options.Value.CacheExpirationInMinutes = settings.CacheExpirationInMinutes;
-
                 return new LocalJobsRepositoryStore(cachingService, options, logger);
             });
         }
@@ -130,6 +125,45 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Configures the SerpApi settings for the application by binding configuration values and applying environment
+    /// variable overrides.
+    /// </summary>
+    /// <remarks>This method binds the SerpApi settings from the application's configuration and applies
+    /// default values and environment variable overrides where applicable. It ensures that the settings are properly
+    /// configured for use in the application.  The method expects a configuration section named <c>SerpApiSettings</c>
+    /// to exist in the application's configuration. If certain values are missing, defaults or environment variables
+    /// may be used.</remarks>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which the SerpApi settings will be added.</param>
+    /// <param name="configuration">The application's configuration source used to retrieve SerpApi settings.</param>
+    /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
+    public static IServiceCollection ConfigureSerpApiSettings(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var settingsSection = configuration.GetSection(nameof(SerpApiSettings));
+        var settings = new SerpApiSettings();
+        settingsSection.Bind(settings);
+
+        services.Configure<SerpApiSettings>(options =>
+        {
+            // Bind configuration values to options
+            configuration.GetSection(nameof(SerpApiSettings)).Bind(options);
+
+            var settings = configuration.GetSection(nameof(AzureSettings));
+            options.CacheExpirationInMinutes = settings.GetValue<int>(nameof(AzureSettings.CacheExpirationInMinutes), Defaults.CacheExpirationInMinutes);
+
+            // Apply environment variable and default overrides
+            if (options.IsEnabled)
+            {
+                options.BaseAddress = string.IsNullOrEmpty(options.BaseAddress) ? Core.Constants.Defaults.SerpApiBaseAddress : options.BaseAddress;
+                options.Endpoint = string.IsNullOrEmpty(options.BaseAddress) ? Defaults.SearchEndpoint : options.Endpoint;
+                options.ApiKey = Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey) ?? options.ApiKey;
+            }
+        });
+        return services;
+    }
+
+    /// <summary>
     /// Adds the jobs retrieval service and its dependencies to the specified <see cref="IServiceCollection"/>.
     /// </summary>
     /// <remarks>This method configures the <see cref="SerpApiSettings"/> from the application's
@@ -144,19 +178,6 @@ public static class ServiceCollectionExtensions
         var settings = new SerpApiSettings();
         settingsSection.Bind(settings);
 
-        services.Configure<SerpApiSettings>(options =>
-        {
-            // Bind configuration values to options
-            configuration.GetSection(nameof(SerpApiSettings)).Bind(options);
-
-            // Apply environment variable and default overrides
-            if (options.IsEnabled)
-            {
-                options.BaseAddress = string.IsNullOrEmpty(options.BaseAddress) ? Core.Constants.Defaults.SerpApiBaseAddress : options.BaseAddress;
-                options.Endpoint = string.IsNullOrEmpty(options.BaseAddress) ? Defaults.SearchEndpoint : options.Endpoint;
-                options.ApiKey = Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey) ?? options.ApiKey;
-            }
-        });
         services.AddResilientHttpClient(configuration, settings.HttpClientName, null, client =>
         {
             client.BaseAddress = new Uri(settings.BaseAddress);
@@ -251,11 +272,6 @@ public static class ServiceCollectionExtensions
     /// <returns>The updated <see cref="IServiceCollection"/> with the <see cref="IDisplayRepository"/> service registered.</returns>
     public static IServiceCollection AddSearchService(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<SerpApiSettings>(options =>
-        {
-            configuration.GetSection(nameof(SerpApiSettings)).Bind(options);
-            options.ApiKey = Environment.GetEnvironmentVariable(Defaults.EnvSearchApiKey) ?? options.ApiKey;
-        });
         services.AddSingleton<ISearch<OrganicResult>, SerpApiSearchService>();
         return services;
     }

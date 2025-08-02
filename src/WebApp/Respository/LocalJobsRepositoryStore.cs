@@ -1,5 +1,4 @@
 ﻿using Application.Contracts;
-using Application.Extensions;
 using Application.Models;
 using Core.Configuration;
 using Core.Contracts;
@@ -82,7 +81,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
             return cachedJob;
         }
 
-        string path = Path.Combine(_jobsProfileDirectory, $"{jobId.FileSystemName()}.json");
+        string path = $"{FileSystemHelpers.GetFilePath(jobId, _jobsProfileDirectory)}";
         if (!File.Exists(path))
         {
             _logger.LogWarning("Profile not found for job: {JobId}", jobId);
@@ -95,7 +94,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
             var job = await JsonSerializer.DeserializeAsync<JobSummary>(stream, _options);
             if (job is not null)
             {
-                _logger.LogInformation("Retrieved job from cache for {JobId}", jobId);
+                _logger.LogDebug("Creating job for cache for {JobId}", jobId);
                 await _cachingService.CreateEntryAsync(jobId, job, TimeSpan.FromMinutes(_cacheExpirationInMinutes));
             }
             return job ?? null;
