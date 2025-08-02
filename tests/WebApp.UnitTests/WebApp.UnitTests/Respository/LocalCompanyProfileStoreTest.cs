@@ -15,6 +15,7 @@ public class LocalCompanyProfileStoreTest
 {
     private readonly string _testDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     private readonly Mock<ICacheService> _cacheServiceMock = new();
+    private readonly Mock<ILogger<LocalCompanyProfileStore>> _loggerMock = new();
 
     public LocalCompanyProfileStoreTest()
     {
@@ -124,7 +125,7 @@ public class LocalCompanyProfileStoreTest
             CompanyName = "Original",
             UpdatedAt = new DateTime(2000, 1, 1)
         };
-        var result = await Assert.ThrowsAsync<DirectoryNotFoundException>(() => LocalCompanyProfileStore.UpdateProperties(original, "NotReal"));
+        var result = await Assert.ThrowsAsync<DirectoryNotFoundException>(() => LocalCompanyProfileStore.UpdateProperties(original, "NotReal", _loggerMock.Object));
         Assert.Equal("The directory 'NotReal' does not exist.", result.Message);
     }
 
@@ -149,7 +150,7 @@ public class LocalCompanyProfileStoreTest
         await File.WriteAllTextAsync(tempFile, JsonSerializer.Serialize(original));
 
         // Act
-        var result = await LocalCompanyProfileStore.UpdateProperties(updated, Path.GetTempPath());
+        var result = await LocalCompanyProfileStore.UpdateProperties(updated, Path.GetTempPath(), _loggerMock.Object);
 
         // Assert
         Assert.NotNull(result);
@@ -169,7 +170,7 @@ public class LocalCompanyProfileStoreTest
         await File.WriteAllTextAsync(tempFile, ""); // Empty file
 
         // Act
-        var result = await LocalCompanyProfileStore.UpdateProperties(new() { CompanyId = companyId, CompanyName = "Test" }, Path.GetTempPath());
+        var result = await LocalCompanyProfileStore.UpdateProperties(new() { CompanyId = companyId, CompanyName = "Test" }, Path.GetTempPath(), _loggerMock.Object);
 
         // Assert
         Assert.Null(result);
@@ -196,7 +197,7 @@ public class LocalCompanyProfileStoreTest
         await File.WriteAllTextAsync(tempFile, JsonSerializer.Serialize(original));
 
         // Act
-        var result = await LocalCompanyProfileStore.UpdateProperties(updated, Path.GetTempPath());
+        var result = await LocalCompanyProfileStore.UpdateProperties(updated, Path.GetTempPath(), _loggerMock.Object);
 
         // Assert
         Assert.NotNull(result);

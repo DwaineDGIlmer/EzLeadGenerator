@@ -222,12 +222,13 @@ public class ServiceCollectionExtensionsTest
         ]);
         var configuration = configBuilder.Build();
         services.AddLogging();
+        services.ConfigureSerpApiSettings(configuration);
         services.AddSingleton(Mock.Of<IHttpClientFactory>());
         services.AddSingleton(Mock.Of<ICacheService>());
         services.AddSearchService(configuration);
 
         var provider = services.BuildServiceProvider();
-        var search = provider.GetService<ISearch<Application.Models.OrganicResult>>();
+        var search = provider.GetService<ISearch<OrganicResult>>();
         Assert.NotNull(search);
     }
 }

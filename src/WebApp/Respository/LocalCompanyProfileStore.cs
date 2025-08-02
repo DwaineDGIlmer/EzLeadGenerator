@@ -201,7 +201,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             }
 
             // Should not happen, but just in case
-            var jsonProfile = await UpdateProperties(profile, _companyProfileDirectory);
+            var jsonProfile = await UpdateProperties(profile, _companyProfileDirectory, _logger);
             if (jsonProfile == null)
             {
                 _logger.LogWarning("Profile not found for update: {companyId}", profile.CompanyId);
@@ -287,9 +287,10 @@ public class LocalCompanyProfileStore : ICompanyRepository
     /// timestamp if it exists and is writable.</remarks>
     /// <param name="profile">The <see cref="CompanyProfile"/> instance whose properties will be updated.</param>
     /// <param name="profileDirectory">The directory where the profile file is located. Must not be null or empty.</param>  
+    /// <param name="logger">The logger instance used for logging errors and information. Cannot be <see langword="null"/>.</param>
     /// <returns>The original <see cref="CompanyProfile"/> instance deserialized from the file, or <see langword="null"/> if the
     /// file does not contain valid data.</returns>
-    public static async Task<CompanyProfile?> UpdateProperties(CompanyProfile profile, string profileDirectory)
+    public static async Task<CompanyProfile?> UpdateProperties(CompanyProfile profile, string profileDirectory, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(profile, nameof(profile));
         ArgumentNullException.ThrowIfNull(profileDirectory, nameof(profileDirectory));
@@ -327,13 +328,13 @@ public class LocalCompanyProfileStore : ICompanyRepository
         catch (JsonException jsonEx)
         {
             // Log the error and return null if deserialization fails
-            _logger.LogError(jsonEx, "JSON deserialization error: {Message}", jsonEx.Message);
+            logger.LogError(jsonEx, "JSON deserialization error: {Message}", jsonEx.Message);
             return null;
         }
         catch (Exception ex)
         {
             // Log any other errors that occur
-            _logger.LogError(ex, "Error reading company profile file: {Message}", ex.Message);
+            logger.LogError(ex, "Error reading company profile file: {Message}", ex.Message);
             throw new IOException($"Error reading company profile file: {profile.CompanyId}", ex);
         }
 

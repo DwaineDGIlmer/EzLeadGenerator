@@ -12,7 +12,7 @@ namespace WebApp.Middleware
     /// services. After performing the updates, it passes control to the next middleware in the pipeline.</remarks>
     public class JobServicesMiddleware
     {
-        private int _jobExecutionInSeconds;
+        private readonly int _jobExecutionInSeconds;
         private readonly SemaphoreSlim _semaphore = new(1, 1);
         private readonly RequestDelegate _next;
         private readonly IJobSourceService _jobSourceService;
@@ -100,7 +100,7 @@ namespace WebApp.Middleware
             await _jobSourceService.UpdateJobSourceAsync();
         }
 
-        private int ValidateJobExecutionInSeconds(IOptions<EzLeadSettings> options)
+        private static int ValidateJobExecutionInSeconds(IOptions<EzLeadSettings> options)
         {
             if (options == null || options.Value == null || options.Value.JobExecutionInSeconds <= 0)
             {
