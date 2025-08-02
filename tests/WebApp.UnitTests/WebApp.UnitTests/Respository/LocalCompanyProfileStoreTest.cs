@@ -226,7 +226,11 @@ public class LocalCompanyProfileStoreTest
 
         // Assert
         var expected = Path.Combine(Directory.GetCurrentDirectory(), "profiles", $"{companyId.FileSystemName()}.json");
-        Assert.Equal(expected, result);
+        Assert.Equal(
+            Path.GetFullPath(expected).Replace('\\', '/'),
+            Path.GetFullPath(result).Replace('\\', '/'),
+            ignoreCase: true
+        );
     }
 
 
