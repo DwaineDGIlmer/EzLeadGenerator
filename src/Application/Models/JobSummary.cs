@@ -1,4 +1,4 @@
-﻿using Application.Extensions;
+﻿using Core.Helpers;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.Models;

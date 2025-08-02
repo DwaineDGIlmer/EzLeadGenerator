@@ -73,7 +73,7 @@ public class AzureJobsRepository(
             var job = JsonSerializer.Deserialize<JobSummary>(json, _options);
             if (job is not null)
             {
-                _logger.LogInformation("Retrieved job from cache for {JobId}", jobId);
+                _logger.LogDebug("Creating job for cache for {JobId}", jobId);
                 await _cachingService.CreateEntryAsync(jobId, job, TimeSpan.FromMinutes(_cacheExpirationInMinutes));
             }
             return job ?? null;

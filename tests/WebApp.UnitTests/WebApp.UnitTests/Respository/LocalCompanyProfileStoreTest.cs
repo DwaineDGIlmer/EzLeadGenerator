@@ -2,9 +2,11 @@ using Application.Models;
 using Application.Services;
 using Core.Configuration;
 using Core.Contracts;
+using Core.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.Text.Json;
 using WebApp.Respository;
 
 namespace WebApp.UnitTests.Respository;
@@ -112,6 +114,121 @@ public class LocalCompanyProfileStoreTest
         Assert.NotNull(result);
         Assert.Equal(profile.CompanyId, result.CompanyId);
     }
+
+    [Fact]
+    public async Task UpdateProperties_Throws_DirectoryNotFoundException()
+    {
+        var original = new CompanyProfile
+        {
+            CompanyId = "123",
+            CompanyName = "Original",
+            UpdatedAt = new DateTime(2000, 1, 1)
+        };
+        var result = await Assert.ThrowsAsync<DirectoryNotFoundException>(() => LocalCompanyProfileStore.UpdateProperties(original, "NotReal"));
+        Assert.Equal("The directory 'NotReal' does not exist.", result.Message);
+    }
+
+    [Fact]
+    public async Task UpdateProperties_UpdatesWritableProperties()
+    {
+        // Arrange
+        var original = new CompanyProfile
+        {
+            CompanyId = "123",
+            CompanyName = "Original",
+            UpdatedAt = new DateTime(2000, 1, 1)
+        };
+        var updated = new CompanyProfile
+        {
+            CompanyId = "123",
+            CompanyName = "Updated",
+            UpdatedAt = new DateTime(2020, 1, 1)
+        };
+
+        string tempFile = LocalCompanyProfileStore.GetFilePath("123", Path.GetTempPath());
+        await File.WriteAllTextAsync(tempFile, JsonSerializer.Serialize(original));
+
+        // Act
+        var result = await LocalCompanyProfileStore.UpdateProperties(updated, Path.GetTempPath());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Original", result.CompanyName); // The original from file
+        Assert.Equal("Updated", updated.CompanyName); // The updated profile should keep its value
+        Assert.True(updated.UpdatedAt > original.UpdatedAt); // UpdatedAt should be set to now
+
+        File.Delete(tempFile);
+    }
+
+    [Fact]
+    public async Task UpdateProperties_ReturnsNullIfFileIsEmpty()
+    {
+        // Arrange
+        string companyId = Guid.NewGuid().ToString();
+        string tempFile = LocalCompanyProfileStore.GetFilePath(companyId, Path.GetTempPath());
+        await File.WriteAllTextAsync(tempFile, ""); // Empty file
+
+        // Act
+        var result = await LocalCompanyProfileStore.UpdateProperties(new() { CompanyId = companyId, CompanyName = "Test" }, Path.GetTempPath());
+
+        // Assert
+        Assert.Null(result);
+
+        File.Delete(tempFile);
+    }
+
+    [Fact]
+    public async Task UpdateProperties_IgnoresReadOnlyProperties()
+    {
+        // Arrange
+        var original = new CompanyProfile
+        {
+            CompanyId = "0987654321",
+            CompanyName = "Original"
+        };
+        var updated = new CompanyProfile
+        {
+            CompanyId = "1234567890",
+            CompanyName = "Updated"
+        };
+
+        string tempFile = LocalCompanyProfileStore.GetFilePath(updated.CompanyId, Path.GetTempPath());
+        await File.WriteAllTextAsync(tempFile, JsonSerializer.Serialize(original));
+
+        // Act
+        var result = await LocalCompanyProfileStore.UpdateProperties(updated, Path.GetTempPath());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Original", result.CompanyName);
+        File.Delete(tempFile);
+    }
+
+    [Fact]
+    public void GetFilePath_ReturnsCorrectPath()
+    {
+        // Arrange
+        var cacheService = new Mock<ICacheService>();
+        var logger = new Mock<ILogger<LocalCompanyProfileStore>>();
+        var options = Options.Create(new SerpApiSettings
+        {
+            FileCompanyProfileDirectory = "profiles",
+            CacheExpirationInMinutes = 10
+        });
+
+        var store = new LocalCompanyProfileStore(cacheService.Object, options, logger.Object);
+
+        // Simulate a companyId with a FileSystemName property
+        var companyId = "acme-corp";
+
+        // Act
+        var result = store.GetFilePath(companyId);
+
+        // Assert
+        var expected = Path.Combine(Directory.GetCurrentDirectory(), "profiles", $"{companyId.FileSystemName()}.json");
+        Assert.Equal(expected, result);
+    }
+
 
     private LocalCompanyProfileStore CreateStore(out Mock<ILogger<LocalCompanyProfileStore>> loggerMock)
     {

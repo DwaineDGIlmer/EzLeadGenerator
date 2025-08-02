@@ -65,13 +65,13 @@ public class ExtensionsTest
     public async Task GetJobAsync_ThrowsArgumentNullException_WhenCacheServiceIsNull()
     {
         // Arrange
-        ICacheService cacheService = null;
+        ICacheService cacheService = null!;
         var loggerMock = new Mock<ILogger>();
         var jobId = "test-job-id";
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            cacheService.GetJobAsync(jobId, loggerMock.Object));
+            cacheService!.GetJobAsync(jobId, loggerMock.Object));
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ExtensionsTest
     {
         // Arrange
         var cacheServiceMock = new Mock<ICacheService>();
-        ILogger logger = null;
+        ILogger logger = null!;
         var jobId = "test-job-id";
 
         // Act & Assert
@@ -95,12 +95,12 @@ public class ExtensionsTest
         var cacheServiceMock = new Mock<ICacheService>();
         var loggerMock = new Mock<ILogger>();
         var fromDate = new DateTime(2025, 1, 1);
-        var cacheKey = $"Jobs:{fromDate.GenHashString()}:{fromDate.Ticks}";
+        var cacheKey = $"Jobs_{fromDate.GenHashString()}_{fromDate.Ticks}";
 
         var jobs = new List<JobSummary>
         {
-            new JobSummary { Id = "job1", JobTitle = "Job 1", PostedDate = new DateTime(2025, 1, 1) },
-            new JobSummary { Id = "job2", JobTitle = "Job 2", PostedDate = new DateTime(2025, 1, 2) }
+            new() { Id = "job1", JobTitle = "Job 1", PostedDate = new DateTime(2025, 1, 1) },
+            new() { Id = "job2", JobTitle = "Job 2", PostedDate = new DateTime(2025, 1, 2) }
         };
 
         cacheServiceMock.Setup(cs => cs.TryGetAsync<IEnumerable<JobSummary>>(cacheKey))
@@ -116,7 +116,7 @@ public class ExtensionsTest
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Retrieved jobs list from cache")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Retrieved jobs list from cache")),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
@@ -129,7 +129,7 @@ public class ExtensionsTest
         var cacheServiceMock = new Mock<ICacheService>();
         var loggerMock = new Mock<ILogger>();
         var fromDate = new DateTime(2025, 1, 1);
-        var cacheKey = $"Jobs:{fromDate.GenHashString()}:{fromDate.Ticks}";
+        var cacheKey = $"Jobs_{fromDate.GenHashString()}_{fromDate.Ticks}";
 
         cacheServiceMock.Setup(cs => cs.TryGetAsync<IEnumerable<JobSummary>>(cacheKey))
             .ReturnsAsync((IEnumerable<JobSummary>)null!);
@@ -143,7 +143,7 @@ public class ExtensionsTest
             x => x.Log(
                 LogLevel.Debug,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(cacheKey)),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(cacheKey)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
@@ -170,7 +170,7 @@ public class ExtensionsTest
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(companyId)),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(companyId)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
@@ -195,7 +195,7 @@ public class ExtensionsTest
             x => x.Log(
                 LogLevel.Debug,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(companyId)),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(companyId)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
@@ -209,12 +209,12 @@ public class ExtensionsTest
         var cacheServiceMock = new Mock<ICacheService>();
         var loggerMock = new Mock<ILogger>();
         var fromDate = new DateTime(2025, 1, 1);
-        var cacheKey = $"Companies:{fromDate.GenHashString()}:{fromDate.Ticks}";
+        var cacheKey = $"Companies_{fromDate.GenHashString()}_{fromDate.Ticks}";
 
         var companies = new List<CompanyProfile>
         {
-            new CompanyProfile { Id = "company1", CompanyName = "Company 1", CreatedAt = new DateTime(2025, 1, 1) },
-            new CompanyProfile { Id = "company2", CompanyName = "Company 2", CreatedAt = new DateTime(2025, 1, 2) }
+            new() { Id = "company1", CompanyName = "Company 1", CreatedAt = new DateTime(2025, 1, 1) },
+            new() { Id = "company2", CompanyName = "Company 2", CreatedAt = new DateTime(2025, 1, 2) }
         };
 
         cacheServiceMock.Setup(cs => cs.TryGetAsync<IEnumerable<CompanyProfile>>(cacheKey))
@@ -230,7 +230,7 @@ public class ExtensionsTest
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Retrieved company list from cache")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Retrieved company list from cache")),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
@@ -243,7 +243,7 @@ public class ExtensionsTest
         var cacheServiceMock = new Mock<ICacheService>();
         var loggerMock = new Mock<ILogger>();
         var fromDate = new DateTime(2025, 1, 1);
-        var cacheKey = $"Companies:{fromDate.GenHashString()}:{fromDate.Ticks}";
+        var cacheKey = $"Companies_{fromDate.GenHashString()}_{fromDate.Ticks}";
 
         cacheServiceMock.Setup(cs => cs.TryGetAsync<IEnumerable<CompanyProfile>>(cacheKey))
             .ReturnsAsync((IEnumerable<CompanyProfile>)null!);
@@ -257,7 +257,7 @@ public class ExtensionsTest
             x => x.Log(
                 LogLevel.Debug,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(cacheKey)),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(cacheKey)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
