@@ -77,8 +77,14 @@ namespace WebApp.Middleware
                 else if (DateTime.UtcNow - LastExecution > TimeSpan.FromSeconds(_jobExecutionInSeconds))
                 {
                     _logger.LogInformation("Updating job sources and company profiles at {Time}", DateTime.UtcNow);
-                    _ = Task.Run(UpdateSourceAsync);                    
-                    _logger.LogInformation("Job sources and company profiles updated at {Time}", DateTime.UtcNow);
+                    _ = Task.Run(UpdateSourceAsync).ContinueWith(t =>
+                    {
+                        if (t.IsFaulted)
+                        {
+                            _logger.LogError(t.Exception, "Exception occurred while updating job sources and company profiles.");
+                        }
+                    });
+                    // Removed misleading log: update may not be finished at this point.
                 }
             }
             finally

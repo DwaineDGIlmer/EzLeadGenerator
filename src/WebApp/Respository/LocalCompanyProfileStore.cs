@@ -327,13 +327,13 @@ public class LocalCompanyProfileStore : ICompanyRepository
         catch (JsonException jsonEx)
         {
             // Log the error and return null if deserialization fails
-            Console.WriteLine($"JSON deserialization error: {jsonEx.Message}");
+            _logger.LogError(jsonEx, "JSON deserialization error: {Message}", jsonEx.Message);
             return null;
         }
         catch (Exception ex)
         {
             // Log any other errors that occur
-            Console.WriteLine($"Error reading company profile file: {ex.Message}");
+            _logger.LogError(ex, "Error reading company profile file: {Message}", ex.Message);
             throw new IOException($"Error reading company profile file: {profile.CompanyId}", ex);
         }
 
