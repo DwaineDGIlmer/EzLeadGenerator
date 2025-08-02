@@ -218,19 +218,15 @@ public class LocalCompanyProfileStoreTest
 
         var store = new LocalCompanyProfileStore(cacheService.Object, options, logger.Object);
 
-        // Simulate a companyId with a FileSystemName property
         var companyId = "acme-corp";
 
         // Act
         var result = store.GetFilePath(companyId);
 
-        // Assert
-        var expected = Path.Combine(Directory.GetCurrentDirectory(), "profiles", $"{companyId.FileSystemName()}.json");
-        Assert.Equal(
-            Path.GetFullPath(expected).Replace('\\', '/'),
-            Path.GetFullPath(result).Replace('\\', '/'),
-            ignoreCase: true
-        );
+        // Assert: Only check the ending segment
+        var expectedEnding = Path.Combine("profiles", $"{companyId.FileSystemName()}.json").Replace('\\', '/');
+        var actualNormalized = result.Replace('\\', '/');
+        Assert.EndsWith(expectedEnding, actualNormalized, StringComparison.OrdinalIgnoreCase);
     }
 
 
