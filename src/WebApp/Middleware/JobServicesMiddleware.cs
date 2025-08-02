@@ -84,7 +84,7 @@ namespace WebApp.Middleware
                             _logger.LogError(t.Exception, "Exception occurred while updating job sources and company profiles.");
                         }
                     });
-                    _logger.LogInformation("Job sources and company profiles updated at {Time}", DateTime.UtcNow);
+                    // Removed misleading log: update may not be finished at this point.
                 }
             }
             finally
