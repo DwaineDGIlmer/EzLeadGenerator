@@ -375,7 +375,8 @@ public class SearpApiSourceService : IJobSourceService
                     continue;
                 }
 
-                if (!job.Location.ToLower().Contains(", nc") && !job.Location.ToLower().Contains(", sc"))
+                if (!job.Location.Contains(", nc", StringComparison.CurrentCultureIgnoreCase) &&
+                    !job.Location.Contains(", sc", StringComparison.CurrentCultureIgnoreCase))
                 {
                     _logger.LogWarning("Job with ID {JobId} is not in area, skipping.", job.JobId);
                     continue;
