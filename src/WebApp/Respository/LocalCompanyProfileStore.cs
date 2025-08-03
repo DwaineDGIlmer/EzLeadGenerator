@@ -68,12 +68,11 @@ public class LocalCompanyProfileStore : ICompanyRepository
 
         _logger.LogInformation("Retrieving company profile for {companyId}", companyId);
 
-        //var cacheProfile = await _cachingService.GetCompanyAsync(companyId, _logger);
-        //if (cacheProfile is not null)
-        //{
-        //    return cacheProfile;
-        //}
-        await _cachingService.RemoveAsync(companyId);
+        var cacheProfile = await _cachingService.GetCompanyAsync(companyId, _logger);
+        if (cacheProfile is not null)
+        {
+            return cacheProfile;
+        }
 
         string path = GetFilePath(companyId);
         if (!File.Exists(path))

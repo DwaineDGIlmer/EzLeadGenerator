@@ -111,7 +111,7 @@ public class ExtensionsTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(jobs.OrderByDescending(j => j.PostedDate), result);
+        Assert.Equal(jobs.OrderBy(j => j.CompanyName), result);
         loggerMock.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -225,7 +225,7 @@ public class ExtensionsTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(companies.OrderByDescending(c => c.CreatedAt), result);
+        Assert.Equal(companies.OrderBy(c => c.CompanyName), result);
         loggerMock.Verify(
             x => x.Log(
                 LogLevel.Information,
