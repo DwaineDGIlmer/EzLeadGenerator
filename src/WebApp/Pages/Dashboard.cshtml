@@ -47,13 +47,22 @@
     }
 
     .kpi-card {
-        background: #fff;
+        background: linear-gradient(135deg, #fff 70%, #f4f6fb 100%);
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+        box-shadow:
+            0 4px 16px rgba(44, 62, 80, 0.10),
+            0 1.5px 4px rgba(44, 62, 80, 0.07);
+        border: 1px solid #e0e6ef;
         padding: 1.5rem 2rem;
         flex: 1 1 180px;
         min-width: 180px;
         text-align: center;
+        transition: box-shadow 0.2s;
+    }
+    .kpi-card:hover {
+        box-shadow:
+            0 8px 24px rgba(44, 62, 80, 0.16),
+            0 2px 8px rgba(44, 62, 80, 0.10);
     }
 
     .kpi-value {
@@ -79,8 +88,11 @@
 
     .dashboard-section {
         background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+        border-radius: 12px;
+        box-shadow:
+            0 4px 16px rgba(44, 62, 80, 0.10),
+            0 1.5px 4px rgba(44, 62, 80, 0.07);
+        border: 1px solid #e0e6ef;
         padding: 1.5rem;
         flex: 1 1 320px;
         min-width: 320px;
@@ -102,6 +114,7 @@
     th, td {
         padding: 0.6rem 0.8rem;
         text-align: left;
+        border: 1px solid #e0e6ef !important;
     }
 
     th {
