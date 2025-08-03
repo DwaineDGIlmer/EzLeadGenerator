@@ -62,7 +62,7 @@ public static class Extensions
         if (cachedJobs is not null)
         {
             logger.LogInformation("Retrieved jobs list from cache");
-            return [.. cachedJobs.OrderByDescending(j => j.CompanyName)];
+            return [.. cachedJobs.OrderBy(j => j.CompanyName)];
         }
         logger.LogDebug("No jobs found in cache for key: {Key}", cacheKey);
         return null;
