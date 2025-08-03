@@ -68,11 +68,12 @@ public class LocalCompanyProfileStore : ICompanyRepository
 
         _logger.LogInformation("Retrieving company profile for {companyId}", companyId);
 
-        var cacheProfile = await _cachingService.GetCompanyAsync(companyId, _logger);
-        if (cacheProfile is not null)
-        {
-            return cacheProfile;
-        }
+        //var cacheProfile = await _cachingService.GetCompanyAsync(companyId, _logger);
+        //if (cacheProfile is not null)
+        //{
+        //    return cacheProfile;
+        //}
+        await _cachingService.RemoveAsync(companyId);
 
         string path = GetFilePath(companyId);
         if (!File.Exists(path))
@@ -148,7 +149,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             _logger.LogDebug("Caching all company profiles with count: {Count}", allCompanies.Count);
             await _cachingService.AddCompaniesAsync(allCompanies, fromDate, _cacheExpirationMinutes, _logger);
         }
-        return [.. allCompanies.OrderByDescending(c => c.CreatedAt)];
+        return [.. allCompanies.OrderBy(c => c.CompanyName)];
     }
 
     /// <summary>

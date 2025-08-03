@@ -144,7 +144,7 @@ public class AzureCompanyRepository(
         }
 
         _logger.LogInformation("Successfully retrieved {Count} company profiles updated since {FromDate}", companies.Count, fromDate);
-        return [.. companies.OrderByDescending(c => c.CreatedAt)];
+        return [.. companies.OrderBy(c => c.CompanyName)];
     }
 
     /// <summary>

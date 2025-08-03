@@ -157,4 +157,46 @@ public class SearpApiSourceServiceTest
         Assert.Equal("John", item.Name);
         Assert.Equal("Manager", item.Title);
     }
+
+    [Fact]
+    public void UpdateName_ReplacesPronounsConjunctionsAndKnownWordsWithUnknown()
+    {
+        // Arrange
+        var input = new HierarchyResults
+        {
+            OrgHierarchy = new List<HierarchyItem>
+            {
+                new() { Name = "he", Title = " Director " },      // pronoun
+                new() { Name = "and", Title = " VP " },           // conjunction
+                new() { Name = "lead", Title = " Practice " },    // known word
+                new() { Name = "Alice", Title = " Manager " }     // normal
+            }
+        };
+
+        // Act
+        var result = SearpApiSourceService.UpdateName(input);
+
+        // Assert
+        Assert.Equal("Unknown", result.OrgHierarchy[0].Name);
+        Assert.Equal("Unknown", result.OrgHierarchy[1].Name);
+        Assert.Equal("Unknown", result.OrgHierarchy[2].Name);
+        Assert.Equal("Alice", result.OrgHierarchy[3].Name);
+
+        // Titles should be trimmed
+        Assert.Equal("Director", result.OrgHierarchy[0].Title);
+        Assert.Equal("VP", result.OrgHierarchy[1].Title);
+        Assert.Equal("Practice", result.OrgHierarchy[2].Title);
+        Assert.Equal("Manager", result.OrgHierarchy[3].Title);
+    }
+
+    [Fact]
+    public void UpdateName_ReturnsEmptyHierarchy_WhenInputIsNull()
+    {
+        // Act
+        var result = SearpApiSourceService.UpdateName(null!);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.OrgHierarchy);
+    }
 }

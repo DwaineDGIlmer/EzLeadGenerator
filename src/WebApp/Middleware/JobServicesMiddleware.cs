@@ -96,8 +96,8 @@ namespace WebApp.Middleware
 
         private async Task UpdateSourceAsync()
         {
-            await _jobSourceService.UpdateCompanyProfilesAsync();
             await _jobSourceService.UpdateJobSourceAsync();
+            await _jobSourceService.UpdateCompanyProfilesAsync();
         }
 
         private static int ValidateJobExecutionInSeconds(IOptions<EzLeadSettings> options)

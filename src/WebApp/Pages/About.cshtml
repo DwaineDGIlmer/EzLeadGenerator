@@ -1,44 +1,88 @@
 ﻿@page
 @model WebApp.Pages.AboutModel
 @{
-    ViewData["JobTitle"] = "About this application.";
+    ViewData["Title"] = "About this application.";
 }
-<h1>About This Lead Intelligence Tool</h1>
 
-<p>This application is designed to support two key personas within the recruiting and staffing industry: <strong>talent acquisition professionals</strong> and <strong>staffing service providers</strong>. Each persona is served by a dedicated page that helps them fulfill their unique workflows—either by identifying talent or by discovering hiring companies.</p>
+<style>
+    body {
+        background-color: #f4f6fb;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .navbar {
+        background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+    }
+
+    .navbar-brand, .nav-link {
+        color: #fff !important;
+    }
+
+    .navbar-brand:hover, .nav-link:hover {
+        color: #ffd700 !important;
+    }
+
+
+    .alert-info, .alert-danger {
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+        border-left: 5px solid #2b5876;
+        background-color: #e3f2fd;
+        color: #2b5876;
+    }
+</style>
+
+<h2 class="mt-3 mb-2">About This Application</h2>
+
+<p>
+    <strong>EzLeadGenerator</strong> is a specialized lead intelligence platform built for <strong>talent acquisition professionals</strong> and <strong>recruiters</strong> focused on Data Engineering roles in the Charlotte, NC area.
+</p>
 
 <hr />
 
-<h2>🔹 Lead Collection Tool</h2>
-<p><strong>Audience:</strong> Technical recruiters filling urgent or hard-to-hire roles, such as AI Engineers.</p>
-<p><strong>Purpose:</strong> Identify and extract individual leads—complete with contact details—from platforms like LinkedIn, GitHub, and TikTok.</p>
-<p><strong>Features:</strong></p>
+<h3>What Does This Site Do?</h3>
+<p>
+    EzLeadGenerator streamlines the process of identifying, analyzing, and acting on Data Engineer job opportunities and company leads. By combining live job market data, AI-powered company analysis, and actionable dashboards, the platform empowers recruiters to quickly discover hiring trends, target the right companies, and connect with potential candidates.
+</p>
+
+<hr />
+
+<h3>How the Main Pages Work Together</h3>
 <ul>
-    <li>Search by keyword and platform (e.g., "AI Engineer" on LinkedIn)</li>
-    <li>Email domain and phone number filtering</li>
-    <li>Paginated results and CSV export</li>
+    <li>
+        <strong>Data Engineer</strong>: The primary page, automatically searching for Data Engineer roles in Charlotte, NC. Results are enriched using AI (ChatGPT) to identify company divisions and possible contacts.
+    </li>
+    <li>
+        <strong>Company Leads</strong>: For any company found on the Data Engineer page, view a detailed company profile, including divisions and suggested contacts, to help you target your outreach.
+    </li>
+    <li>
+        <strong>Dashboard</strong>: Visualize the current job market—see which companies are hiring, which agencies are active, and what job titles are trending, all in one place.
+    </li>
+    <li>
+        <strong>Talent Search</strong>: A focused tool for running custom talent searches beyond Data Engineers, giving you flexibility to find candidates for any role.
+    </li>
 </ul>
 
 <hr />
 
-<h2>🔹 Talent Demand Page</h2>
-<p><strong>Audience:</strong> Staffing service providers, business development professionals, and contractor agencies.</p>
-<p><strong>Purpose:</strong> Surface companies that are actively hiring for targeted roles using the SerpApi Google Jobs API.</p>
-<p><strong>Features:</strong></p>
+<h3>Who Is This For?</h3>
+<p>
+    This application is designed for recruiters, staffing agencies, and business development professionals who want to:
+</p>
 <ul>
-    <li>Search by job title and location</li>
-    <li>Grouped listings by company with job details</li>
-    <li>Optional job description viewing and CSV export</li>
+    <li>Quickly identify Data Engineer openings in Charlotte, NC and surrounding area</li>
+    <li>Analyze hiring companies and discover new business leads</li>
+    <li>Find and contact potential candidates or company decision-makers</li>
+    <li>Track market trends and hiring activity with real-time dashboards</li>
 </ul>
 
 <hr />
 
-<h2>🔁 How the Pages Work Together</h2>
-<p>The two pages form a full-cycle lead funnel:</p>
-<ul>
-    <li><strong>Talent Demand Page</strong>: Discover who’s hiring</li>
-    <li><strong>Lead Collection Page</strong>: Find and contact talent to fulfill those openings</li>
-</ul>
+<p>
+    <em>
+        EzLeadGenerator brings together job search, company intelligence, and AI-driven insights—so you can spend less time searching and more time connecting with the right people.
+    </em>
+</p>
 
 <p>Whether you're prospecting for new clients or filling roles with verified leads, this tool helps unify both sides of the staffing equation.</p>
 

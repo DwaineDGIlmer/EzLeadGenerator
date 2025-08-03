@@ -22,15 +22,28 @@ namespace Application.Services;
 /// up-to-date and accurately reflects the current job market as retrieved  from Google.</remarks>
 public class SearpApiSourceService : IJobSourceService
 {
+    private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "thier"];
+    private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so"];
+    private static readonly List<string> _wordsNotInNames = ["relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering"];
     private static readonly List<string> _tokens =
     [
         "lead",
-        "manager",
-        "director",
-        "ceo",
-        "president",
         "data",
         "engineer",
+        "manager",
+        "director",
+        "practice",
+        "Data Science",
+        "Data Analytics",
+        "Data Scientist",
+        "Data Analyst",
+        "Business Intelligence (BI)",
+        "Data Strategy",
+        "Data Governance",
+        "Data Management",
+        "Data Architecture",
+        "Data Operations",
+        "Data Solutions",
     ];
     private readonly ILogger _logger;
     private readonly ICacheService _cacheService;
@@ -140,13 +153,37 @@ public class SearpApiSourceService : IJobSourceService
 
                 string snippet = string.Join(" ", snippets.Select(link => $"site:{link}"));
                 string domainname = CoreRegex.ExtractDomainName(snippet);
-                if (!string.IsNullOrWhiteSpace(domainname))
+                string link = string.Empty;
+                if (string.IsNullOrWhiteSpace(domainname))
                 {
-                    prompt = $"{job.CompanyName.Replace(" ", string.Empty).ToLower()} organizational structure {job.Division} leadership team";
+                    var names = job.CompanyName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var item in googleResults)
+                    {
+                        var links = new[] { item.Link };
+                        foreach (var candidateLink in links)
+                        {
+                            if (names.Any(name => candidateLink.Contains(name, StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                domainname = CoreRegex.ExtractDomainName(candidateLink);
+                                link = candidateLink;
+                                _logger.LogInformation("Extracted domain name: {DomainName} for company: {CompanyName}", domainname, job.CompanyName);
+                                break;
+                            }
+                        }
+                        if (!string.IsNullOrWhiteSpace(domainname))
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(job.Division))
+                {
+                    prompt = $"{job.CompanyName.Replace(" ", string.Empty).ToLower()} organizational structure {job.Division} data engineering leadership team";
                 }
                 else
                 {
-                    prompt = $"{job.CompanyName.Replace(" ", string.Empty).ToLower()} organizational structure leadership team";
+                    prompt = $"{job.CompanyName.Replace(" ", string.Empty).ToLower()} organizational structure data engineering leadership team";
                 }
 
                 googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
@@ -169,12 +206,20 @@ public class SearpApiSourceService : IJobSourceService
                     {
                         if (companyProfile is not null)
                         {
-                            await _companyRepository.UpdateCompanyProfileAsync(new CompanyProfile(job, clientResult));
+                            await _companyRepository.UpdateCompanyProfileAsync(new CompanyProfile(job, clientResult)
+                            {
+                                Link = link,
+                                DomainName = domainname,
+                            });
                             _logger.LogInformation("Updated existing company profile for: {CompanyName}", job.CompanyName);
                         }
                         else
                         {
-                            await _companyRepository.AddCompanyProfileAsync(new CompanyProfile(job, clientResult));
+                            await _companyRepository.AddCompanyProfileAsync(new CompanyProfile(job, clientResult)
+                            {
+                                Link = link,
+                                DomainName = domainname,
+                            });
                             _logger.LogInformation("Added new company profile for: {CompanyName}", job.CompanyName);
                         }
                     }
@@ -197,6 +242,47 @@ public class SearpApiSourceService : IJobSourceService
         return jobs.Count() == results.Count();
     }
 
+    /// <summary>
+    /// Updates the names and titles within the organizational hierarchy results.
+    /// </summary>
+    /// <remarks>This method trims whitespace from the titles of all items in the hierarchy and replaces
+    /// certain names with "Unknown" based on predefined lists of pronouns, conjunctions, and known words. The input
+    /// <paramref name="results"/> must not be null, and its <see cref="HierarchyResults.OrgHierarchy"/> property must
+    /// contain valid items to process.</remarks>
+    /// <param name="results">The organizational hierarchy results to update. Cannot be null.</param>
+    /// <returns>The updated <see cref="HierarchyResults"/> object with modified names and trimmed titles.</returns>
+    public static HierarchyResults UpdateName(HierarchyResults results)
+    {
+        foreach (var item in results?.OrgHierarchy ?? [])
+        {
+            item.Title = item.Title.Trim();
+            var nameWords = item.Name.Split([' ', '&'], StringSplitOptions.RemoveEmptyEntries);
+            if (
+                nameWords.Any(w => _pronouns.Contains(w, StringComparer.CurrentCultureIgnoreCase)) ||
+                nameWords.Any(w => _conjunctions.Contains(w, StringComparer.CurrentCultureIgnoreCase)) ||
+                nameWords.Any(w => _wordsNotInNames.Contains(w, StringComparer.CurrentCultureIgnoreCase))
+            )
+            {
+                item.Name = "Unknown";
+            }
+        }
+        return results ?? new HierarchyResults();
+    }
+
+    /// <summary>
+    /// Retrieves the organizational hierarchy relevant to a job posting by analyzing the job description  and the
+    /// company's public organizational structure.
+    /// </summary>
+    /// <remarks>This method uses AI-based analysis to identify the reporting chain or leadership team
+    /// responsible  for hiring the specified role. It prioritizes the closest manager, director, and relevant VP or 
+    /// practice lead, while excluding unrelated executives.  If cached results are available for the specified job and
+    /// organizational structure, they are returned  to improve performance. Otherwise, the method performs a real-time
+    /// analysis using AI services.  The returned hierarchy includes names and titles that match the functional domain
+    /// described in the job  posting. Titles unrelated to the hiring scope (e.g., CFO, CMO) are omitted.</remarks>
+    /// <param name="job">The job posting details, including the company name and job description.</param>
+    /// <param name="organicResults">The company's public organizational structure data.</param>
+    /// <returns>A <see cref="HierarchyResults"/> object containing the relevant organizational hierarchy, or  <see
+    /// langword="null"/> if no valid results are found.</returns>
     private async Task<HierarchyResults?> GetSearchResults(JobSummary job, string organicResults)
     {
         var cacheKey = CachingHelper.GenCacheKey(nameof(SearpApiSourceService), job.CompanyName, organicResults.GenHashString());
@@ -232,6 +318,12 @@ public class SearpApiSourceService : IJobSourceService
                 var sanitized = CoreRegex.SanitizeJson(text);
                 sanitizedJson = JsonHelpers.ExtractJson(sanitized);
                 var result = JsonSerializer.Deserialize<HierarchyResults>(sanitizedJson, _options);
+                if (result is null || result.OrgHierarchy is null || !result.OrgHierarchy.Any())
+                {
+                    _logger.LogWarning("No valid organizational hierarchy found for company: {CompanyName}", job.CompanyName);
+                    return null;
+                }
+                result = UpdateName(result);
                 await _cacheService.CreateEntryAsync(cacheKey, result);
                 return result;
             }
@@ -277,14 +369,13 @@ public class SearpApiSourceService : IJobSourceService
                     continue;
                 }
 
-                if (job.Location.Contains("remote", StringComparison.CurrentCultureIgnoreCase))
+                if (job.Location.ToLower().Contains("remote"))
                 {
                     _logger.LogWarning("Job with ID {JobId} is remote, skipping.", job.JobId);
                     continue;
                 }
 
-                if (!job.Location.Contains(", nc", StringComparison.CurrentCultureIgnoreCase) &&
-                    !job.Location.Contains(", sc", StringComparison.CurrentCultureIgnoreCase))
+                if (!job.Location.ToLower().Contains(", nc") && !job.Location.ToLower().Contains(", sc"))
                 {
                     _logger.LogWarning("Job with ID {JobId} is not in area, skipping.", job.JobId);
                     continue;

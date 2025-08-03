@@ -25,6 +25,16 @@ public class CompanyProfile
     public string CompanyName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the URL link associated with the company.
+    /// </summary>
+    public string Link { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the name of the domain.
+    /// </summary>
+    public string DomainName { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the results of the hierarchy analysis.
     /// </summary>
     public HierarchyResults HierarchyResults { get; set; } = new();

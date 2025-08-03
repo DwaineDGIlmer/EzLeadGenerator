@@ -1,38 +1,38 @@
 ﻿@page
 @model WebApp.Pages.ContactModel
 @{
-    ViewData["JobTitle"] = "Contact";
+    ViewData["Title"] = "Contact";
 }
-<h1>@ViewData["JobTitle"]</h1>
 
-<head>
-    <style>
-        body {
-            background-color: #f4f6fb;
+<style>
+    body {
+        background-color: #f4f6fb;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .navbar {
+        background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+    }
+
+    .navbar-brand, .nav-link {
+        color: #fff !important;
+    }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #ffd700 !important;
         }
 
-        .navbar {
-            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
-        }
+    .footer {
+        background-color: #2b5876;
+        color: #fff;
+    }
 
-        .navbar-brand, .nav-link {
-            color: #fff !important;
-        }
+    .footer a {
+        color: #ffd700;
+    }
+</style>
 
-            .navbar-brand:hover, .nav-link:hover {
-                color: #ffd700 !important;
-            }
-
-        .footer {
-            background-color: #2b5876;
-            color: #fff;
-        }
-
-            .footer a {
-                color: #ffd700;
-            }
-    </style>
-</head>
+<h2 class="mt-3 mb-2">Contact</h2>
 
 <div class="container mt-4">
     <p class="mb-3 text-muted">
