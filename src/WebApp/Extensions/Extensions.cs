@@ -62,7 +62,7 @@ public static class Extensions
         if (cachedJobs is not null)
         {
             logger.LogInformation("Retrieved jobs list from cache");
-            return [.. cachedJobs.OrderByDescending(j => j.PostedDate)];
+            return [.. cachedJobs.OrderBy(j => j.CompanyName)];
         }
         logger.LogDebug("No jobs found in cache for key: {Key}", cacheKey);
         return null;
@@ -149,7 +149,7 @@ public static class Extensions
         if (cacheCompanies is not null)
         {
             logger.LogInformation("Retrieved company list from cache");
-            return [.. cacheCompanies.OrderByDescending(c => c.CreatedAt)];
+            return [.. cacheCompanies.OrderBy(c => c.CompanyName)];
         }
         logger.LogDebug("Company list not found in cache for key: {Key}", cacheKey);
         return null;

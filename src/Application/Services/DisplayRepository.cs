@@ -131,7 +131,7 @@ namespace Application.Services
         public IEnumerable<CompanyProfile> GetPaginatedCompanies(DateTime fromDate, int page, int pageSize)
         {
             return _allCompanies
-                    .OrderByDescending(c => c.UpdatedAt)
+                    .OrderBy(c => c.CompanyName)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();

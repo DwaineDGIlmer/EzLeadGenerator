@@ -148,7 +148,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             _logger.LogDebug("Caching all company profiles with count: {Count}", allCompanies.Count);
             await _cachingService.AddCompaniesAsync(allCompanies, fromDate, _cacheExpirationMinutes, _logger);
         }
-        return [.. allCompanies.OrderByDescending(c => c.CreatedAt)];
+        return [.. allCompanies.OrderBy(c => c.CompanyName)];
     }
 
     /// <summary>

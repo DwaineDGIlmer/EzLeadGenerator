@@ -10,7 +10,6 @@ using Core.Extensions;
 using Core.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using WebApp.Middleware;
 using WebApp.Respository;
 
 namespace WebApp.Extensions;
