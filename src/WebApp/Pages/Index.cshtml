@@ -21,13 +21,19 @@
     .navbar-brand:hover, .nav-link:hover {
         color: #ffd700 !important;
     }
-
     .card {
-        background: #fff;
+        background: #eef3f7 !important;
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
         margin-bottom: 30px;
         padding: 24px 32px;
+    }
+    .table-bordered {
+        border: 1px solid #e0e6ef !important;
+    }
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #e0e6ef !important;
     }
 
     .alert-info, .alert-danger {
@@ -38,28 +44,10 @@
         color: #2b5876;
     }
 
-    .company-highlight {
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 1.1em;
-        margin-bottom: 8px;
-        display: inline-block;
-    }
-
-    .job-row {
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
-        padding: 18px 20px;
-        margin-bottom: 24px;
-        transition: box-shadow 0.2s;
-        background: #eef3f7 !important;
-    }
-
     .job-description {
         white-space: pre-line;
         font-family: 'Segoe UI', Arial, sans-serif;
-        background: #f6fafd;
+        background: #eef3f7 !important;
         border-radius: 4px;
         padding: 8px 10px;
         margin-top: 4px;
@@ -67,11 +55,6 @@
         color: #222;
         font-weight: 400;
         display: block;
-    }
-
-    h5 {
-        color: #2b5876;
-        font-family: 'Segoe UI', Arial, sans-serif;
     }
 </style>
 
@@ -94,25 +77,49 @@ else if (!Model.JobSummaries.Any())
 }
 else
 {
-    <div class="card">
-        <div class="list-group">
-            @foreach (var job in Model.JobSummaries)
-            {
-                <div class="job-row">
-                    <h3 class="mb-3">@job.CompanyName</h3>
-                    <p class="mb-1"><strong>Job Title:</strong> @job.JobTitle</p>
-                    <p class="mb-1"><strong>HiringAgency:</strong> @job.HiringAgency</p>
-                    <p class="mb-1"><strong>Published:</strong> @job.PostedDate.ToString("MMM dd, yyyy")</p>
-                    <p class="mb-1"><strong>Location:</strong> @job.Location</p>
-                    <p class="mb-1"><strong>Division:</strong> @job.Division</p>
-                    <p class="mb-1"><strong>SourceLink:</strong> <a href="@job.SourceLink" target="_blank">@(new Uri(job.SourceLink).GetLeftPart(UriPartial.Authority))</a></p>
-                    <p class="mb-3">
-                        <strong>Job Description:</strong>
-                        <span class="job-description">@job.JobDescription</span>
-                    </p>
-                </div>
-            }
-        </div>
+    <div>
+        @foreach (var job in Model.JobSummaries)
+        {
+            <div class="card mb-4">
+                <h3 class="mb-3">@job.CompanyName</h3>
+                <table class="table-bordered" style="width:100%">
+                    <tbody>
+                        <tr>
+                            <th style="width: 160px;">Job Title</th>
+                            <td>@job.JobTitle</td>
+                        </tr>
+                        <tr>
+                            <th>Hiring Agency</th>
+                            <td>@job.HiringAgency</td>
+                        </tr>
+                        <tr>
+                            <th>Published</th>
+                            <td>@job.PostedDate.ToString("MMM dd, yyyy")</td>
+                        </tr>
+                        <tr>
+                            <th>Location</th>
+                            <td>@job.Location</td>
+                        </tr>
+                        <tr>
+                            <th>Division</th>
+                            <td>@job.Division</td>
+                        </tr>
+                        <tr>
+                            <th>Source Link</th>
+                            <td>
+                                <a href="@job.SourceLink" target="_blank" rel="noopener">
+                                    @(new Uri(job.SourceLink).GetLeftPart(UriPartial.Authority))
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="vertical-align: top;">Job Description</th>
+                            <td><span class="job-description">@job.JobDescription</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 
     <nav aria-label="Job pagination" class="mt-4">
