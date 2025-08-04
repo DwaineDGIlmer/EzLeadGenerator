@@ -70,7 +70,7 @@ public class ExtensionsTest
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            cacheService.GetJobAsync(jobId, loggerMock.Object));
+            cacheService!.GetJobAsync(jobId, loggerMock.Object));
     }
 
     [Fact]
