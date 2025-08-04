@@ -115,7 +115,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
         var cachedProfiles = await _cachingService.GetCompaniesAsync(fromDate, _logger);
         if (cachedProfiles != null)
         {
-            return cachedProfiles.Where(c => c.UpdatedAt >= fromDate).OrderByDescending(c => c.CreatedAt);
+            return cachedProfiles;
         }
 
         var allCompanies = new List<CompanyProfile>();
@@ -148,7 +148,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             _logger.LogDebug("Caching all company profiles with count: {Count}", allCompanies.Count);
             await _cachingService.AddCompaniesAsync(allCompanies, fromDate, _cacheExpirationMinutes, _logger);
         }
-        return [.. allCompanies.OrderBy(c => c.CompanyName)];
+        return allCompanies;
     }
 
     /// <summary>

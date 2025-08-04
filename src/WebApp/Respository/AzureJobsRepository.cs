@@ -139,7 +139,7 @@ public class AzureJobsRepository(
             _logger.LogInformation("Found {JobCount} jobs posted since {FromDate}", jobs.Count, fromDate);
             await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes, _logger);
         }
-        return [.. jobs.OrderByDescending(j => j.PostedDate)];
+        return jobs;
     }
 
     /// <summary>

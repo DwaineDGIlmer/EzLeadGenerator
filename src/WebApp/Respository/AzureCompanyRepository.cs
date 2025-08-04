@@ -111,7 +111,7 @@ public class AzureCompanyRepository(
         if (cachedProfiles != null)
         {
             _logger.LogInformation("Retrieved company profiles from cache");
-            return cachedProfiles.Where(c => c.UpdatedAt >= fromDate).OrderByDescending(c => c.CreatedAt);
+            return cachedProfiles;
         }
 
         var queryResults = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partionKey}'");
@@ -144,7 +144,7 @@ public class AzureCompanyRepository(
         }
 
         _logger.LogInformation("Successfully retrieved {Count} company profiles updated since {FromDate}", companies.Count, fromDate);
-        return [.. companies.OrderBy(c => c.CompanyName)];
+        return companies;
     }
 
     /// <summary>
@@ -169,6 +169,8 @@ public class AzureCompanyRepository(
                 {"Id", profile.Id ?? string.Empty},
                 {"CompanyId", profile.CompanyId ?? string.Empty},
                 {"CompanyName", profile.CompanyName ?? string.Empty},
+                {"DomainName", profile.DomainName ?? string.Empty},
+                {"Link", profile.Link ?? string.Empty},
                 {"HierarchyResults", JsonSerializer.Serialize(profile.HierarchyResults, _options)},
                 {"CreatedAt", profile.CreatedAt.ToString("o")},
                 {"UpdatedAt", profile.UpdatedAt.ToString("o")}
@@ -214,6 +216,8 @@ public class AzureCompanyRepository(
                 {"Data", JsonSerializer.Serialize(profile, _options)},
                 {"CompanyName", profile.CompanyName ?? string.Empty},
                 {"CompanyId", profile.CompanyId ?? string.Empty},
+                {"DomainName", profile.DomainName ?? string.Empty},
+                {"Link", profile.Link ?? string.Empty},
                 {"HierarchyResults", JsonSerializer.Serialize(profile.HierarchyResults, _options)},
                 {"UpdatedAt", profile.UpdatedAt.ToString("o")},
                 {"CreatedAt", profile.CreatedAt.ToString("o")}

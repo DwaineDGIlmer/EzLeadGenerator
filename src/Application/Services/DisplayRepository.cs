@@ -78,7 +78,8 @@ namespace Application.Services
         /// objects for the specified page.</returns>
         public Task<IEnumerable<JobSummary>> GetPaginatedJobsAsync(DateTime fromDate, int page, int pageSize)
         {
-            return Task.Run(() => GetPaginatedJobs(fromDate, page, pageSize));
+            var allJobs = GetPaginatedJobs(fromDate, page, pageSize);
+            return Task.FromResult(allJobs);
         }
 
         /// <summary>
@@ -114,7 +115,8 @@ namespace Application.Services
         /// cref="CompanyProfile"/> objects, ordered by their last job synchronization date in descending order.</returns>
         public Task<IEnumerable<CompanyProfile>> GetPaginatedCompaniesAsync(DateTime fromDate, int page, int pageSize)
         {
-            return Task.Run(() => GetPaginatedCompanies(fromDate, page, pageSize));
+            var allProfiles = GetPaginatedCompanies(fromDate, page, pageSize);
+            return Task.FromResult(allProfiles);
         }
 
         /// <summary>

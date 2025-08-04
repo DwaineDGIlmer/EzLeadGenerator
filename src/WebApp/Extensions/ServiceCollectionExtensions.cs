@@ -267,9 +267,9 @@ public static class ServiceCollectionExtensions
     /// Adds the <see cref="IDisplayRepository"/> service to the specified <see cref="IServiceCollection"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to which the service is added.</param>
-    /// <param name="configuration">The <see cref="IConfiguration"/>used for adding the services to.</param>
+    /// 
     /// <returns>The updated <see cref="IServiceCollection"/> with the <see cref="IDisplayRepository"/> service registered.</returns>
-    public static IServiceCollection AddSearchService(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddSearchService(this IServiceCollection services)
     {
         services.AddSingleton<ISearch<OrganicResult>, SerpApiSearchService>();
         return services;

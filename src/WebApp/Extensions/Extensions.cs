@@ -57,12 +57,12 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(fromDate);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cacheKey = GenCacheKey("Jobs", fromDate);
+        var cacheKey = GetCacheKey("Jobs", fromDate);
         var cachedJobs = await cacheService.TryGetAsync<IEnumerable<JobSummary>>(cacheKey);
         if (cachedJobs is not null)
         {
             logger.LogInformation("Retrieved jobs list from cache");
-            return [.. cachedJobs.OrderBy(j => j.CompanyName)];
+            return cachedJobs;
         }
         logger.LogDebug("No jobs found in cache for key: {Key}", cacheKey);
         return null;
@@ -91,7 +91,7 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(fromDate);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cacheKey = GenCacheKey("Jobs", fromDate);
+        var cacheKey = GetCacheKey("Jobs", fromDate);
         await cacheService.CreateEntryAsync(cacheKey, jobs, TimeSpan.FromMinutes(cacheExpirationInMinutes));
     }
 
@@ -144,12 +144,12 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(fromDate);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cacheKey = GenCacheKey("Companies", fromDate);
+        var cacheKey = GetCacheKey("Companies", fromDate);
         var cacheCompanies = await cacheService.TryGetAsync<IEnumerable<CompanyProfile>>(cacheKey);
         if (cacheCompanies is not null)
         {
             logger.LogInformation("Retrieved company list from cache");
-            return [.. cacheCompanies.OrderBy(c => c.CompanyName)];
+            return cacheCompanies;
         }
         logger.LogDebug("Company list not found in cache for key: {Key}", cacheKey);
         return null;
@@ -178,13 +178,20 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(fromDate);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cacheKey = GenCacheKey("Companies", fromDate);
+        var cacheKey = GetCacheKey("Companies", fromDate);
         await cacheService.CreateEntryAsync(cacheKey, companies, TimeSpan.FromMinutes(cacheExpirationInMinutes));
     }
 
-    private static string GenCacheKey(string prefix, DateTime fromDate)
+    /// <summary>
+    /// Generates a cache key by combining a specified prefix and a date.
+    /// </summary>
+    /// <param name="prefix">The prefix to include in the cache key. Cannot be <see langword="null"/>.</param>
+    /// <param name="fromDate">The date to include in the cache key. Cannot be <see langword="null"/>.</param>
+    /// <returns>A string representing the cache key, formatted as "<paramref name="prefix"/>_<paramref name="fromDate"/>".</returns>
+    public static string GetCacheKey(string prefix, DateTime fromDate)
     {
-        // Generates a hash string based on the date time, ensuring uniqueness for each date.
-        return $"{prefix}_{fromDate.GenHashString()}_{fromDate.Ticks}";
+        ArgumentNullException.ThrowIfNull(prefix);
+        ArgumentNullException.ThrowIfNull(fromDate);
+        return $"{prefix}_{fromDate.Date.GenHashString()}";
     }
 }

@@ -1,8 +1,7 @@
 using Application.Configurations;
 using Application.Constants;
 
-
-namespace UnitTests.Configurations;
+namespace Application.UnitTests.Configurations;
 
 public class AzureSettingsTest
 {
