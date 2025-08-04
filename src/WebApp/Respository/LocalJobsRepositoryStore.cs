@@ -156,7 +156,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
         {
             await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes, _logger);
         }
-        return [.. jobs.OrderByDescending(j => j.PostedDate)];
+        return jobs;
     }
 
     /// <summary>

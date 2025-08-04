@@ -225,7 +225,7 @@ public class ServiceCollectionExtensionsTest
         services.ConfigureSerpApiSettings(configuration);
         services.AddSingleton(Mock.Of<IHttpClientFactory>());
         services.AddSingleton(Mock.Of<ICacheService>());
-        services.AddSearchService(configuration);
+        services.AddSearchService();
 
         var provider = services.BuildServiceProvider();
         var search = provider.GetService<ISearch<OrganicResult>>();
