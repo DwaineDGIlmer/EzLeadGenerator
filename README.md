@@ -1,4 +1,4 @@
-# EzLeadGenerator
+# 🧠 EzLeadGenerator
 
 EzLeadGenerator is an AI-assisted .NET web application designed to automate and streamline the process of generating thousands of high-quality leads for recruiting and staffing professionals.
 
@@ -7,7 +7,7 @@ EzLeadGenerator is an AI-assisted .NET web application designed to automate and 
 
 ---
 
-## Features
+## ✨ Features
 
 - **AI-powered lead generation:** Analyze and enrich job and company data using AI.
 - **Advanced search:** Filter job postings by title and location.
@@ -18,7 +18,7 @@ EzLeadGenerator is an AI-assisted .NET web application designed to automate and 
 
 ---
 
-## Table of Contents
+## 📚 Table of Contents
 
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
@@ -31,7 +31,7 @@ EzLeadGenerator is an AI-assisted .NET web application designed to automate and 
 
 ---
 
-## Getting Started
+## 🛠️ Getting Started
 
 ### Prerequisites
 
@@ -66,7 +66,7 @@ EzLeadGenerator is an AI-assisted .NET web application designed to automate and 
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
 Edit [`src/WebApp/appsettings.json`](src/WebApp/appsettings.json) to set your API keys and endpoints:
 
@@ -85,7 +85,7 @@ dotnet user-secrets set "SearchApiKey" "<your-api-key>"
 
 ---
 
-## Testing
+## 🧪 Testing
 
 Run unit tests with:
 ```sh
@@ -94,7 +94,7 @@ dotnet test
 
 ---
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 EzLeadGenerator/
@@ -111,26 +111,27 @@ EzLeadGenerator/
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or pull request.
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).  
 Copyright © 2025 Dwain Gilmer
 
 ---
 
-## Author
+## 👤 Author
 
 [Dwain Gilmer](mailto:dwaine.gilmer@protonmail.com)
+[GitHub](https://github.com/DwaineDGIlmer)  
 
 ---
 
-## Project Links
+## 🔗 Project Links
 
 - [Project Homepage](https://github.com/DwaineDGIlmer/EzLeadGenerator)
 - [Application Layer README](./src/Application/README.md)

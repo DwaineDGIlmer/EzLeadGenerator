@@ -1,4 +1,4 @@
-# EzLeadGenerator WebApp
+﻿# 🧠 EzLeadGenerator WebApp
 
 EzLeadGenerator WebApp is a modern ASP.NET Core application that automates lead generation and analysis for recruiting and staffing professionals.
 
@@ -7,7 +7,7 @@ EzLeadGenerator WebApp is a modern ASP.NET Core application that automates lead 
 
 ---
 
-## Features
+## ✨ Features
 
 - **AI-powered enrichment:** Job and company profile analysis using AI.
 - **Advanced search:** Filter job postings by title and location.
@@ -20,7 +20,7 @@ EzLeadGenerator WebApp is a modern ASP.NET Core application that automates lead 
 
 ---
 
-## Table of Contents
+## 📚 Table of Contents
 
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
@@ -34,7 +34,7 @@ EzLeadGenerator WebApp is a modern ASP.NET Core application that automates lead 
 
 ---
 
-## Getting Started
+## 🛠️ Getting Started
 
 ### Prerequisites
 
@@ -60,7 +60,7 @@ EzLeadGenerator WebApp is a modern ASP.NET Core application that automates lead 
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
 Edit [`src/WebApp/appsettings.json`](src/WebApp/appsettings.json) to set your API keys and endpoints.
 
@@ -75,7 +75,7 @@ Edit [`src/WebApp/appsettings.json`](src/WebApp/appsettings.json) to set your AP
 
 ---
 
-## Testing
+## 🧪 Testing
 
 Run unit tests with:
 ```sh
@@ -84,7 +84,7 @@ dotnet test
 
 ---
 
-## Project Structure
+## 🗂️ Project Structure
 
 - [`src/WebApp/Extensions`](./Extensions/README.md)  
   Utility extension methods for caching, logging, and DI registration.
@@ -101,7 +101,7 @@ Each subfolder contains its own `README.md` with details on classes, usage, and 
 
 ---
 
-## Secure Local Development
+## 🔒 Secure Local Development
 
 **Never commit secrets or connection strings to GitHub.**  
 Follow these steps to test locally without violating security:
@@ -129,25 +129,26 @@ Follow these steps to test locally without violating security:
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or pull request.
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the [MIT License](../LICENSE).
 
 ---
 
-## Author
+## 🧑‍💻 Author
 
 [Dwain Gilmer](mailto:dwaine.gilmer@protonmail.com)
+[GitHub](https://github.com/DwaineDGIlmer)  
 
 ---
 
-## Project Links
+## 🔗 Project Links
 
 - [Project Homepage](https://github.com/DwaineDGIlmer/EzLeadGenerator)
 - [Extensions README](./Extensions/README.md)

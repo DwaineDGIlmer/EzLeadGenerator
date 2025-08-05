@@ -1,4 +1,4 @@
-# EzLeadGenerator Application Layer
+# 🧠 EzLeadGenerator Application Layer
 
 The Application layer contains the core business logic, models, contracts, and service interfaces for the EzLeadGenerator solution. It is designed for use by the WebApp and supporting infrastructure projects.
 
@@ -7,7 +7,7 @@ The Application layer contains the core business logic, models, contracts, and s
 
 ---
 
-## Features
+## ✨ Features
 
 - **Domain models:** Jobs, companies, summaries, and more.
 - **Service and repository contracts:** For dependency injection and testability.
@@ -16,7 +16,7 @@ The Application layer contains the core business logic, models, contracts, and s
 
 ---
 
-## Table of Contents
+## 📚 Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
@@ -31,13 +31,13 @@ The Application layer contains the core business logic, models, contracts, and s
 
 ---
 
-## Overview
+## 🚀 Overview
 
 This project contains the core business logic, models, contracts, and service interfaces for the EzLeadGenerator solution. It is designed to be consumed by both the WebApp and supporting infrastructure projects.
 
 ---
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 src/
@@ -52,7 +52,7 @@ src/
 
 ---
 
-## Folder References
+### Folder References
 
 - [Models README](./Models/README.md) — Core data models for jobs, companies, search results, and utility types.
 - [Contracts README](./Contracts/README.md) — Interfaces for repositories, services, and business logic contracts.
@@ -62,13 +62,13 @@ src/
 
 ---
 
-## Usage
+## 🚀 Usage
 
 Reference this project from your ASP.NET Core WebApp or any other .NET project that needs access to the core business logic and contracts.
 
 ---
 
-## Installation
+## 💾 Installation
 
 1. **Clone the repository:**
    ```sh
@@ -86,7 +86,7 @@ Reference this project from your ASP.NET Core WebApp or any other .NET project t
 
 ---
 
-## Project Links
+## 🔗 Project Links
 
 - [Project Homepage](https://github.com/DwaineDGIlmer/EzLeadGenerator)
 - [Configurations README](./Configurations/README.md)
@@ -96,19 +96,19 @@ Reference this project from your ASP.NET Core WebApp or any other .NET project t
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please open issues or submit pull requests for improvements and bug fixes.  
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines.
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the [MIT License](../../LICENSE).
 
 ---
 
-## Contact
+## 📬 Contact
 
 For questions or support, please contact Dwaine Gilmer at [Protonmail.com](mailto:dwaine.gilmer@protonmail.com) or submit an issue on the project's GitHub
