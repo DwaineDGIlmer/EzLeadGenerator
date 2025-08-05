@@ -282,7 +282,8 @@ public class SearpApiSourceService : IJobSourceService
         if (lastMatch != null)
         {
             // Include the found word in the result
-            job.Title = job.Title[..(lastMatch.Index + lastMatch.Word.Length)];
+            int endIndex = Math.Min(lastMatch.Index + lastMatch.Word.Length, job.Title.Length);
+            job.Title = job.Title[..endIndex];
         }
     }
 
