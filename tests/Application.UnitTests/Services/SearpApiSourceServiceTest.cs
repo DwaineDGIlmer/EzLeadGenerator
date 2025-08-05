@@ -6,6 +6,7 @@ using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.UnitTests.Services;
 
@@ -164,13 +165,13 @@ public class SearpApiSourceServiceTest
         // Arrange
         var input = new HierarchyResults
         {
-            OrgHierarchy = new List<HierarchyItem>
-            {
+            OrgHierarchy =
+            [
                 new() { Name = "he", Title = " Director " },      // pronoun
                 new() { Name = "and", Title = " VP " },           // conjunction
                 new() { Name = "lead", Title = " Practice " },    // known word
                 new() { Name = "Alice", Title = " Manager " }     // normal
-            }
+            ]
         };
 
         // Act
@@ -198,5 +199,77 @@ public class SearpApiSourceServiceTest
         // Assert
         Assert.NotNull(result);
         Assert.Empty(result.OrgHierarchy);
+    }
+
+
+
+    [Theory]
+    [InlineData("", "Data Engineer")]
+    [InlineData(" ", "Data Engineer")]
+    [InlineData("Data Engineer, TNIFIN AG", "Data Engineer")]
+    [InlineData("Lead Data Engineer", "Lead Data Engineer")]
+    [InlineData("Senior Principal Data Engineer", "Senior Principal Data Engineer")]
+    [InlineData("Manager, Data Engineering", "Manager")]
+    [InlineData("Lead Engineer - Analytics", "Lead Engineer - Analytics")]
+    [InlineData("Data Analyst (Contract)", "Data Analyst")]
+    [InlineData("Data Science Manager", "Data Science Manager")]
+    [InlineData("Principal Engineer", "Principal Engineer")]
+    [InlineData("Lead, Data", "Lead")]
+    [InlineData("Lead Data Engineer Remote", "Lead Data Engineer Remote")]
+    [InlineData("Lead Data Engineer Hybrid", "Lead Data Engineer Hybrid")]
+    [InlineData("Senior Data Engineer(Enterprise Platforms Technology)", "Senior Data Engineer")]
+    [InlineData("Senior Data Engineer - Capital One Software(Remote)", "Senior Data Engineer")]    
+    [InlineData("Manager/Director", "Manager")]
+    [InlineData("Data Engineer - HRIT Reporting and Analytics", "Data Engineer - HRIT Reporting and Analytics")]    
+    [InlineData("Senior Data Engineer (Req #001205)", "Senior Data Engineer")]
+    [InlineData("Engineer", "Engineer")]
+    [InlineData("Data Engineer - Hybrid", "Data Engineer - Hybrid")]    
+    [InlineData("Lead Engineer!", "Lead Engineer")]
+    [InlineData("Data Engineer I", "Data Engineer I")]
+    [InlineData("Data Engineer II", "Data Engineer II")]
+    [InlineData("Data Engineer III", "Data Engineer III")]    
+    [InlineData("Manager & Supervisor", "Manager")]
+    [InlineData("Lead Engineer (Remote)", "Lead Engineer")]
+    [InlineData("Lead Engineer - Data", "Lead Engineer")]
+    [InlineData("Manager - Data Analytics", "Manager - Data Analytics")]
+    [InlineData("Manager", "Manager")]
+    [InlineData("Lead", "Lead")]
+    [InlineData("Manager, Data", "Manager")]
+    [InlineData("Lead Data Engineer–Cloud & GenAI Automation", "Lead Data Engineer")]
+    [InlineData("Lead Data Automation Engineer", "Lead Data Automation Engineer")]
+    [InlineData("Lead Engineer, Data", "Lead Engineer")]
+    [InlineData("Lead Engineer, Data Analytics", "Lead Engineer")]
+    [InlineData("Data Engineering Lead", "Data Engineering Lead")]
+    [InlineData("Data Engineering Supervisor", "Data Engineering Supervisor")]
+    public void UpdateJobTitle_TrimsAndExtractsCorrectTitle(string input, string expected)
+    {
+        var job = new JobResult { Title = input };
+        SearpApiSourceService.UpdateJobTitle(job);
+        Assert.Equal(expected, job.Title);
+    }
+
+    [Fact]
+    public void UpdateJobTitle_DoesNothing_WhenNoMatch()
+    {
+        var job = new JobResult { Title = "Unrelated Title" };
+        SearpApiSourceService.UpdateJobTitle(job);
+        Assert.Equal("Unrelated Title", job.Title);
+    }
+
+    [Fact]
+    public void UpdateJobTitle_HandlesEmptyJobTitle()
+    {
+        var job = new JobResult { Title = "" };
+        SearpApiSourceService.UpdateJobTitle(job);
+        Assert.Equal("Data Engineer", job.Title);
+    }
+
+    [Fact]
+    public void UpdateJobTitle_HandlesNullJobTitle()
+    {
+        var job = new JobResult { Title = null! };
+        // Should not throw
+        SearpApiSourceService.UpdateJobTitle(job);
+        Assert.Equal("Data Engineer", job.Title);
     }
 }
