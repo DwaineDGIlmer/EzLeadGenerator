@@ -2,16 +2,37 @@
 
 EzLeadGenerator WebApp is a modern ASP.NET Core application that automates lead generation and analysis for recruiting and staffing professionals.
 
+[![.NET](https://img.shields.io/badge/.NET-8.0-blue)](https://dotnet.microsoft.com/download)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+---
+
 ## Features
 
-- AI-powered job and company profile enrichment
-- Search and filter job postings by title and location
-- Grouped job results for easy analysis
-- Paginated job listings and CSV export
-- Company analysis with organizational hierarchy
-- Privacy-first demo (no user data stored)
-- Configurable via `appsettings.json`
-- Supports both local file and Azure Table/Blob storage
+- **AI-powered enrichment:** Job and company profile analysis using AI.
+- **Advanced search:** Filter job postings by title and location.
+- **Grouped results:** Easily analyze jobs by company or division.
+- **Pagination & export:** Paginated job listings and CSV export.
+- **Company insights:** Organizational hierarchy and division inference.
+- **Privacy-first demo:** No user data stored.
+- **Flexible storage:** Supports both local file and Azure Table/Blob storage.
+- **Configurable:** All settings via `appsettings.json` or environment variables.
+
+---
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Configuration](#configuration)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Secure Local Development](#secure-local-development)
+- [Contributing](#contributing)
+- [License](#license)
+- [Author](#author)
+- [Links](#project-links)
+
+---
 
 ## Getting Started
 
@@ -22,23 +43,37 @@ EzLeadGenerator WebApp is a modern ASP.NET Core application that automates lead 
 
 ### Build and Run
 
-1. Restore dependencies:
+1. **Restore dependencies:**
     ```sh
     dotnet restore
     ```
-2. Build the project:
+2. **Build the project:**
     ```sh
     dotnet build
     ```
-3. Run the web application:
+3. **Run the web application:**
     ```sh
     dotnet run --project src/WebApp
     ```
-4. Open your browser and navigate to `https://localhost:5001` (or the URL shown in the console).
+4. **Browse to:**  
+   [https://localhost:5001](https://localhost:5001) (or the URL shown in the console)
 
-### Configuration
+---
+
+## Configuration
 
 Edit [`src/WebApp/appsettings.json`](src/WebApp/appsettings.json) to set your API keys and endpoints.
+
+- **Connection Strings:**  
+  Use [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) for local development:
+  ```sh
+  dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "<your-local-connection-string>"
+  ```
+- **Production:**  
+  Set connection strings in the Azure Portal under  
+  `resourceGroups/AiEventing/providers/Microsoft.Web/sites/EzLeadGenerator/connectionStrings`.
+
+---
 
 ## Testing
 
@@ -47,17 +82,22 @@ Run unit tests with:
 dotnet test
 ```
 
-## License
+---
 
-This project is licensed under the MIT License.
+## Project Structure
 
-## Author
+- [`src/WebApp/Extensions`](./Extensions/README.md)  
+  Utility extension methods for caching, logging, and DI registration.
+- [`src/WebApp/Middleware`](./Middleware/README.md)  
+  Middleware for background job updates and cross-cutting concerns.
+- [`src/WebApp/Respository`](./Respository/README.md)  
+  Data access and persistence for company profiles and job summaries.
+- [`src/Application`](../Application)  
+  Application layer: services, contracts, models, and configuration.
+- [`src/Domain`](../Domain)  
+  Domain models and business logic.
 
-[Dwain Gilmer](mailto:dwaine.gilmer@protonmail.com)
-
-## Links
-
-- [Project Homepage](https://github.com/DwaineDGIlmer/EzLeadGenerator)
+Each subfolder contains its own `README.md` with details on classes, usage, and dependencies.
 
 ---
 
@@ -66,45 +106,50 @@ This project is licensed under the MIT License.
 **Never commit secrets or connection strings to GitHub.**  
 Follow these steps to test locally without violating security:
 
-### 1. Use User Secrets (Recommended for ASP.NET Core)
-
-Store your Azure Table Storage connection string securely for local development:
-
-```sh
-dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "<your-local-connection-string>"
-```
-
-This keeps secrets out of `appsettings.json` and source control.
-
-### 2. Use Placeholders in `appsettings.json`
-
-Your `appsettings.json` should use an empty value or placeholder:
-
-```json
-"ConnectionStrings": {
-  "AzureTableStorage": ""
-}
-```
-
-### 3. Never Commit Secrets
-
-Do not commit real connection strings or secrets to GitHub.  
-If you use files like `.env` or `secrets.json`, add them to `.gitignore`:
-
-```
-secrets.json
-.env
-```
-
-### 4. Use Environment Variables in Production
-
-For Azure deployments, set connection strings in the Azure Portal under  
-`resourceGroups/AiEventing/providers/Microsoft.Web/sites/EzLeadGenerator/connectionStrings`.
-
-### 5. Document Setup
-
-Add these instructions to your `README.md` so all contributors know how to set up secrets securely.
+1. **Use User Secrets (Recommended for ASP.NET Core)**
+    ```sh
+    dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "<your-local-connection-string>"
+    ```
+2. **Use Placeholders in `appsettings.json`**
+    ```json
+    "ConnectionStrings": {
+      "AzureTableStorage": ""
+    }
+    ```
+3. **Never Commit Secrets**
+    - Add files like `.env` or `secrets.json` to `.gitignore`:
+      ```
+      secrets.json
+      .env
+      ```
+4. **Use Environment Variables in Production**
+    - Set connection strings in the Azure Portal as described above.
+5. **Document Setup**
+    - Add these instructions to your `README.md` so all contributors know how to set up secrets securely.
 
 ---
 
-**For questions or contributions, please open an issue or pull request.**
+## Contributing
+
+Contributions are welcome! Please open an issue or pull request.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](../LICENSE).
+
+---
+
+## Author
+
+[Dwain Gilmer](mailto:dwaine.gilmer@protonmail.com)
+
+---
+
+## Project Links
+
+- [Project Homepage](https://github.com/DwaineDGIlmer/EzLeadGenerator)
+- [Extensions README](./Extensions/README.md)
+- [Middleware README](./Middleware/README.md)
+- [Repository README](./Respository/README.md)
