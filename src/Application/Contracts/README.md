@@ -1,32 +1,32 @@
-# Services Folder
+# Contracts Folder
 
-This folder contains the core service classes for the EzLeadGenerator application layer. These services provide business logic for searching, retrieving, processing, and displaying job and company data, as well as integrating with external APIs and AI services.
+This folder contains the core contracts and interfaces for the EzLeadGenerator application layer. These contracts define the abstractions for services, repositories, and other components, ensuring loose coupling and facilitating dependency injection and testing.
 
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Service Classes](#service-classes)
-  - [SerpApiSearchService](#serpapisearchservice)
-  - [SerpApiSearchJobsService](#serpapisearchjobsservice)
-  - [SearpApiSourceService](#searpapisourceservice)
-  - [DisplayRepository](#displayrepository)
+- [Contracts and Interfaces](#contracts-and-interfaces)
+  - [ISerpApiSearchService](#iserpapisearchservice)
+  - [ISerpApiSearchJobsService](#iserpapisearchjobsservice)
+  - [ISerpApiSourceService](#iserpapisourceservice)
+  - [IDisplayRepository](#idisplayrepository)
 - [Usage](#usage)
-- [Extending Services](#extending-services)
+- [Extending Contracts](#extending-contracts)
 - [Contact](#contact)
 
 ---
 
 ## Overview
 
-The `Services` folder provides implementations for searching job listings, retrieving company and job data, integrating with AI for organizational inference, and supporting data display and pagination. These services are designed for dependency injection and are consumed by higher-level application components.
+The `Contracts` folder defines interfaces and base types for searching job listings, retrieving company and job data, integrating with AI for organizational inference, and supporting data display and pagination. These contracts are designed for dependency injection and are implemented by concrete classes in the application.
 
 ---
 
-## Service Classes
+## Contracts and Interfaces
 
-### SerpApiSearchService
+### ISerpApiSearchService
 
 - **Purpose:**  
   Performs Google search operations using the Serp API, handles caching of results, and logs operations.
