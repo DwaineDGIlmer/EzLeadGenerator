@@ -268,7 +268,7 @@ public class SearpApiSourceService : IJobSourceService
         }
 
         var match = Regex.Match(job.Title, @"[^a-zA-Z0-9 -]");
-        if (match.Success && !string.IsNullOrEmpty(job.Title[..match.Index]))
+        if (match.Success && match.Index > 0)
         {
             job.Title = job.Title[..match.Index].Trim();
         }
