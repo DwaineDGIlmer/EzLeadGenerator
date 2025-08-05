@@ -6,8 +6,6 @@ using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace Application.UnitTests.Services;
 
 public class SearpApiSourceServiceTest
@@ -235,7 +233,7 @@ public class SearpApiSourceServiceTest
     [InlineData("Manager", "Manager")]
     [InlineData("Lead", "Lead")]
     [InlineData("Manager, Data", "Manager")]
-    [InlineData("Lead Data Engineer–Cloud & GenAI Automation", "Lead Data Engineer")]
+    [InlineData("Lead Data EngineerÂ–Cloud & GenAI Automation", "Lead Data Engineer")]
     [InlineData("Lead Data Automation Engineer", "Lead Data Automation Engineer")]
     [InlineData("Lead Engineer, Data", "Lead Engineer")]
     [InlineData("Lead Engineer, Data Analytics", "Lead Engineer")]
