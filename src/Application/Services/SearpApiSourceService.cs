@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using OpenAI.Chat;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Application.Services;
 
@@ -25,6 +26,7 @@ public class SearpApiSourceService : IJobSourceService
     private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "their"];
     private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so"];
     private static readonly List<string> _wordsNotInNames = ["relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering"];
+    private static readonly List<string> _titleWords = ["engineer", "engineering", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation"];
     private static readonly List<string> _tokens =
     [
         "lead",
@@ -243,6 +245,49 @@ public class SearpApiSourceService : IJobSourceService
     }
 
     /// <summary>
+    /// Updates the job title of the specified <see cref="JobResult"/> object based on predefined rules.
+    /// </summary>
+    /// <remarks>This method modifies the <paramref name="job"/> object's <c>Title</c> property to ensure it
+    /// is valid and meaningful. If the title is empty, consists only of whitespace, or matches the company name, it is
+    /// set to "Data Engineer". Additionally, the method trims invalid characters and adjusts the title based on
+    /// predefined keywords.</remarks>
+    /// <param name="job">The <see cref="JobResult"/> object whose <c>Title</c> property will be updated. Cannot be <c>null</c>.</param>
+    public static void UpdateJobTitle(JobResult job)
+    {
+        if (string.IsNullOrEmpty(job.Title) ||
+            job.Title.Equals(" ") ||
+            job.Title.Equals(job.CompanyName))
+        {
+            job.Title = "Data Engineer";
+            return;
+        }
+        // Preserve titles ending with " I", " II", or " III"
+        if (Regex.IsMatch(job.Title, @"\b(I|II|III)$"))
+        {
+            return;
+        }
+
+        var match = Regex.Match(job.Title, @"[^a-zA-Z0-9 -]");
+        if (match.Success && match.Index > 0)
+        {
+            job.Title = job.Title[..match.Index].Trim();
+        }
+        // Find all matches with their indexes
+        var matches = _titleWords
+            .Select(word => new { Word = word, Index = job.Title.IndexOf(word, StringComparison.OrdinalIgnoreCase) })
+            .Where(x => x.Index != -1);
+
+        // Get the match with the highest index (last in the string)
+        var lastMatch = matches.OrderByDescending(x => x.Index).FirstOrDefault();
+        if (lastMatch != null)
+        {
+            // Include the found word in the result
+            int endIndex = Math.Min(lastMatch.Index + lastMatch.Word.Length, job.Title.Length);
+            job.Title = job.Title[..endIndex];
+        }
+    }
+
+    /// <summary>
     /// Updates the names and titles within the organizational hierarchy results.
     /// </summary>
     /// <remarks>This method trims whitespace from the titles of all items in the hierarchy and replaces
@@ -318,7 +363,7 @@ public class SearpApiSourceService : IJobSourceService
                 var sanitized = CoreRegex.SanitizeJson(text);
                 sanitizedJson = JsonHelpers.ExtractJson(sanitized);
                 var result = JsonSerializer.Deserialize<HierarchyResults>(sanitizedJson, _options);
-                if (result is null || result.OrgHierarchy is null || !result.OrgHierarchy.Any())
+                if (result is null || result.OrgHierarchy is null || result.OrgHierarchy.Count == 0)
                 {
                     _logger.LogWarning("No valid organizational hierarchy found for company: {CompanyName}", job.CompanyName);
                     return null;
@@ -369,7 +414,7 @@ public class SearpApiSourceService : IJobSourceService
                     continue;
                 }
 
-                if (job.Location.ToLower().Contains("remote"))
+                if (job.Location.Contains("remote", StringComparison.CurrentCultureIgnoreCase))
                 {
                     _logger.LogWarning("Job with ID {JobId} is remote, skipping.", job.JobId);
                     continue;
@@ -381,6 +426,15 @@ public class SearpApiSourceService : IJobSourceService
                     _logger.LogWarning("Job with ID {JobId} is not in area, skipping.", job.JobId);
                     continue;
                 }
+
+                // This is to catch Data Center Engineer, etc
+                if (job.Title.Contains("center", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    _logger.LogWarning("Job with ID {JobId} is not relevant, skipping.", job.JobId);
+                    continue;
+                }
+
+                UpdateJobTitle(job);
 
                 var prompt = Prompts.DivisionMessage.Replace("{CompanyName}", job.CompanyName).Replace("{Description}", job.Description);
                 var divisionResults = await _aiChatService.GetChatCompletion<DivisionInference>(Prompts.DivisionSystem, prompt);
