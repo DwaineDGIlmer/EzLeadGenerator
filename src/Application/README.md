@@ -89,7 +89,7 @@ Reference this project from your ASP.NET Core WebApp or any other .NET project t
 ## Project Links
 
 - [Project Homepage](https://github.com/DwaineDGIlmer/EzLeadGenerator)
-- [Configuration README](./Configuration/README.md)
+- [Configurations README](./Configurations/README.md)
 - [Contracts README](./Contracts/README.md)
 - [Models README](./Models/README.md)
 - [Services README](./Services/README.md)
