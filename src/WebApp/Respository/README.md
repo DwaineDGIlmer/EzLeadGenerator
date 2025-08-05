@@ -19,7 +19,7 @@ This folder contains repository classes for the EzLeadGenerator web application.
 
 ## Overview
 
-The `Respository` folder provides implementations of the `ICompanyRepository` and `IJobsRepository` interfaces. These classes abstract the details of data storage and retrieval, allowing the application to work with either Azure Table Storage or local JSON files for development and production scenarios.
+The `Repository` folder provides implementations of the `ICompanyRepository` and `IJobsRepository` interfaces. These classes abstract the details of data storage and retrieval, allowing the application to work with either Azure Table Storage or local JSON files for development and production scenarios.
 
 ---
 
