@@ -49,16 +49,20 @@ src/
     ├── Extensions/       # Extension methods and helpers
     └── README.md         # This file
 ```
+<details>
+  <summary>Expand for details</summary>
+  The solution is organized into several libraries and folders, most with its own documentation:
 
----
+- [Application](.)  
+  Application layer containing core business logic, models, contracts, and service interfaces.
+    - [Configurations](./Configurations/README.md) — Contains strongly-typed configuration classes for external services and application settings.
+    - [Contracts](./Contracts/README.md) — Defines interfaces for repositories, services, and business logic contracts.
+    - [Models](./Models/README.md) — Contains core data models for jobs, companies, search results, and utility types.
+    - [Services](./Services/README.md) — Implements service logic for search, job retrieval, and data display.
 
-### Folder References
-
-- [Models README](./Models/README.md) — Core data models for jobs, companies, search results, and utility types.
-- [Contracts README](./Contracts/README.md) — Interfaces for repositories, services, and business logic contracts.
-- [Configurations README](./Configurations/README.md) — Strongly-typed configuration classes for external services and application settings.
-- [Services README](./Services/README.md) — Service implementations for search, job retrieval, and data display.
-- [Extensions README](./Extensions/README.md) — Extension methods and helpers for the application layer.
+- [Application.UnitTests/](tests/Application.UnitTests)  
+  Unit tests for the Application major components.
+</details>
 
 ---
 
