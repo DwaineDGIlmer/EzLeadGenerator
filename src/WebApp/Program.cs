@@ -10,7 +10,6 @@ builder.Services.InitializeServices(builder.Configuration);
 builder.Services.ConfigureSerpApiSettings(builder.Configuration);
 builder.Services.AddResilientHttpClient(builder.Configuration, nameof(EzLeadGenerator));
 builder.Services.AddJobsRetrivalService(builder.Configuration);
-builder.Services.AddCacheService(builder.Configuration);
 builder.Services.AddCompanyProfileStore(builder.Configuration);
 builder.Services.AddJobsProfileStore(builder.Configuration);
 builder.Services.AddSearchService();

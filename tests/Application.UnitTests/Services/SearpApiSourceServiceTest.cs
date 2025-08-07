@@ -6,6 +6,7 @@ using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Application.UnitTests.Services;
 
 public class SearpApiSourceServiceTest
@@ -221,6 +222,7 @@ public class SearpApiSourceServiceTest
     [InlineData("Data Engineer - HRIT Reporting and Analytics", "Data Engineer - HRIT Reporting and Analytics")]    
     [InlineData("Senior Data Engineer (Req #001205)", "Senior Data Engineer")]
     [InlineData("Engineer", "Engineer")]
+    [InlineData("Data Engineer - AWS", "Data Engineer - AWS")]    
     [InlineData("Data Engineer - Hybrid", "Data Engineer - Hybrid")]    
     [InlineData("Lead Engineer!", "Lead Engineer")]
     [InlineData("Data Engineer I", "Data Engineer I")]

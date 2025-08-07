@@ -85,19 +85,30 @@ dotnet test
 ---
 
 ## 🗂️ Project Structure
+```
+src/
+└── WebApp/
+    ├── App_Data/         # Local data storage for job and company profiles
+    ├── Extensions/       # Extension methods and helpers
+    ├── Middleware/       # Custom middleware for request handling and logging
+    ├── Pages/            # Razor pages for the web application
+    ├── Repository/       # Repository implementations for data access and persistence
+    └── README.md         # This file
+```
+<details>
+  <summary>Expand for details</summary>
+  The solution is organized into several libraries and folders, most with its own documentation:
 
-- [`src/WebApp/Extensions`](./Extensions/README.md)  
-  Utility extension methods for caching, logging, and DI registration.
-- [`src/WebApp/Middleware`](./Middleware/README.md)  
-  Middleware for background job updates and cross-cutting concerns.
-- [`src/WebApp/Respository`](./Respository/README.md)  
-  Data access and persistence for company profiles and job summaries.
-- [`src/Application`](../Application)  
-  Application layer: services, contracts, models, and configuration.
-- [`src/Domain`](../Domain)  
-  Domain models and business logic.
+- [WebApp](.)
 
-Each subfolder contains its own `README.md` with details on classes, usage, and dependencies.
+  Web application project that consumes the Application layer and provides a user interface for lead generation.
+  - [Extensions](./Extensions/README.md) — Contains extension methods and helpers for the application layer.
+  - [Middleware](./Middleware/README.md) — Custom middleware for request handling and logging.
+  - [Repository](./Repository/README.md) — Contains repository implementations for data access and persistence.
+
+  - [WebApp.UnitTests](tests/WebApp.UnitTests)
+  Unit tests for the the Web Application.
+</details>
 
 ---
 
