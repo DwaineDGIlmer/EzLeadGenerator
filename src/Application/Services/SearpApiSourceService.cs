@@ -439,7 +439,7 @@ public class SearpApiSourceService : IJobSourceService
                     job.CompanyName.Contains("talent", StringComparison.CurrentCultureIgnoreCase) ||
                     job.CompanyName.Contains("cybercoder", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    _logger.LogWarning("Job with ID {JobId} is a possible recruitment company, skippin.", job.JobId);
+                    _logger.LogWarning("Job with ID {JobId} is a possible recruitment company, skipping.", job.JobId);
                     continue;
                 }
 
