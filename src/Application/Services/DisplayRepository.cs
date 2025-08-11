@@ -173,9 +173,16 @@ namespace Application.Services
         {
             try
             {
-                var companyProfiles = companyRepository.GetCompanyProfileAsync(DateTime.Now.AddDays(-30)).Result;
-                _allCompanies.AddRange(companyProfiles);
-                _logger.LogInformation("Successfully loaded {CompanyCount} company profiles", companyProfiles.Count());
+                foreach (var job in _allJobs)
+                {
+                    var companyProfile = companyRepository.GetCompanyProfileAsync(job.CompanyId).Result;
+                    if (companyProfile != null && 
+                        !_allCompanies.Contains(companyProfile))
+                    {
+                        _allCompanies.Add(companyProfile);
+                    }
+                }
+                _logger.LogInformation("Successfully loaded {CompanyCount} company profiles", _allCompanies.Count());
             }
             catch (Exception ex)
             {
