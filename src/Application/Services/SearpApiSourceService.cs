@@ -25,13 +25,8 @@ public class SearpApiSourceService : IJobSourceService
 {
     private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "their"];
     private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so"];
-<<<<<<< HEAD
     private static readonly List<string> _wordsNotInNames = ["data", "architect", "doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering"];
     private static readonly List<string> _titleWords = ["engineer", "engineering", "aws", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation", "architect",];
-=======
-    private static readonly List<string> _wordsNotInNames = ["doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering", "data", "architect" ];
-    private static readonly List<string> _titleWords = ["engineer", "engineering", "aws", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation"];
->>>>>>> c0f7c5017b37d0a83de995ad27df9d941c8560f4
     private static readonly List<string> _tokens =
     [
         "lead",
