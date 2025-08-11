@@ -324,7 +324,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
                 foreach (var property in properties)
                 {
                     // Skip read-only properties and properties that should not be updated
-                    if (!property.CanWrite || !property.CanRead || property.Name == nameof(HierarchyResults))
+                    if (!property.CanWrite || !property.CanRead || property.Name == nameof(CompanyProfile.HierarchyResults))
                         continue;
 
                     var incomingValue = property.GetValue(profile);
