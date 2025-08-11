@@ -157,6 +157,32 @@ public class SearpApiSourceServiceTest
         Assert.Equal("Manager", item.Title);
     }
 
+    [Theory]
+    [InlineData("Jane Doe", "Unknown")]
+    [InlineData("Data Architect", "Unknown")]
+    [InlineData("John Smith", "John Smith")]
+    [InlineData("Chad Pumpernickel", "Chad Pumpernickel")]
+    public void UpdateName_ReturnsCorrectName(string input, string expected)
+    {
+        // Act
+        var result = SearpApiSourceService.UpdateName(new HierarchyResults() 
+        {
+            OrgHierarchy = new List<HierarchyItem>
+            {
+                new HierarchyItem { Name = input, Title = "Some Title" }
+            }
+        });
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result.OrgHierarchy);
+        
+        var title = result.OrgHierarchy.FirstOrDefault();
+        Assert.NotNull(title);
+        Assert.Equal(expected, title.Name);
+    }
+
+
     [Fact]
     public void UpdateName_ReplacesPronounsConjunctionsAndKnownWordsWithUnknown()
     {
@@ -192,7 +218,7 @@ public class SearpApiSourceServiceTest
     public void UpdateName_ReturnsEmptyHierarchy_WhenInputIsNull()
     {
         // Act
-        var result = SearpApiSourceService.UpdateName(null!);
+        var result = SearpApiSourceService.UpdateName((HierarchyResults)null!);
 
         // Assert
         Assert.NotNull(result);

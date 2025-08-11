@@ -1,5 +1,6 @@
 ﻿using Application.Contracts;
 using Application.Models;
+using Application.Services;
 using Core.Configuration;
 using Core.Contracts;
 using Core.Helpers;
@@ -307,22 +308,35 @@ public class LocalCompanyProfileStore : ICompanyRepository
             using FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
 
             jsonProfile = await JsonSerializer.DeserializeAsync<CompanyProfile>(stream);
-            var properties = typeof(CompanyProfile).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var property in properties)
+            if (jsonProfile is not null)
             {
-                // Skip read-only properties
-                if (!property.CanWrite || !property.CanRead)
-                    continue;
+                // Ensure the OrgHierarchy is not null and contains unique items
+                foreach (var item in profile.HierarchyResults.OrgHierarchy)
+                {
+                    if (item is not null &&
+                        !jsonProfile.HierarchyResults.OrgHierarchy.ToList().Exists(x => x.Name == item.Name))
+                    {
+                        jsonProfile.HierarchyResults.OrgHierarchy.Add(item);
+                    }
+                }
 
-                var incomingValue = property.GetValue(profile);
-                var existingValue = property.GetValue(jsonProfile);
+                var properties = typeof(CompanyProfile).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                foreach (var property in properties)
+                {
+                    // Skip read-only properties and properties that should not be updated
+                    if (!property.CanWrite || !property.CanRead || property.Name == nameof(CompanyProfile.HierarchyResults))
+                        continue;
 
-                // Skip if incoming value should be ignored
-                if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
-                    continue;
+                    var incomingValue = property.GetValue(profile);
+                    var existingValue = property.GetValue(jsonProfile);
 
-                // Update the property
-                property.SetValue(profile, incomingValue);
+                    // Skip if incoming value should be ignored
+                    if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
+                        continue;
+
+                    // Update the property
+                    property.SetValue(profile, incomingValue);
+                }
             }
         }
         catch (JsonException jsonEx)
@@ -344,6 +358,6 @@ public class LocalCompanyProfileStore : ICompanyRepository
         {
             updatedAtProperty.SetValue(profile, DateTime.UtcNow);
         }
-        return jsonProfile;
+        return jsonProfile ?? profile;
     }
 }
