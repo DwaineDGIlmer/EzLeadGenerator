@@ -117,6 +117,55 @@ public class LocalCompanyProfileStoreTest
     }
 
     [Fact]
+    public async Task UpdateProperties_Hiarchyn()
+    {
+        // Arrange
+        var original = new CompanyProfile
+        {
+            CompanyId = "123",
+            CompanyName = "Original",
+            HierarchyResults = new HierarchyResults
+            {
+                OrgHierarchy =
+                [
+                    new HierarchyItem { Name = "John Smith", Title = "King" }
+                ]
+            },
+            UpdatedAt = new DateTime(2000, 1, 1)
+        };
+        var updated = new CompanyProfile
+        {
+            CompanyId = "123",
+            CompanyName = "Updated",
+            HierarchyResults = new HierarchyResults
+            {
+                OrgHierarchy =
+                [
+                    new HierarchyItem { Name = "Jane Doe", Title = "Queen" }
+                ]
+            },
+            UpdatedAt = new DateTime(2020, 1, 1)
+        };
+
+        string tempFile = LocalCompanyProfileStore.GetFilePath("123", Path.GetTempPath());
+        await File.WriteAllTextAsync(tempFile, JsonSerializer.Serialize(original));
+
+        // Act
+        var result = await LocalCompanyProfileStore.UpdateProperties(updated, Path.GetTempPath(), _loggerMock.Object);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.True(updated.UpdatedAt > original.UpdatedAt);
+        Assert.NotNull(result?.HierarchyResults);
+        Assert.True(result.HierarchyResults.OrgHierarchy.Count == 2);
+
+        var resultHierarchy = result.HierarchyResults?.OrgHierarchy?.Where(r => r.Title == "Queen");
+        Assert.NotNull(resultHierarchy);
+
+        File.Delete(tempFile);
+    }
+
+    [Fact]
     public async Task UpdateProperties_Throws_DirectoryNotFoundException()
     {
         var original = new CompanyProfile
