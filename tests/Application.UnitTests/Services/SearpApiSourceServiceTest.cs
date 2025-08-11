@@ -162,7 +162,7 @@ public class SearpApiSourceServiceTest
     [InlineData("Data Architect", "Unknown")]
     [InlineData("John Smith", "John Smith")]
     [InlineData("Chad Pumpernickel", "Chad Pumpernickel")]
-    public void UpdateName_ReturnsCorrectNamel(string input, string expected)
+    public void UpdateName_ReturnsCorrectName(string input, string expected)
     {
         // Act
         var result = SearpApiSourceService.UpdateName(new HierarchyResults() 
