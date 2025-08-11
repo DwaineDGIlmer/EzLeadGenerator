@@ -117,7 +117,7 @@ public class LocalCompanyProfileStoreTest
     }
 
     [Fact]
-    public async Task UpdateProperties_Hiarchyn()
+    public async Task UpdateProperties_Hierarchy()
     {
         // Arrange
         var original = new CompanyProfile
