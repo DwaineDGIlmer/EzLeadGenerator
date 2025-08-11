@@ -176,7 +176,8 @@ namespace Application.Services
                 foreach (var job in _allJobs)
                 {
                     var companyProfile = companyRepository.GetCompanyProfileAsync(job.CompanyId).Result;
-                    if (companyProfile != null)
+                    if (companyProfile != null && 
+                        !_allCompanies.Contains(companyProfile))
                     {
                         _allCompanies.Add(companyProfile);
                     }
