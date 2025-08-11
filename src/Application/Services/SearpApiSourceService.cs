@@ -25,7 +25,7 @@ public class SearpApiSourceService : IJobSourceService
 {
     private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "their"];
     private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so"];
-    private static readonly List<string> _wordsNotInNames = ["relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering"];
+    private static readonly List<string> _wordsNotInNames = ["doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering", "data", "architect" ];
     private static readonly List<string> _titleWords = ["engineer", "engineering", "aws", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation"];
     private static readonly List<string> _tokens =
     [
@@ -181,11 +181,11 @@ public class SearpApiSourceService : IJobSourceService
 
                 if (!string.IsNullOrWhiteSpace(job.Division))
                 {
-                    prompt = $"{job.CompanyName.Replace(" ", string.Empty).ToLower()} organizational structure {job.Division} data engineering leadership team";
+                    prompt = $"{job.CompanyName} organizational structure {job.Division} data engineering leadership team";
                 }
                 else
                 {
-                    prompt = $"{job.CompanyName.Replace(" ", string.Empty).ToLower()} organizational structure data engineering leadership team";
+                    prompt = $"{job.CompanyName} organizational structure data engineering leadership team";
                 }
 
                 googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
@@ -431,6 +431,15 @@ public class SearpApiSourceService : IJobSourceService
                 if (job.Title.Contains("center", StringComparison.CurrentCultureIgnoreCase))
                 {
                     _logger.LogWarning("Job with ID {JobId} is not relevant, skipping.", job.JobId);
+                    continue;
+                }
+
+                // Remove recruitment companies
+                if (job.CompanyName.Contains("recruit", StringComparison.CurrentCultureIgnoreCase) ||
+                    job.CompanyName.Contains("talent", StringComparison.CurrentCultureIgnoreCase) ||
+                    job.CompanyName.Contains("cybercoder", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    _logger.LogWarning("Job with ID {JobId} is a possible recruitment company, skippin.", job.JobId);
                     continue;
                 }
 

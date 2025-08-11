@@ -114,11 +114,11 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cachedJob = await cacheService.TryGetAsync<CompanyProfile>(companyId);
-        if (cachedJob is not null)
+        var cacheCompany = await cacheService.TryGetAsync<CompanyProfile>(companyId);
+        if (cacheCompany is not null)
         {
             logger.LogInformation("Retrieved company profile from cache for {companyId}", companyId);
-            return cachedJob;
+            return cacheCompany;
         }
         logger.LogDebug("Company id {companyId} not found in cache", companyId);
         return null;
