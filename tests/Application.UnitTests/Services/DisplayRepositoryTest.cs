@@ -25,8 +25,11 @@ public class DisplayRepositoryTest
     {
         _jobsRepoMock.Setup(r => r.GetJobsAsync(It.IsAny<DateTime>()))
             .ReturnsAsync(jobs ?? []);
-        _companyRepoMock.Setup(r => r.GetCompanyProfileAsync(It.IsAny<DateTime>()))
-            .ReturnsAsync(companies ?? []);
+
+        var companyList = companies?.ToList() ?? new List<CompanyProfile>();
+        _companyRepoMock.Setup(r => r.GetCompanyProfileAsync(It.IsAny<string>()))
+            .ReturnsAsync((string id) => companyList.FirstOrDefault(c => c.Id == id));
+
         return new DisplayRepository(_companyRepoMock.Object, _jobsRepoMock.Object, _loggerMock.Object);
     }
 
@@ -51,9 +54,10 @@ public class DisplayRepositoryTest
     public async Task GetPaginatedCompaniesAsync_ReturnsCorrectPage()
     {
         var companies = Enumerable.Range(1, 8)
-            .Select(i => new CompanyProfile(new JobSummary(), new HierarchyResults()) { UpdatedAt = DateTime.Now.AddDays(-i), Id = i.ToString() })
+            .Select(i => new CompanyProfile(new JobSummary { CompanyId = i.ToString() }, new HierarchyResults()) { UpdatedAt = DateTime.Now.AddDays(-i), Id = i.ToString() })
             .ToList();
-        var repo = CreateRepository(null, companies);
+        var jobs = companies.Select(c => new JobSummary { CompanyId = c.Id, PostedDate = c.UpdatedAt, Id = c.Id }).ToList();
+        var repo = CreateRepository(jobs, companies);
 
         await Task.Delay(100);
 
