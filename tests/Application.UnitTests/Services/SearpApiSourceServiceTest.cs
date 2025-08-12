@@ -52,7 +52,7 @@ public class SearpApiSourceServiceTest
         _jobsRetrievalMock.Setup(j => j.FetchJobs(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(jobs);
 
-        _jobsRepositoryMock.Setup(r => r.GetJobsAsync(It.IsAny<string>()))
+        _jobsRepositoryMock.Setup(r => r.GetJobAsync(It.IsAny<string>()))
             .ReturnsAsync((JobSummary?)null);
 
         _aiChatServiceMock.Setup(a => a.GetChatCompletion<DivisionInference>(It.IsAny<string>(), It.IsAny<string>()))
@@ -86,7 +86,7 @@ public class SearpApiSourceServiceTest
         _jobsRetrievalMock.Setup(j => j.FetchJobs(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(jobs);
 
-        _jobsRepositoryMock.Setup(r => r.GetJobsAsync(It.IsAny<string>()))
+        _jobsRepositoryMock.Setup(r => r.GetJobAsync(It.IsAny<string>()))
             .ReturnsAsync((JobSummary?)null);
 
         _aiChatServiceMock.Setup(a => a.GetChatCompletion<DivisionInference>(It.IsAny<string>(), It.IsAny<string>()))
@@ -165,7 +165,7 @@ public class SearpApiSourceServiceTest
     public void UpdateName_ReturnsCorrectName(string input, string expected)
     {
         // Act
-        var result = SearpApiSourceService.UpdateName(new HierarchyResults() 
+        var result = SearpApiSourceService.UpdateName(new HierarchyResults()
         {
             OrgHierarchy = new List<HierarchyItem>
             {
@@ -176,7 +176,7 @@ public class SearpApiSourceServiceTest
         // Assert
         Assert.NotNull(result);
         Assert.Single(result.OrgHierarchy);
-        
+
         var title = result.OrgHierarchy.FirstOrDefault();
         Assert.NotNull(title);
         Assert.Equal(expected, title.Name);
@@ -242,17 +242,17 @@ public class SearpApiSourceServiceTest
     [InlineData("Lead Data Engineer Remote", "Lead Data Engineer Remote")]
     [InlineData("Lead Data Engineer Hybrid", "Lead Data Engineer Hybrid")]
     [InlineData("Senior Data Engineer(Enterprise Platforms Technology)", "Senior Data Engineer")]
-    [InlineData("Senior Data Engineer - Capital One Software(Remote)", "Senior Data Engineer")]    
+    [InlineData("Senior Data Engineer - Capital One Software(Remote)", "Senior Data Engineer")]
     [InlineData("Manager/Director", "Manager")]
-    [InlineData("Data Engineer - HRIT Reporting and Analytics", "Data Engineer - HRIT Reporting and Analytics")]    
+    [InlineData("Data Engineer - HRIT Reporting and Analytics", "Data Engineer - HRIT Reporting and Analytics")]
     [InlineData("Senior Data Engineer (Req #001205)", "Senior Data Engineer")]
     [InlineData("Engineer", "Engineer")]
-    [InlineData("Data Engineer - AWS", "Data Engineer - AWS")]    
-    [InlineData("Data Engineer - Hybrid", "Data Engineer - Hybrid")]    
+    [InlineData("Data Engineer - AWS", "Data Engineer - AWS")]
+    [InlineData("Data Engineer - Hybrid", "Data Engineer - Hybrid")]
     [InlineData("Lead Engineer!", "Lead Engineer")]
     [InlineData("Data Engineer I", "Data Engineer I")]
     [InlineData("Data Engineer II", "Data Engineer II")]
-    [InlineData("Data Engineer III", "Data Engineer III")]    
+    [InlineData("Data Engineer III", "Data Engineer III")]
     [InlineData("Manager & Supervisor", "Manager")]
     [InlineData("Lead Engineer (Remote)", "Lead Engineer")]
     [InlineData("Lead Engineer - Data", "Lead Engineer")]

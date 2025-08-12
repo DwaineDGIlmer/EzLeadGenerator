@@ -86,7 +86,7 @@ public class ExtensionsTest
             cacheServiceMock.Object.GetJobAsync(jobId, logger));
     }
 
-    // GetJobsAsync Tests
+    // GetJobAsync Tests
     [Fact]
     public async Task GetJobsAsync_ReturnsOrderedJobs_WhenJobsExistInCache()
     {
@@ -109,7 +109,7 @@ public class ExtensionsTest
         var result = await cacheServiceMock.Object.GetJobsAsync(fromDate, loggerMock.Object);
 
         // Assert
-        Assert.NotNull(result);        
+        Assert.NotNull(result);
         loggerMock.Verify(
             x => x.Log(
                 LogLevel.Information,

@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
             {
                 var env = sp.GetRequiredService<IWebHostEnvironment>();
                 var logger = sp.GetRequiredService<ILogger<LocalCompanyProfileStore>>();
-                var options = sp.GetRequiredService<IOptions<SerpApiSettings>>();
+                var options = sp.GetRequiredService<IOptions<EzLeadSettings>>();
                 var cachingService = sp.GetRequiredService<ICacheService>();
 
                 return new LocalCompanyProfileStore(cachingService, options, logger);
@@ -92,12 +92,11 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<IJobsRepository>(sp =>
             {
-                var env = sp.GetRequiredService<IWebHostEnvironment>();
                 var logger = sp.GetRequiredService<ILogger<LocalJobsRepositoryStore>>();
-                var options = sp.GetRequiredService<IOptions<SerpApiSettings>>();
+                var options = sp.GetRequiredService<IOptions<EzLeadSettings>>();
                 var cachingService = sp.GetRequiredService<ICacheService>();
 
-                return new LocalJobsRepositoryStore(cachingService, options, logger);
+                return new LocalJobsRepositoryStore(options, cachingService, logger);
             });
         }
         else
@@ -203,7 +202,7 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration">The <see cref="IConfiguration"/>used for adding the services to.</param>
     /// <remarks>The name should be the class name.</remarks>
     /// <returns>IServiceCollection instance.</returns>
-    public static IServiceCollection AddCacheService(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCachingService(this IServiceCollection services, IConfiguration configuration)
     {
         var settingsSection = configuration.GetSection(nameof(AiEventSettings));
         var settings = new AiEventSettings();

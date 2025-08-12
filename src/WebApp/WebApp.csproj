@@ -43,11 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Data\company_profiles\" />
-    <Folder Include="App_Data\job_summaries\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
 

@@ -4,8 +4,12 @@ using WebApp.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add the cache service to the service collection
+builder.Services.AddCachingService(builder.Configuration);
+
 // Initialize the logging services
 builder.Services.InitializeServices(builder.Configuration);
+
 // Configure the application settings first
 builder.Services.ConfigureSerpApiSettings(builder.Configuration);
 builder.Services.AddResilientHttpClient(builder.Configuration, nameof(EzLeadGenerator));

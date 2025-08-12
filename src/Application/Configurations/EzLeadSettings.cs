@@ -11,5 +11,20 @@
         /// Gets or sets the maximum time between job executions in seconds.
         /// </summary>
         public int JobExecutionInSeconds { get; set; } = 3600;
+
+        /// <summary>
+        /// Gets or set the caching location for company profiles.
+        /// </summary>
+        public string FileCompanyProfileDirectory { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the caching location for job profiles.
+        /// </summary>
+        public string FileJobProfileDirectory { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the cache expiration.
+        /// </summary>
+        public int CacheExpirationInMinutes { get; set; } = 1440;
     }
 }

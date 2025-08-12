@@ -1,6 +1,6 @@
-﻿using Application.Contracts;
+﻿using Application.Configurations;
+using Application.Contracts;
 using Application.Models;
-using Core.Configuration;
 using Core.Contracts;
 using Core.Helpers;
 using Microsoft.Extensions.Options;
@@ -35,12 +35,12 @@ public class LocalJobsRepositoryStore : IJobsRepository
     /// </summary>
     /// <remarks>This constructor ensures that the specified directories exist by creating them if
     /// they do not.</remarks>
-    /// <param name="cacheService">The cache service used for caching operations. Cannot be <see langword="null"/>.</param> 
     /// <param name="options">Configuration options for the service, including paths for job and job directories. Cannot be <see langword="null"/>.</param>
+    /// <param name="cacheService">The cache service used for caching operations. Cannot be <see langword="null"/>.</param> 
     /// <param name="logger">The logger instance used for logging operations within the store. Cannot be <see langword="null"/>.</param>
     public LocalJobsRepositoryStore(
+        IOptions<EzLeadSettings> options,
         ICacheService cacheService,
-        IOptions<SerpApiSettings> options,
         ILogger<LocalJobsRepositoryStore> logger)
     {
         ArgumentNullException.ThrowIfNull(cacheService, nameof(cacheService));
@@ -50,7 +50,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
 
         _cachingService = cacheService;
         _cacheExpirationInMinutes = options.Value.CacheExpirationInMinutes;
-        _jobsProfileDirectory = Path.Combine(Environment.CurrentDirectory, options.Value.FileJobProfileDirectory).Replace('/', '\\');
+        _jobsProfileDirectory = GetJobsDirectory(options.Value).Replace('/', '\\');
         _logger = logger;
 
         // This is the same directory used by any caller using SerpApiSettings
@@ -68,7 +68,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
     /// <see cref="JobSummary"/> with unknown values.</returns>
     /// <exception cref="InvalidDataException">Thrown if the deserialized job job is null.</exception>
     /// <exception cref="ArgumentException">Thrown when jobId is null or empty.</exception>
-    public async Task<JobSummary?> GetJobsAsync(string jobId)
+    public async Task<JobSummary?> GetJobAsync(string jobId)
     {
         if (string.IsNullOrWhiteSpace(jobId))
             throw new ArgumentException("Job ID cannot be null or empty.", nameof(jobId));
@@ -81,7 +81,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
             return cachedJob;
         }
 
-        string path = $"{FileSystemHelpers.GetFilePath(jobId, _jobsProfileDirectory)}";
+        string path = GetFilePath(jobId, _jobsProfileDirectory);
         if (!File.Exists(path))
         {
             _logger.LogWarning("Profile not found for job: {JobId}", jobId);
@@ -131,7 +131,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
             return jobs;
         }
 
-        foreach (var file in Directory.GetFiles(_jobsProfileDirectory, "*.json"))
+        foreach (var file in Directory.GetFiles(_jobsProfileDirectory, "job.*.json"))
         {
             try
             {
@@ -176,13 +176,12 @@ public class LocalJobsRepositoryStore : IJobsRepository
         if (string.IsNullOrWhiteSpace(job.JobId))
             throw new ArgumentException("Job ID cannot be null or empty.", nameof(job));
 
-        var fileName = job.JobId.FileSystemName();
-        string path = Path.Combine(_jobsProfileDirectory, $"{fileName}.json");
+        string path = GetFilePath(job.JobId, _jobsProfileDirectory);
         try
         {
             using FileStream stream = File.Create(path);
             await JsonSerializer.SerializeAsync(stream, job, _options);
-            _logger.LogInformation("JobSummary saved: {JobId} as {fileName}", job.JobId, fileName);
+            _logger.LogInformation("JobSummary saved: {JobId} as {fileName}", job.JobId, Path.GetFileName(path));
         }
         catch (Exception ex)
         {
@@ -206,7 +205,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
         if (string.IsNullOrWhiteSpace(job.JobId))
             throw new ArgumentException("Job ID cannot be null or empty.", nameof(job));
 
-        string path = Path.Combine(_jobsProfileDirectory, $"{job.JobId.FileSystemName()}.json");
+        string path = GetFilePath(job.JobId, _jobsProfileDirectory);
         if (!File.Exists(path))
         {
             _logger.LogInformation("Job job not found, creating new: {JobId}", job.JobId);
@@ -216,39 +215,11 @@ public class LocalJobsRepositoryStore : IJobsRepository
 
         try
         {
-            JobSummary? jobSummary = null;
-            using (FileStream readStream = File.OpenRead(path))
+            JobSummary? jobSummary = await UpdateProperties(job, _jobsProfileDirectory, _options, _logger);
+            if (jobSummary == null)
             {
-                jobSummary = await JsonSerializer.DeserializeAsync<JobSummary>(readStream, _options);
-            }
-
-            if (jobSummary != null)
-            {
-                // Merge properties using reflection
-                var properties = typeof(JobSummary).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                foreach (var property in properties)
-                {
-                    // Skip read-only properties
-                    if (!property.CanWrite || !property.CanRead)
-                        continue;
-
-                    var incomingValue = property.GetValue(job);
-
-                    // Skip if incoming value should be ignored
-                    if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
-                        continue;
-
-                    // Update the property in the existing job
-                    property.SetValue(jobSummary, incomingValue);
-                }
-
-                // Always update the UpdatedAt timestamp if the property exists
-                var updatedAtProperty = typeof(JobSummary).GetProperty("UpdatedAt");
-                if (updatedAtProperty != null && updatedAtProperty.CanWrite)
-                {
-                    updatedAtProperty.SetValue(jobSummary, DateTime.UtcNow);
-                }
+                _logger.LogWarning("Profile not found for update: {JobId}", job.JobId);
+                return;
             }
 
             // Save the updated job
@@ -256,7 +227,6 @@ public class LocalJobsRepositoryStore : IJobsRepository
             {
                 await JsonSerializer.SerializeAsync(writeStream, jobSummary ?? job, _options);
             }
-
             _logger.LogInformation("Job job updated: {JobId}", job.JobId);
         }
         catch (Exception ex)
@@ -280,8 +250,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
         if (string.IsNullOrWhiteSpace(job.JobId))
             throw new ArgumentException("Job ID cannot be null or empty.", nameof(job));
 
-        string path = Path.Combine(_jobsProfileDirectory, $"{job.JobId.FileSystemName()}.json");
-
+        string path = GetFilePath(job.JobId, _jobsProfileDirectory);
         await Task.Run(() =>
         {
             try
@@ -302,5 +271,101 @@ public class LocalJobsRepositoryStore : IJobsRepository
                 throw;
             }
         });
+    }
+
+    /// <summary>
+    /// Updates the properties of a job job by merging them with the existing job job in the specified directory.
+    /// </summary>
+    /// <param name="job">The job summary to update</param>
+    /// <param name="jobDirectory">The jobs directory</param>
+    /// <param name="options">The JSON serializer options to use for serialization and deserialization.</param>
+    /// <param name="logger">The logger.</param>
+    /// <returns></returns>
+    /// <exception cref="DirectoryNotFoundException"></exception>
+    public static async Task<JobSummary?> UpdateProperties(JobSummary job, string jobDirectory, JsonSerializerOptions options, ILogger logger)
+    {
+        ArgumentNullException.ThrowIfNull(job, nameof(job));
+        ArgumentNullException.ThrowIfNull(jobDirectory, nameof(jobDirectory));
+
+        if (!Directory.Exists(jobDirectory))
+        {
+            throw new DirectoryNotFoundException($"The directory '{jobDirectory}' does not exist.");
+        }
+
+        JobSummary? jobSummary = null;
+        try
+        {
+            string path = GetFilePath(job.JobId, jobDirectory);
+            if(!File.Exists(path))
+            {
+                logger.LogWarning("Job profile file not found: {Path}", path);
+                return job;
+            }
+
+            using FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+            {
+                jobSummary = await JsonSerializer.DeserializeAsync<JobSummary>(stream, options);
+            }
+
+            if (jobSummary != null)
+            {
+                // Merge properties using reflection
+                var properties = typeof(JobSummary).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (var property in properties)
+                {
+                    // Skip read-only properties
+                    if (!property.CanWrite || !property.CanRead)
+                        continue;
+
+                    var incomingValue = property.GetValue(job);
+
+                    // Skip if incoming value should be ignored
+                    if (ReflectionHelper.ShouldIgnoreProperty(property, incomingValue))
+                        continue;
+
+                    // Update the property in the existing job
+                    property.SetValue(jobSummary, incomingValue);
+                }
+            }
+        }
+        catch (JsonException jsonEx)
+        {
+            // Log the error and return null if deserialization fails
+            logger.LogError(jsonEx, "JSON deserialization error: {Message}", jsonEx.Message);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            // Log any other errors that occur
+            logger.LogError(ex, "Error reading job profile file: {Message}", ex.Message);
+            throw new IOException($"Error reading job profile file: {job.JobId}", ex);
+        }
+
+        // Always update the UpdatedAt timestamp if the property exists
+        var updatedAtProperty = typeof(JobSummary).GetProperty(nameof(JobSummary.UpdatedAt));
+        if (updatedAtProperty != null && updatedAtProperty.CanWrite)
+        {
+            updatedAtProperty.SetValue(jobSummary, DateTime.UtcNow);
+        }
+        return jobSummary ?? job;
+    }
+
+    private static string GetFilePath(string jobId, string directory) =>
+    Path.Combine(directory, $"job.{jobId.FileSystemName()}.json");
+
+    private static string GetJobsDirectory(EzLeadSettings? settings)
+    {
+        if (settings is not null && !string.IsNullOrEmpty(settings.FileJobProfileDirectory))
+        {
+            return Path.Combine(settings.FileJobProfileDirectory, "jobs");
+        }
+
+        var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (dir is not null && !string.IsNullOrEmpty(dir.ToString()))
+        {
+            return Path.Combine(dir.ToString(), "cache", "jobs");
+        }
+        return Path.Combine(AppContext.BaseDirectory, "cache", "jobs");
     }
 }

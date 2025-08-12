@@ -88,7 +88,6 @@ dotnet test
 ```
 src/
 └── WebApp/
-    ├── App_Data/         # Local data storage for job and company profiles
     ├── Extensions/       # Extension methods and helpers
     ├── Middleware/       # Custom middleware for request handling and logging
     ├── Pages/            # Razor pages for the web application

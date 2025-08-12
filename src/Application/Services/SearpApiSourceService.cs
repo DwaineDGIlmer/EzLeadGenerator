@@ -155,7 +155,7 @@ public class SearpApiSourceService : IJobSourceService
 
                 string snippet = string.Join(" ", snippets.Select(link => $"site:{link}"));
                 string domainname = CoreRegex.ExtractDomainName(snippet);
-                string link = string.Empty;
+                string link = googleResults.FirstOrDefault()?.Link ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(domainname))
                 {
                     var names = job.CompanyName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -402,7 +402,7 @@ public class SearpApiSourceService : IJobSourceService
         {
             try
             {
-                if (_jobsRepository.GetJobsAsync(job.JobId).Result is not null)
+                if (await _jobsRepository.GetJobAsync(job.JobId) is not null)
                 {
                     _logger.LogInformation("Job with ID {JobId} already exists, skipping.", job.JobId);
                     continue;
