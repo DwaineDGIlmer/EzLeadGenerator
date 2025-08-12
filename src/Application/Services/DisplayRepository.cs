@@ -180,7 +180,7 @@ namespace Application.Services
                 {
                     var companyProfile = companyRepository.GetCompanyProfileAsync(job.CompanyId).Result;
                     if (companyProfile != null &&
-                        !allCompanies.ToList().Exists(job => job.CompanyId == companyProfile.CompanyId))
+                        !allCompanies.Exists(job => job.CompanyId == companyProfile.CompanyId))
                     {
                         allCompanies.Add(companyProfile);
                     }
