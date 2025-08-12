@@ -112,7 +112,7 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(job);
 
-        var cacheKey = GetCacheKey("Company", job.JobId);
+        var cacheKey = GetCacheKey("Job", job.JobId);
         await cacheService.CreateEntryAsync(cacheKey, job, TimeSpan.FromMinutes(cacheExpirationInMinutes));
     }
 
