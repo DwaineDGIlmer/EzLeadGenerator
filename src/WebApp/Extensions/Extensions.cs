@@ -178,7 +178,7 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Adds a comapny profile to the cache with a specified expiration time.
+    /// Adds a company profile to the cache with a specified expiration time.
     /// </summary>
     /// <param name="cacheService">The cache service used to store the job summaries.</param>
     /// <param name="company"> The company profile to be cached. Cannot be <see langword="null"/>.</param>
