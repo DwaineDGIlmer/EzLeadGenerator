@@ -288,6 +288,115 @@ public class SearpApiSourceService : IJobSourceService
     }
 
     /// <summary>
+    /// Updates the job source by retrieving jobs, validating their data, and adding them to the repository.
+    /// </summary>
+    /// <remarks>This method fetches jobs based on the configured query and location settings, validates each
+    /// job's data, and adds valid jobs to the repository. Jobs are skipped if they already exist, lack required
+    /// information, are remote, or are outside the specified geographic area. The method uses AI-based inference to
+    /// determine the division of each job before adding it to the repository.</remarks>
+    /// <returns><see langword="true"/> if the job source was successfully updated with at least one valid job; otherwise, <see
+    /// langword="false"/>.</returns>
+    public async Task<bool> UpdateJobSourceAsync()
+    {
+        var jobs = await _jobsRetrieval.FetchJobs(_settings.Query, _settings.Location);
+        if (jobs is null || !jobs.Any())
+        {
+            return false;
+        }
+
+        foreach (var job in jobs)
+        {
+            try
+            {
+                if (await _jobsRepository.GetJobAsync(job.JobId) is not null)
+                {
+                    _logger.LogInformation("Job with ID {JobId} already exists, skipping.", job.JobId);
+                    continue;
+                }
+
+                // Validate the job
+                if (!IsValid(job, _logger))
+                {
+                    _logger.LogInformation("Job with ID {JobId} is not valid, skipping.", job.JobId);
+                    continue;
+                }
+
+                UpdateJobTitle(job);
+
+                var prompt = Prompts.DivisionMessage.Replace("{CompanyName}", job.CompanyName).Replace("{Description}", job.Description);
+                var divisionResults = await _aiChatService.GetChatCompletion<DivisionInference>(Prompts.DivisionSystem, prompt);
+                var summary = new JobSummary(job)
+                {
+                    Division = divisionResults?.Division ?? string.Empty,
+                    Reasoning = divisionResults?.Reasoning ?? string.Empty,
+                    Confidence = divisionResults?.Confidence ?? 0
+                };
+                await _jobsRepository.AddJobAsync(summary);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here, but should be done in a real application)
+                _logger.LogError("Error updating job source: {Message}", ex.Message);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Validates the specified job result to ensure it meets the criteria for being added to the repository.
+    /// </summary>
+    /// <param name="job">The job to validate.</param>
+    /// <param name="logger">The Logger</param>
+    /// <returns>True if valid otherwise false.</returns>
+    public static bool IsValid(JobResult job, ILogger logger)
+    {
+        // Check the Job summary for missing information
+        if (string.IsNullOrWhiteSpace(job.CompanyName) || string.IsNullOrWhiteSpace(job.Description))
+        {
+            logger.LogWarning("Job with ID {JobId} has missing company name or description, skipping.", job.JobId);
+            return false;
+        }
+
+        // Check if the job is remote
+        if (job.Location.Contains("remote", StringComparison.CurrentCultureIgnoreCase))
+        {
+            logger.LogWarning("Job with ID {JobId} is remote, skipping.", job.JobId);
+            return false;
+        }
+
+        // Check if the job is in the specified area (North Carolina or South Carolina)
+        if (!job.Location.Contains(", nc", StringComparison.CurrentCultureIgnoreCase) &&
+            !job.Location.Contains(", sc", StringComparison.CurrentCultureIgnoreCase))
+        {
+            logger.LogWarning("Job with ID {JobId} is not in area, skipping.", job.JobId);
+            return false;
+        }
+
+        // This is to catch Data Center Engineer, etc
+        if (job.Title.Contains("center", StringComparison.CurrentCultureIgnoreCase))
+        {
+            logger.LogWarning("Job with ID {JobId} is not relevant, skipping.", job.JobId);
+            return false;
+        }
+
+        // Check if the job is coming from a recruitment company
+        if (job.CompanyName.Equals("Yeah! Global", StringComparison.CurrentCultureIgnoreCase) ||
+            job.CompanyName.Equals("Motion Recruitment", StringComparison.CurrentCultureIgnoreCase) ||
+            job.CompanyName.Equals("Jobs via Dice", StringComparison.CurrentCultureIgnoreCase) ||
+            job.CompanyName.Equals("Insight Global", StringComparison.CurrentCultureIgnoreCase) ||
+            job.CompanyName.Contains("recruit", StringComparison.CurrentCultureIgnoreCase) ||
+            job.CompanyName.Contains("talent", StringComparison.CurrentCultureIgnoreCase) ||
+            job.CompanyName.Contains("staffing", StringComparison.CurrentCultureIgnoreCase) ||
+            job.CompanyName.Contains("cybercoder", StringComparison.CurrentCultureIgnoreCase))
+        {
+            logger.LogWarning("Job with ID {JobId} is a possible recruitment company, skipping.", job.JobId);
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
     /// Updates the names and titles within the organizational hierarchy results.
     /// </summary>
     /// <remarks>This method trims whitespace from the titles of all items in the hierarchy and replaces
@@ -379,90 +488,6 @@ public class SearpApiSourceService : IJobSourceService
             _logger.LogError("Error retrieving cached search results: {Message} \r\nFailing json: {sanitizedJson}", ex.Message, sanitizedJson);
         }
         return null;
-    }
-
-    /// <summary>
-    /// Updates the job source by retrieving jobs, validating their data, and adding them to the repository.
-    /// </summary>
-    /// <remarks>This method fetches jobs based on the configured query and location settings, validates each
-    /// job's data, and adds valid jobs to the repository. Jobs are skipped if they already exist, lack required
-    /// information, are remote, or are outside the specified geographic area. The method uses AI-based inference to
-    /// determine the division of each job before adding it to the repository.</remarks>
-    /// <returns><see langword="true"/> if the job source was successfully updated with at least one valid job; otherwise, <see
-    /// langword="false"/>.</returns>
-    public async Task<bool> UpdateJobSourceAsync()
-    {
-        var jobs = await _jobsRetrieval.FetchJobs(_settings.Query, _settings.Location);
-        if (jobs is null || !jobs.Any())
-        {
-            return false;
-        }
-
-        foreach (var job in jobs)
-        {
-            try
-            {
-                if (await _jobsRepository.GetJobAsync(job.JobId) is not null)
-                {
-                    _logger.LogInformation("Job with ID {JobId} already exists, skipping.", job.JobId);
-                    continue;
-                }
-
-                if (string.IsNullOrWhiteSpace(job.CompanyName) || string.IsNullOrWhiteSpace(job.Description))
-                {
-                    _logger.LogWarning("Job with ID {JobId} has missing company name or description, skipping.", job.JobId);
-                    continue;
-                }
-
-                if (job.Location.Contains("remote", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    _logger.LogWarning("Job with ID {JobId} is remote, skipping.", job.JobId);
-                    continue;
-                }
-
-                if (!job.Location.Contains(", nc", StringComparison.CurrentCultureIgnoreCase) &&
-                    !job.Location.Contains(", sc", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    _logger.LogWarning("Job with ID {JobId} is not in area, skipping.", job.JobId);
-                    continue;
-                }
-
-                // This is to catch Data Center Engineer, etc
-                if (job.Title.Contains("center", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    _logger.LogWarning("Job with ID {JobId} is not relevant, skipping.", job.JobId);
-                    continue;
-                }
-
-                // Remove recruitment companies
-                if (job.CompanyName.Contains("recruit", StringComparison.CurrentCultureIgnoreCase) ||
-                    job.CompanyName.Contains("talent", StringComparison.CurrentCultureIgnoreCase) ||
-                    job.CompanyName.Contains("cybercoder", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    _logger.LogWarning("Job with ID {JobId} is a possible recruitment company, skipping.", job.JobId);
-                    continue;
-                }
-
-                UpdateJobTitle(job);
-
-                var prompt = Prompts.DivisionMessage.Replace("{CompanyName}", job.CompanyName).Replace("{Description}", job.Description);
-                var divisionResults = await _aiChatService.GetChatCompletion<DivisionInference>(Prompts.DivisionSystem, prompt);
-                var summary = new JobSummary(job)
-                {
-                    Division = divisionResults?.Division ?? string.Empty,
-                    Reasoning = divisionResults?.Reasoning ?? string.Empty,
-                    Confidence = divisionResults?.Confidence ?? 0
-                };
-                await _jobsRepository.AddJobAsync(summary);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (not implemented here, but should be done in a real application)
-                _logger.LogError("Error updating job source: {Message}", ex.Message);
-                return false;
-            }
-        }
-        return true;
     }
 }
 

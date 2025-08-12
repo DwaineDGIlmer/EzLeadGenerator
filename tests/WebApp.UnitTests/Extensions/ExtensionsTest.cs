@@ -16,8 +16,9 @@ public class ExtensionsTest
         var cacheServiceMock = new Mock<ICacheService>();
         var loggerMock = new Mock<ILogger>();
         var jobId = "test-job-id";
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Job", jobId);
         var expectedJob = new JobSummary { Id = jobId, JobTitle = "Test Job" };
-        cacheServiceMock.Setup(cs => cs.TryGetAsync<JobSummary>(jobId))
+        cacheServiceMock.Setup(cs => cs.TryGetAsync<JobSummary>(cacheKey))
             .ReturnsAsync(expectedJob);
 
         // Act
@@ -156,7 +157,8 @@ public class ExtensionsTest
         var loggerMock = new Mock<ILogger>();
         var companyId = "test-company-id";
         var expectedCompany = new CompanyProfile { Id = companyId, CompanyName = "Test Company" };
-        cacheServiceMock.Setup(cs => cs.TryGetAsync<CompanyProfile>(companyId))
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Company", companyId);
+        cacheServiceMock.Setup(cs => cs.TryGetAsync<CompanyProfile>(cacheKey))
             .ReturnsAsync(expectedCompany);
 
         // Act

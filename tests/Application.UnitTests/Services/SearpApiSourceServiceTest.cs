@@ -225,8 +225,6 @@ public class SearpApiSourceServiceTest
         Assert.Empty(result.OrgHierarchy);
     }
 
-
-
     [Theory]
     [InlineData("", "Data Engineer")]
     [InlineData(" ", "Data Engineer")]
@@ -296,5 +294,71 @@ public class SearpApiSourceServiceTest
         // Should not throw
         SearpApiSourceService.UpdateJobTitle(job);
         Assert.Equal("Data Engineer", job.Title);
+    }
+
+    [Theory]
+    [InlineData(null, "desc", "Charlotte, NC", "Engineer", false)] // Missing company name
+    [InlineData("TestCo", null, "Charlotte, NC", "Engineer", false)] // Missing description
+    [InlineData("TestCo", "desc", "Remote", "Engineer", false)] // Remote job
+    [InlineData("TestCo", "desc", "Charlotte, NC", "Data Center Engineer", false)] // Title contains "center"
+    [InlineData("Recruiting Inc", "desc", "Charlotte, NC", "Engineer", false)] // CompanyName contains "recruit"
+    [InlineData("Talent Group", "desc", "Charlotte, NC", "Engineer", false)] // CompanyName contains "talent"
+    [InlineData("Staffing Solutions", "desc", "Charlotte, NC", "Engineer", false)] // CompanyName contains "staffing"
+    [InlineData("CyberCoders", "desc", "Charlotte, NC", "Engineer", false)] // CompanyName contains "cybercoder"
+    [InlineData("TestCo", "desc", "New York, NY", "Engineer", false)] // Not in NC/SC
+    [InlineData("TestCo", "desc", "Charlotte, NC", "Engineer", true)] // Valid
+    [InlineData("TestCo", "desc", "Columbia, SC", "Engineer", true)] // Valid
+    public void IsValid_ReturnsExpectedResult(
+        string companyName,
+        string description,
+        string location,
+        string title,
+        bool expected)
+    {
+        // Arrange
+        var job = new JobResult
+        {
+            CompanyName = companyName,
+            Description = description,
+            Location = location,
+            Title = title,
+            JobId = "1"
+        };
+        var loggerMock = new Mock<ILogger>();
+
+        // Act
+        var result = SearpApiSourceService.IsValid(job, loggerMock.Object);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void IsValid_LogsWarning_WhenInvalid()
+    {
+        // Arrange
+        var job = new JobResult
+        {
+            CompanyName = "",
+            Description = "",
+            Location = "Charlotte, NC",
+            Title = "Engineer",
+            JobId = "1"
+        };
+        var loggerMock = new Mock<ILogger>();
+
+        // Act
+        var result = SearpApiSourceService.IsValid(job, loggerMock.Object);
+
+        // Assert
+        Assert.False(result);
+        loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 }

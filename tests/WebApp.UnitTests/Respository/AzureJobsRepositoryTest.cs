@@ -47,7 +47,8 @@ public class AzureJobsRepositoryTest
     {
         var jobId = "cachedJob";
         var cachedJob = new JobSummary { JobId = jobId, PostedDate = DateTime.UtcNow };
-        _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(jobId)).ReturnsAsync(cachedJob);
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Job", jobId);
+        _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(cacheKey)).ReturnsAsync(cachedJob);
 
         var repo = CreateRepository();
         var result = await repo.GetJobAsync(jobId);

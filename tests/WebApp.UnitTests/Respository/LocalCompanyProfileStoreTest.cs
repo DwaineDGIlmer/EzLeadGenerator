@@ -108,7 +108,8 @@ public class LocalCompanyProfileStoreTest
     {
         var store = CreateStore(out var _);
         var profile = CreateProfile("cached-company");
-        _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>(profile.CompanyId)).ReturnsAsync(profile);
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Company", profile.CompanyId);
+        _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>(cacheKey)).ReturnsAsync(profile);
 
         var result = await store.GetCompanyProfileAsync(profile.CompanyId);
 

@@ -62,6 +62,11 @@ public class AzureCompanyRepository(
         try
         {
             var response = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, CompanyId);
+            if(response is null)
+            {
+                _logger.LogInformation("Response from Tableclient was null: {CompanyId}", CompanyId);
+                return null;
+            }
             var json = response.Value.GetString("Data");
 
             if (string.IsNullOrEmpty(json))
@@ -75,7 +80,7 @@ public class AzureCompanyRepository(
             {
                 _logger.LogInformation("Successfully retrieved company profile for {CompanyId}", CompanyId);
 
-                await _cachingService.CreateEntryAsync(CompanyId, profile, TimeSpan.FromMinutes(_cacheExpirationInMinutes));
+                await _cachingService.AddCompanyAsync(profile, _cacheExpirationInMinutes);
                 _logger.LogDebug("Added company profile for {CompanyId} to cache", CompanyId);
             }
             return profile ?? null;
@@ -133,7 +138,7 @@ public class AzureCompanyRepository(
                 if (companies.Count != 0)
                 {
                     _logger.LogDebug("Caching company profiles for partition key: {PartitionKey}", _partionKey);
-                    await _cachingService.AddCompaniesAsync(companies, fromDate, _cacheExpirationInMinutes, _logger);
+                    await _cachingService.AddCompaniesAsync(companies, fromDate, _cacheExpirationInMinutes);
                 }
             }
             catch (Exception ex)

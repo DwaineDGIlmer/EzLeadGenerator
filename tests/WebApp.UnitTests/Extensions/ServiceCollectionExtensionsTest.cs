@@ -1,3 +1,4 @@
+using Application.Configurations;
 using Application.Contracts;
 using Application.Models;
 using Core.Configuration;
@@ -94,9 +95,9 @@ public class ServiceCollectionExtensionsTest
         {
             options = new OpenAiSettings();
         });
-        services.Configure<SerpApiSettings>(options =>
+        services.Configure<EzLeadSettings>(options =>
         {
-            options = new SerpApiSettings()
+            options = new EzLeadSettings()
             {
                 FileJobProfileDirectory = "TestDirectory"
             };
