@@ -46,14 +46,15 @@ public class AzureCompanyRepositoryTest
     {
         var repo = CreateRepository();
         var companyName = "TestCompany";
-        var cachedProfile = new CompanyProfile(new JobSummary() { CompanyName = companyName }, new HierarchyResults()) { CompanyId = "company1" };
-        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Company", cachedProfile.CompanyId);
+        var companyId = "TestCompany";
+        var cachedProfile = new CompanyProfile(new JobSummary() { CompanyName = companyName }, new HierarchyResults()) { CompanyId = companyId };
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Company", companyId);
         _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>(cacheKey)).ReturnsAsync(cachedProfile);
 
-        var result = await repo.GetCompanyProfileAsync(companyName);
+        var result = await repo.GetCompanyProfileAsync(companyId);
 
         Assert.NotNull(result);
-        Assert.Equal("company1", result.CompanyId);
+        Assert.Equal(companyId, result.CompanyId);
         Assert.Equal(companyName, result.CompanyName);
         _tableClientMock.Verify(x => x.GetEntityAsync<TableEntity>(It.IsAny<string>(), It.IsAny<string>(), null, default), Times.Never);
     }

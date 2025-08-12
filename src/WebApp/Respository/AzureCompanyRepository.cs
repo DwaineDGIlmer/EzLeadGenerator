@@ -62,6 +62,11 @@ public class AzureCompanyRepository(
         try
         {
             var response = await _tableClient.GetEntityAsync<TableEntity>(_partionKey, CompanyId);
+            if(response is null)
+            {
+                _logger.LogInformation("Response from Tableclient was null: {CompanyId}", CompanyId);
+                return null;
+            }
             var json = response.Value.GetString("Data");
 
             if (string.IsNullOrEmpty(json))
