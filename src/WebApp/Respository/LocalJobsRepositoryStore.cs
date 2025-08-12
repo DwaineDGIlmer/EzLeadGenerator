@@ -95,7 +95,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
             if (job is not null)
             {
                 _logger.LogDebug("Creating job for cache for {JobId}", jobId);
-                await _cachingService.CreateEntryAsync(jobId, job, TimeSpan.FromMinutes(_cacheExpirationInMinutes));
+                await _cachingService.AddJobAsync(job, _cacheExpirationInMinutes);
             }
             return job ?? null;
         }
@@ -154,7 +154,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
 
         if (jobs.Count != 0)
         {
-            await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes, _logger);
+            await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes);
         }
         return jobs;
     }

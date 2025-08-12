@@ -1,6 +1,7 @@
 using Application.Models;
 using Core.Contracts;
 using Core.Extensions;
+using Core.Helpers;
 
 namespace WebApp.Extensions;
 
@@ -28,7 +29,8 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cachedJob = await cacheService.TryGetAsync<JobSummary>(jobId);
+        var cacheKey = GetCacheKey("Job", jobId); 
+        var cachedJob = await cacheService.TryGetAsync<JobSummary>(cacheKey);
         if (cachedJob is not null)
         {
             logger.LogInformation("Retrieved job {JobId} from cache", jobId);
@@ -78,21 +80,40 @@ public static class Extensions
     /// <param name="jobs">The collection of job summaries to be cached. If <see langword="null"/>, an empty collection will be cached.</param>
     /// <param name="fromDate">The date used to generate the cache key. Cannot be <see langword="null"/>.</param>
     /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry will remain valid.</param>
-    /// <param name="logger">The logger used to log diagnostic information. Cannot be <see langword="null"/>.</param>
+    /// 
     /// <returns>A task that represents the asynchronous operation.</returns>
     public static async Task AddJobsAsync(
     this ICacheService cacheService,
     IEnumerable<JobSummary> jobs,
     DateTime fromDate,
-    int cacheExpirationInMinutes,
-    ILogger logger)
+    int cacheExpirationInMinutes)
     {
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(fromDate);
-        ArgumentNullException.ThrowIfNull(logger);
 
         var cacheKey = GetCacheKey("Jobs", fromDate);
         await cacheService.CreateEntryAsync(cacheKey, jobs, TimeSpan.FromMinutes(cacheExpirationInMinutes));
+    }
+
+
+    /// <summary>
+    /// Adds a comapny profile to the cache with a specified expiration time.
+    /// </summary>
+    /// <param name="cacheService">The cache service used to store the job summaries.</param>
+    /// <param name="job"> The job profile to be cached. Cannot be <see langword="null"/>.</param>
+    /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry remains valid.</param>
+    /// 
+    /// <returns>A task that represents the asynchronous operation of adding the job summaries to the cache.</returns>
+    public static async Task AddJobAsync(
+    this ICacheService cacheService,
+    JobSummary job,
+    int cacheExpirationInMinutes)
+    {
+        ArgumentNullException.ThrowIfNull(cacheService);
+        ArgumentNullException.ThrowIfNull(job);
+
+        var cacheKey = GetCacheKey("Company", job.JobId);
+        await cacheService.CreateEntryAsync(cacheKey, job, TimeSpan.FromMinutes(cacheExpirationInMinutes));
     }
 
     /// <summary>
@@ -114,7 +135,8 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cacheCompany = await cacheService.TryGetAsync<CompanyProfile>(companyId);
+        var cacheKey = GetCacheKey("Company", companyId);
+        var cacheCompany = await cacheService.TryGetAsync<CompanyProfile>(cacheKey);
         if (cacheCompany is not null)
         {
             logger.LogInformation("Retrieved company profile from cache for {companyId}", companyId);
@@ -156,6 +178,26 @@ public static class Extensions
     }
 
     /// <summary>
+    /// Adds a comapny profile to the cache with a specified expiration time.
+    /// </summary>
+    /// <param name="cacheService">The cache service used to store the job summaries.</param>
+    /// <param name="company"> The company profile to be cached. Cannot be <see langword="null"/>.</param>
+    /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry remains valid.</param>
+    /// 
+    /// <returns>A task that represents the asynchronous operation of adding the job summaries to the cache.</returns>
+    public static async Task AddCompanyAsync(
+    this ICacheService cacheService,
+    CompanyProfile company,
+    int cacheExpirationInMinutes)
+    {
+        ArgumentNullException.ThrowIfNull(cacheService);
+        ArgumentNullException.ThrowIfNull(company);
+
+        var cacheKey = GetCacheKey("Company", company.CompanyId);
+        await cacheService.CreateEntryAsync(cacheKey, company, TimeSpan.FromMinutes(cacheExpirationInMinutes));
+    }
+
+    /// <summary>
     /// Adds a collection of job summaries to the cache with a specified expiration time.
     /// </summary>
     /// <remarks>The cache key is generated using the provided <paramref name="fromDate"/> and includes a hash
@@ -165,18 +207,16 @@ public static class Extensions
     /// <param name="companies">The collection of company profiles to be cached. Can be empty but must not be null.</param>
     /// <param name="fromDate">The date used to generate the cache key. Cannot be null.</param>
     /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry remains valid.</param>
-    /// <param name="logger">The logger used to record diagnostic information. Cannot be null.</param>
+    /// 
     /// <returns>A task that represents the asynchronous operation of adding the job summaries to the cache.</returns>
     public static async Task AddCompaniesAsync(
     this ICacheService cacheService,
     IEnumerable<CompanyProfile> companies,
     DateTime fromDate,
-    int cacheExpirationInMinutes,
-    ILogger logger)
+    int cacheExpirationInMinutes)
     {
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(fromDate);
-        ArgumentNullException.ThrowIfNull(logger);
 
         var cacheKey = GetCacheKey("Companies", fromDate);
         await cacheService.CreateEntryAsync(cacheKey, companies, TimeSpan.FromMinutes(cacheExpirationInMinutes));
@@ -193,5 +233,18 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(prefix);
         ArgumentNullException.ThrowIfNull(fromDate);
         return $"{prefix}_{fromDate.Date.GenHashString()}";
+    }
+
+    /// <summary>
+    /// Generates a cache key by combining a specified prefix and a date.
+    /// </summary>
+    /// <param name="prefix">The prefix to include in the cache key. Cannot be <see langword="null"/>.</param>
+    /// <param name="key">The key to include in the cache key. Cannot be <see langword="null"/>.</param>
+    /// <returns>A string representing the cache key.</returns>
+    public static string GetCacheKey(string prefix, string key)
+    {
+        ArgumentNullException.ThrowIfNull(prefix);
+        ArgumentNullException.ThrowIfNull(key);
+        return $"{prefix}_{key.GenHashString()}";
     }
 }

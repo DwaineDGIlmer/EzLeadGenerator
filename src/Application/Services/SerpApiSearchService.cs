@@ -145,15 +145,4 @@ public class SerpApiSearchService : ISearch<OrganicResult>
         }
         return null;
     }
-
-    private async Task<IEnumerable<string>?> GetCachedSearchResults(string cacheKey)
-    {
-        var cachedSearch = await _cacheService.TryGetAsync<IEnumerable<string>>(cacheKey);
-        if (cachedSearch is not null)
-        {
-            _logger.LogInformation("Returning cached GoogleSearch Result for key: {CacheKey}", cacheKey);
-            return cachedSearch;
-        }
-        return null;
-    }
 }

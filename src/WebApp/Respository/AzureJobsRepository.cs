@@ -74,7 +74,7 @@ public class AzureJobsRepository(
             if (job is not null)
             {
                 _logger.LogDebug("Creating job for cache for {JobId}", jobId);
-                await _cachingService.CreateEntryAsync(jobId, job, TimeSpan.FromMinutes(_cacheExpirationInMinutes));
+                await _cachingService.AddJobAsync(job, _cacheExpirationInMinutes);
             }
             return job ?? null;
         }
@@ -137,7 +137,7 @@ public class AzureJobsRepository(
         if (jobs.Count != 0)
         {
             _logger.LogInformation("Found {JobCount} jobs posted since {FromDate}", jobs.Count, fromDate);
-            await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes, _logger);
+            await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes);
         }
         return jobs;
     }

@@ -88,7 +88,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             {
                 _logger.LogInformation("Successfully retrieved company profile for {companyId}", companyId);
 
-                await _cachingService.CreateEntryAsync(companyId, profile, TimeSpan.FromMinutes(_cacheExpirationMinutes));
+                await _cachingService.AddCompanyAsync(profile, _cacheExpirationMinutes);
                 _logger.LogDebug("Caching all company profile, company id: {companyId}", companyId);
             }
             return profile ?? null;
@@ -145,7 +145,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
         if (allCompanies.Count != 0)
         {
             _logger.LogDebug("Caching all company profiles with count: {Count}", allCompanies.Count);
-            await _cachingService.AddCompaniesAsync(allCompanies, fromDate, _cacheExpirationMinutes, _logger);
+            await _cachingService.AddCompaniesAsync(allCompanies, fromDate, _cacheExpirationMinutes);
         }
         return allCompanies;
     }
