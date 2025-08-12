@@ -302,7 +302,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
                 return job;
             }
 
-            using FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+            using FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read);
             {
                 jobSummary = await JsonSerializer.DeserializeAsync<JobSummary>(stream, options);
             }
