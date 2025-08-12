@@ -333,7 +333,9 @@ public class LocalJobsRepositoryStore : IJobsRepository
         {
             // Log the error and return null if deserialization fails
             logger.LogError(jsonEx, "JSON deserialization error: {Message}", jsonEx.Message);
-            return null;
+            // Log the error and return the original job if deserialization fails
+            logger.LogError(jsonEx, "JSON deserialization error: {Message}", jsonEx.Message);
+            return job;
         }
         catch (Exception ex)
         {
