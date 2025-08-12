@@ -7,7 +7,6 @@ using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using WebApp.Respository;
 
