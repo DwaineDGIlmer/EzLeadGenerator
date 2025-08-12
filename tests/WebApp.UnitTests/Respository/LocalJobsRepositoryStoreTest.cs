@@ -27,19 +27,19 @@ public class LocalJobsRepositoryStoreTest
     }
 
     [Fact]
-    public async Task GetJobsAsync_ById_ReturnsJob_FromCache()
+    public async Task GetJobAsync_ById_ReturnsJob_FromCache()
     {
         var store = CreateStore();
         var jobId = "cachedJob";
         var cachedJob = CreateJob(jobId);
-
-        _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(jobId)).ReturnsAsync(cachedJob);
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Job", jobId);
+        _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(cacheKey)).ReturnsAsync(cachedJob);
 
         var result = await store.GetJobAsync(jobId);
 
         Assert.NotNull(result);
         Assert.Equal(jobId, result.JobId);
-        _cacheServiceMock.Verify(x => x.TryGetAsync<JobSummary>(jobId), Times.Once);
+        _cacheServiceMock.Verify(x => x.TryGetAsync<JobSummary>(cacheKey), Times.Once);
     }
 
     [Fact]

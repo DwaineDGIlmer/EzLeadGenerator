@@ -7,6 +7,7 @@ using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using WebApp.Respository;
 
@@ -45,14 +46,16 @@ public class AzureCompanyRepositoryTest
     public async Task GetCompanyProfileAsync_ReturnsProfile_FromCache()
     {
         var repo = CreateRepository();
-        var cachedProfile = new CompanyProfile(new JobSummary() { CompanyName = "CachedCompany" }, new HierarchyResults()) { CompanyId = "company1" };
-        _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>("company1")).ReturnsAsync(cachedProfile);
+        var companyName = "TestCompany";
+        var cachedProfile = new CompanyProfile(new JobSummary() { CompanyName = companyName }, new HierarchyResults()) { CompanyId = "company1" };
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Company", companyName);
+        _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>(cacheKey)).ReturnsAsync(cachedProfile);
 
-        var result = await repo.GetCompanyProfileAsync("company1");
+        var result = await repo.GetCompanyProfileAsync(companyName);
 
         Assert.NotNull(result);
         Assert.Equal("company1", result.CompanyId);
-        Assert.Equal("CachedCompany", result.CompanyName);
+        Assert.Equal(companyName, result.CompanyName);
         _tableClientMock.Verify(x => x.GetEntityAsync<TableEntity>(It.IsAny<string>(), It.IsAny<string>(), null, default), Times.Never);
     }
 
