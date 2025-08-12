@@ -26,7 +26,7 @@ public class DisplayRepositoryTest
         _jobsRepoMock.Setup(r => r.GetJobsAsync(It.IsAny<DateTime>()))
             .ReturnsAsync(jobs ?? []);
 
-        var companyList = companies?.ToList() ?? new List<CompanyProfile>();
+        var companyList = companies?.ToList() ?? [];
         _companyRepoMock.Setup(r => r.GetCompanyProfileAsync(It.IsAny<string>()))
             .ReturnsAsync((string id) => companyList.FirstOrDefault(c => c.Id == id));
 
@@ -82,14 +82,14 @@ public class DisplayRepositoryTest
         // Arrange
         var jobs = new List<JobSummary>
         {
-            new JobSummary { CompanyId = "1" },
-            new JobSummary { CompanyId = "2" },
-            new JobSummary { CompanyId = "1" } // duplicate company id
+            new() { CompanyId = "1" },
+            new() { CompanyId = "2" },
+            new() { CompanyId = "1" } // duplicate company id
         };
         var companyProfiles = new List<CompanyProfile>
         {
-            new CompanyProfile(new JobSummary { CompanyId = "1" }, new HierarchyResults()) { Id = "1", CompanyId = "1" },
-            new CompanyProfile(new JobSummary { CompanyId = "2" }, new HierarchyResults()) { Id = "2", CompanyId = "2" }
+            new(new JobSummary { CompanyId = "1" }, new HierarchyResults()) { Id = "1", CompanyId = "1" },
+            new(new JobSummary { CompanyId = "2" }, new HierarchyResults()) { Id = "2", CompanyId = "2" }
         };
         var allCompanies = new List<CompanyProfile>();
         var loggerMock = new Mock<ILogger>();
@@ -118,7 +118,7 @@ public class DisplayRepositoryTest
         // Arrange
         var jobs = new List<JobSummary>
         {
-            new JobSummary { CompanyId = "1" }
+            new() { CompanyId = "1" }
         };
         var allCompanies = new List<CompanyProfile>();
         var loggerMock = new Mock<ILogger>();
@@ -144,10 +144,10 @@ public class DisplayRepositoryTest
         // Arrange
         var jobs = new List<JobSummary>
         {
-            new JobSummary { Id = "1" },
-            new JobSummary { Id = "2" }
+            new() { Id = "1" },
+            new() { Id = "2" }
         };
-        var allJobs = new List<JobSummary>();
+        var allJobs = new List<JobSummary>() { new() { Id = "0" } };
         var loggerMock = new Mock<ILogger>();
         var jobsRepoMock = new Mock<IJobsRepository>();
         jobsRepoMock.Setup(r => r.GetJobsAsync(It.IsAny<DateTime>())).ReturnsAsync(jobs);
@@ -156,7 +156,8 @@ public class DisplayRepositoryTest
         DisplayRepository.LoadAllJobs(jobsRepoMock.Object, allJobs, loggerMock.Object);
 
         // Assert
-        Assert.Equal(2, allJobs.Count);
+        Assert.Equal(3, allJobs.Count);
+        Assert.Contains(allJobs, j => j.Id == "0");
         Assert.Contains(allJobs, j => j.Id == "1");
         Assert.Contains(allJobs, j => j.Id == "2");
         loggerMock.Verify(l => l.Log(
@@ -182,10 +183,10 @@ public class DisplayRepositoryTest
 
         // Assert
         loggerMock.Verify(l => l.Log(
-            LogLevel.Information,
+            LogLevel.Error,
             It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("No jobs to load, skipping job loading.")),
-            It.IsAny<Exception>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error loading company profiles")),
+            It.Is<AggregateException>(ex => ex.InnerException != null && ex.InnerException.Message == "Test exception"),
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 }

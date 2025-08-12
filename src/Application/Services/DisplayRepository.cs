@@ -149,12 +149,6 @@ namespace Application.Services
         /// <returns></returns>
         public static void LoadAllJobs(IJobsRepository jobsRepository, List<JobSummary> allJobs, ILogger logger)
         {
-            if(allJobs.Count == 0)
-            {
-                logger.LogInformation("No jobs to load, skipping job loading.");
-                return;
-            }
-
             try
             {
                 var jobs = jobsRepository.GetJobsAsync(DateTime.Now.AddDays(-30)).Result;
@@ -180,6 +174,12 @@ namespace Application.Services
         /// <returns></returns>
         public static void LoadAllCompanies(ICompanyRepository companyRepository, List<JobSummary> allJobs, List<CompanyProfile> allCompanies, ILogger logger)
         {
+            if (allJobs.Count == 0)
+            {
+                logger.LogInformation("No jobs to load, skipping job loading.");
+                return;
+            }
+
             try
             {
                 foreach (var job in allJobs)
