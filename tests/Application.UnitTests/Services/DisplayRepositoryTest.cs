@@ -184,7 +184,7 @@ public class DisplayRepositoryTest
         loggerMock.Verify(l => l.Log(
             LogLevel.Error,
             It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error loading company profiles")),
+            It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error loading jobs")),
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
