@@ -35,8 +35,8 @@ namespace Application.Services
             ArgumentNullException.ThrowIfNull(jobsRepository, nameof(jobsRepository));
 
             _logger = logger;
-            LoadAllJobs(jobsRepository);
-            LoadAllCompanies(companyRepository);
+            LoadAllJobs(jobsRepository, _allJobs, _logger);
+            LoadAllCompanies(companyRepository, _allJobs, _allCompanies, _logger);
         }
 
         /// <summary>
@@ -94,11 +94,10 @@ namespace Application.Services
         /// <returns>An enumerable collection of <see cref="JobSummary"/> objects representing the jobs for the specified page.</returns>
         public IEnumerable<JobSummary> GetPaginatedJobs(DateTime fromDate, int page, int pageSize)
         {
-            return _allJobs
+            return [.. _allJobs
                     .OrderByDescending(j => j.PostedDate)
                     .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
+                    .Take(pageSize)];
         }
 
         /// <summary>
@@ -132,11 +131,10 @@ namespace Application.Services
         /// profiles.</returns>
         public IEnumerable<CompanyProfile> GetPaginatedCompanies(DateTime fromDate, int page, int pageSize)
         {
-            return _allCompanies
+            return [.. _allCompanies
                     .OrderBy(c => c.CompanyName)
                     .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
+                    .Take(pageSize)];
         }
 
         /// <summary>
@@ -146,18 +144,20 @@ namespace Application.Services
         /// internal collection. It logs the number of profiles loaded or any errors encountered during the
         /// operation.</remarks>
         /// <param name="jobsRepository">The repository from which to retrieve job profiles. Cannot be null.</param>
+        /// <param name="allJobs">List of job summaries to populate with the loaded data.</param>
+        /// <param name="logger">Logger used for logging operations within the repository. Cannot be null.</param>
         /// <returns></returns>
-        private void LoadAllJobs(IJobsRepository jobsRepository)
+        public static void LoadAllJobs(IJobsRepository jobsRepository, List<JobSummary> allJobs, ILogger logger)
         {
             try
             {
                 var jobs = jobsRepository.GetJobsAsync(DateTime.Now.AddDays(-30)).Result;
-                _allJobs.AddRange(jobs);
-                _logger.LogInformation("Successfully loaded {CompanyCount} company profiles", jobs.Count());
+                allJobs.AddRange(jobs);
+                logger.LogInformation("Successfully loaded {CompanyCount} company profiles", jobs.Count());
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading company profiles");
+                logger.LogError(ex, "Error loading company profiles");
             }
         }
 
@@ -168,25 +168,34 @@ namespace Application.Services
         /// <remarks>This method retrieves company profiles from the past 30 days and logs the number of
         /// profiles loaded. If an error occurs during the loading process, it logs the error.</remarks>
         /// <param name="companyRepository">The repository from which to retrieve company profiles. Cannot be null.</param>
+        /// <param name="allCompanies">List of company profiles to populate with the loaded data.</param>
+        /// <param name="allJobs">List of job summaries to use for retrieving company profiles.</param>
+        /// <param name="logger">The logger used for logging operations within the repository. Cannot be null.</param>
         /// <returns></returns>
-        private void LoadAllCompanies(ICompanyRepository companyRepository)
+        public static void LoadAllCompanies(ICompanyRepository companyRepository, List<JobSummary> allJobs, List<CompanyProfile> allCompanies, ILogger logger)
         {
+            if (allJobs.Count == 0)
+            {
+                logger.LogInformation("No jobs to load, skipping job loading.");
+                return;
+            }
+
             try
             {
-                foreach (var job in _allJobs)
+                foreach (var job in allJobs)
                 {
                     var companyProfile = companyRepository.GetCompanyProfileAsync(job.CompanyId).Result;
-                    if (companyProfile != null && 
-                        !_allCompanies.Contains(companyProfile))
+                    if (companyProfile != null &&
+                        !allCompanies.Exists(job => job.CompanyId == companyProfile.CompanyId))
                     {
-                        _allCompanies.Add(companyProfile);
+                        allCompanies.Add(companyProfile);
                     }
                 }
-                _logger.LogInformation("Successfully loaded {CompanyCount} company profiles", _allCompanies.Count());
+                logger.LogInformation("Successfully loaded {CompanyCount} company profiles", allCompanies.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading company profiles");
+                logger.LogError(ex, "Error loading company profiles");
             }
         }
     }

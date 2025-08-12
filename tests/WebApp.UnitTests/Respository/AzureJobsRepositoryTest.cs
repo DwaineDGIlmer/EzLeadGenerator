@@ -36,7 +36,7 @@ public class AzureJobsRepositoryTest
             .ReturnsAsync(responseMock);
 
         var repo = CreateRepository();
-        var result = await repo.GetJobsAsync(jobId);
+        var result = await repo.GetJobAsync(jobId);
 
         Assert.NotNull(result);
         Assert.Equal(jobId, result!.JobId);
@@ -50,7 +50,7 @@ public class AzureJobsRepositoryTest
         _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(jobId)).ReturnsAsync(cachedJob);
 
         var repo = CreateRepository();
-        var result = await repo.GetJobsAsync(jobId);
+        var result = await repo.GetJobAsync(jobId);
 
         Assert.NotNull(result);
         Assert.Equal(jobId, result!.JobId);
@@ -66,7 +66,7 @@ public class AzureJobsRepositoryTest
             .ThrowsAsync(new RequestFailedException(404, "Not found"));
 
         var repo = CreateRepository();
-        var result = await repo.GetJobsAsync(jobId);
+        var result = await repo.GetJobAsync(jobId);
 
         Assert.Null(result);
     }

@@ -1,7 +1,6 @@
-﻿using Application.Contracts;
+﻿using Application.Configurations;
+using Application.Contracts;
 using Application.Models;
-using Application.Services;
-using Core.Configuration;
 using Core.Contracts;
 using Core.Helpers;
 using Microsoft.Extensions.Options;
@@ -36,17 +35,16 @@ public class LocalCompanyProfileStore : ICompanyRepository
     /// <param name="logger">The logger instance used for logging operations within the store. Cannot be <see langword="null"/>.</param>
     public LocalCompanyProfileStore(
         ICacheService cacheService,
-        IOptions<SerpApiSettings> options,
+        IOptions<EzLeadSettings> options,
         ILogger<LocalCompanyProfileStore> logger)
     {
         ArgumentNullException.ThrowIfNull(cacheService, nameof(cacheService));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         ArgumentNullException.ThrowIfNull(options, nameof(options));
-        ArgumentNullException.ThrowIfNull(options.Value.FileCompanyProfileDirectory, nameof(options.Value.FileCompanyProfileDirectory));
 
         _cachingService = cacheService;
         _cacheExpirationMinutes = options.Value.CacheExpirationInMinutes;
-        _companyProfileDirectory = Path.Combine(Environment.CurrentDirectory, options.Value.FileCompanyProfileDirectory).Replace('/', '\\');
+        _companyProfileDirectory = GetProfileDirectory(options.Value).Replace('/', '\\');
         _logger = logger;
 
         // This is the same directory used by any caller using SerpApiSettings
@@ -192,9 +190,12 @@ public class LocalCompanyProfileStore : ICompanyRepository
     public async Task UpdateCompanyProfileAsync(CompanyProfile profile)
     {
         ArgumentNullException.ThrowIfNull(profile, nameof(profile));
-        string path = GetFilePath(profile.CompanyId);
+        if (string.IsNullOrWhiteSpace(profile.CompanyId))
+            throw new ArgumentException("Company ID cannot be null or empty.", nameof(profile.CompanyId));
+
         try
         {
+            string path = GetFilePath(profile.CompanyId);
             if (!File.Exists(path))
             {
                 await AddCompanyProfileAsync(profile);
@@ -252,30 +253,6 @@ public class LocalCompanyProfileStore : ICompanyRepository
                 throw new IOException($"Failed to delete profile for companyId: {profile.CompanyId}", ex);
             }
         });
-    }
-
-    /// <summary>
-    /// Retrieves the file path associated with the specified company ID.
-    /// </summary>
-    /// <param name="companyId">The unique identifier of the company. Cannot be null or empty.</param>
-    /// <returns>The file path corresponding to the given company ID.</returns>
-    public string GetFilePath(string companyId)
-    {
-        return GetFilePath(companyId, _companyProfileDirectory);
-    }
-
-    /// <summary>
-    /// Constructs the file path for a company's profile based on its identifier.
-    /// </summary>
-    /// <param name="companyId">The unique identifier of the company. Must not be null or empty.</param>
-    /// <param name="profileDirectory">The directory where the profile files are stored. Must not be null or empty.</param>
-    /// <returns>The full file path to the company's profile JSON file.</returns>
-    public static string GetFilePath(string companyId, string profileDirectory)
-    {
-        ArgumentNullException.ThrowIfNull(companyId, nameof(companyId));
-        ArgumentNullException.ThrowIfNull(profileDirectory, nameof(profileDirectory));
-
-        return Path.Combine(profileDirectory, $"{companyId.FileSystemName()}.json");
     }
 
     /// <summary>
@@ -359,5 +336,39 @@ public class LocalCompanyProfileStore : ICompanyRepository
             updatedAtProperty.SetValue(profile, DateTime.UtcNow);
         }
         return jsonProfile ?? profile;
+    }
+
+    /// <summary>
+    /// Retrieves the file path associated with the specified company ID.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company. Cannot be null or empty.</param>
+    /// <returns>The file path corresponding to the given company ID.</returns>
+    public string GetFilePath(string companyId)
+    {
+        return GetFilePath(companyId, _companyProfileDirectory);
+    }
+
+    /// <summary>
+    /// Retrieves the file path associated with the specified company ID.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company. Cannot be null or empty.</param>
+    /// <param name="profileDirectory">The directory where the profile files are stored. Cannot be null or empty.</param>
+    /// <returns>The file path corresponding to the given company ID.</returns>
+    public static string GetFilePath(string companyId, string profileDirectory) =>
+    Path.Combine(profileDirectory, $"company.{companyId.FileSystemName()}.json");
+
+    private static string GetProfileDirectory(EzLeadSettings? settings)
+    {
+        if (settings is not null && !string.IsNullOrEmpty(settings.FileCompanyProfileDirectory))
+        {
+            return Path.Combine(settings.FileCompanyProfileDirectory, "companies");
+        }
+
+        var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (dir is not null && !string.IsNullOrEmpty(dir.ToString()))
+        {
+            return Path.Combine(dir.ToString(), "cache", "companies");
+        }
+        return Path.Combine(AppContext.BaseDirectory, "cache", "companies");
     }
 }

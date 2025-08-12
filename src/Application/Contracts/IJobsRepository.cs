@@ -17,7 +17,7 @@ public interface IJobsRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see
     /// cref="JobSummary"/> objects representing the jobs associated with the specified company. The list will be
     /// empty if no jobs are found.</returns>
-    Task<JobSummary?> GetJobsAsync(string JobId);
+    Task<JobSummary?> GetJobAsync(string JobId);
 
     /// <summary>
     /// Asynchronously retrieves a list of job summaries that have been created or updated since the specified date.

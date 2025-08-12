@@ -132,7 +132,7 @@ public class ServiceCollectionExtensionsTest
     }
 
     [Fact]
-    public void AddCacheService_RegistersMemoryCacheService_WhenInMemory()
+    public void AddCachingService_RegistersMemoryCacheService_WhenInMemory()
     {
         var services = CreateServiceCollection();
         var configBuilder = new ConfigurationBuilder();
@@ -143,7 +143,7 @@ public class ServiceCollectionExtensionsTest
         var configuration = configBuilder.Build();
 
         services.AddLogging();
-        services.AddCacheService(configuration);
+        services.AddCachingService(configuration);
 
         var provider = services.BuildServiceProvider();
         var cacheService = provider.GetService<ICacheService>();
@@ -151,7 +151,7 @@ public class ServiceCollectionExtensionsTest
     }
 
     [Fact]
-    public void AddCacheService_RegistersFileCacheService_WhenFileSystem()
+    public void AddCachingService_RegistersFileCacheService_WhenFileSystem()
     {
         var services = CreateServiceCollection();
         var configBuilder = new ConfigurationBuilder();
@@ -162,7 +162,7 @@ public class ServiceCollectionExtensionsTest
         var configuration = configBuilder.Build();
 
         services.AddLogging();
-        services.AddCacheService(configuration);
+        services.AddCachingService(configuration);
 
         var provider = services.BuildServiceProvider();
         var cacheService = provider.GetService<ICacheService>();

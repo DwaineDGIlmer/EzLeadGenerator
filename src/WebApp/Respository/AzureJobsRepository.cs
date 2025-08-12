@@ -46,7 +46,7 @@ public class AzureJobsRepository(
     /// object if found.</returns>
     /// <exception cref="ArgumentException">Thrown when jobId is null or empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the job is not found.</exception>
-    public async Task<JobSummary?> GetJobsAsync(string jobId)
+    public async Task<JobSummary?> GetJobAsync(string jobId)
     {
         if (string.IsNullOrWhiteSpace(jobId))
             throw new ArgumentException("Job ID cannot be null or empty.", nameof(jobId));

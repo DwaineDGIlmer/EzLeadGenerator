@@ -1,6 +1,6 @@
+using Application.Configurations;
 using Application.Models;
 using Application.Services;
-using Core.Configuration;
 using Core.Contracts;
 using Core.Helpers;
 using Microsoft.Extensions.Logging;
@@ -260,7 +260,7 @@ public class LocalCompanyProfileStoreTest
         // Arrange
         var cacheService = new Mock<ICacheService>();
         var logger = new Mock<ILogger<LocalCompanyProfileStore>>();
-        var options = Options.Create(new SerpApiSettings
+        var options = Options.Create(new EzLeadSettings
         {
             FileCompanyProfileDirectory = "profiles",
             CacheExpirationInMinutes = 10
@@ -274,7 +274,7 @@ public class LocalCompanyProfileStoreTest
         var result = store.GetFilePath(companyId);
 
         // Assert: Only check the ending segment
-        var expectedEnding = Path.Combine("profiles", $"{companyId.FileSystemName()}.json").Replace('\\', '/');
+        var expectedEnding = Path.Combine("profiles", "companies", $"company.{companyId.FileSystemName()}.json").Replace('\\', '/');
         var actualNormalized = result.Replace('\\', '/');
         Assert.EndsWith(expectedEnding, actualNormalized, StringComparison.OrdinalIgnoreCase);
     }
@@ -282,8 +282,8 @@ public class LocalCompanyProfileStoreTest
 
     private LocalCompanyProfileStore CreateStore(out Mock<ILogger<LocalCompanyProfileStore>> loggerMock)
     {
-        var optionsMock = new Mock<IOptions<SerpApiSettings>>();
-        optionsMock.Setup(o => o.Value).Returns(new SerpApiSettings
+        var optionsMock = new Mock<IOptions<EzLeadSettings>>();
+        optionsMock.Setup(o => o.Value).Returns(new EzLeadSettings
         {
             FileCompanyProfileDirectory = _testDirectory
         });
