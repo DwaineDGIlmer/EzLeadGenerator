@@ -47,7 +47,7 @@ public class AzureCompanyRepositoryTest
         var repo = CreateRepository();
         var companyName = "TestCompany";
         var cachedProfile = new CompanyProfile(new JobSummary() { CompanyName = companyName }, new HierarchyResults()) { CompanyId = "company1" };
-        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Company", companyName);
+        var cacheKey = WebApp.Extensions.Extensions.GetCacheKey("Company", cachedProfile.CompanyId);
         _cacheServiceMock.Setup(x => x.TryGetAsync<CompanyProfile>(cacheKey)).ReturnsAsync(cachedProfile);
 
         var result = await repo.GetCompanyProfileAsync(companyName);
