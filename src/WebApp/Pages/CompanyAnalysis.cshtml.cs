@@ -190,7 +190,7 @@ public class CompanyAnalysisPage : PageModel
                 return "Jobs";
             }
         }
-        return "buisness";
+        return "business";
     }
 
     /// <summary>
