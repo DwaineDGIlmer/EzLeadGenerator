@@ -69,7 +69,7 @@ public class CompanyAnalysisTest
         var result = CompanyAnalysisPage.GetTitle(snippet, displayLink);
 
         // Assert
-        Assert.Equal("Business", result);
+        Assert.Equal("business", result);
     }
 
     [Fact]
