@@ -160,6 +160,9 @@ public class SearpApiSourceServiceTest
     [Theory]
     [InlineData("Jane Doe", "")]
     [InlineData("Data Architect", "")]
+    [InlineData("Unknown", "")]
+    [InlineData("Open Role", "")]
+    [InlineData("Not provided", "")]
     [InlineData("John Smith", "John Smith")]
     [InlineData("Chad Pumpernickel", "Chad Pumpernickel")]
     public void UpdateName_ReturnsCorrectName(string input, string expected)

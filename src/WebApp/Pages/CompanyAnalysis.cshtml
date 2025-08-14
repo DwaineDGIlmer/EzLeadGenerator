@@ -108,6 +108,43 @@
         color: #2b5876;
         font-family: 'Segoe UI', Arial, sans-serif;
     }
+
+    .contacts-hover {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .contacts-hover .contacts-label {
+        opacity: 0;
+        position: absolute;
+        left: 110%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #2b5876;
+        color: #fff;
+        padding: 0.3em 0.8em;
+        border-radius: 6px;
+        white-space: nowrap;
+        font-size: 1em;
+        transition: opacity 0.2s;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .contacts-hover:hover .contacts-label {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .sticky-pagination {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f4f6fb;
+    padding-top: 1rem;
+    }
+    
     @@media (max-width: 900px) {
         .card {
             padding: 1rem 0.5rem;
@@ -131,6 +168,29 @@ else if (!Model.CompanySummaries.Any())
 else
 {
     <div>
+        <!-- Top Pagination Bar -->
+        <nav aria-label="Company pagination" class="mb-4 sticky-pagination">
+            <ul class="pagination justify-content-center">
+                @if (Model.PageNumber > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?page=@(Model.PageNumber - 1)">Previous</a>
+                    </li>
+                }
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+                @if (Model.PageNumber < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?page=@(Model.PageNumber + 1)">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
         @foreach (var company in Model.CompanySummaries)
         {
             @if (string.IsNullOrEmpty(company.Link))
@@ -141,15 +201,16 @@ else
             {
                 <h3 class="mb-3"><a href="@company.Link" class="result-title text-decoration-none" target="_blank" rel="noopener">@company.CompanyName</a></h3>
             }
+
             @if (company.HierarchyResults.OrgHierarchy.Count > 0)
             {
-                <div class="alert alert-info d-flex align-items-center mb-4">
-                    <div class="small text-muted mt-1">
-                        <h4 class="mb-3" style="color:#2b5876;">
-                            <span style="font-size:1.2em;vertical-align:middle;">&#128101;</span>
-                            Possible Contacts
-                        </h4>
-                        <table class="table-bordered" style="background: #e3f2fd; border-radius: 8px; box-shadow: none;">
+                <div class="alert alert-info mb-4">
+                    <div class="small text-muted mt-1 text-center">
+                        <span class="contacts-hover">
+                            <span style="font-size:1.8em;vertical-align:middle;">&#128101;</span>
+                            <span class="contacts-label">Possible contacts at @Model.CompanyName.</span>
+                        </span>
+                        <table class="table-bordered" style="background: #e3f2fd; border-radius: 8px; box-shadow: none; margin: 1rem auto 0 auto;">
                             <thead>
                                 <tr>
                                     <th style="background: #e3f2fd; color: #2b5876;">Title</th>
@@ -166,6 +227,15 @@ else
                                 }
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info d-flex align-items-center mb-4" style="min-height:120px;">
+                    <div class="w-100 text-center">
+                        <span style="font-size:2em; color:#b0b8c1;">&#128100;</span>
+                        <div class="mt-2" style="color:#b0b8c1;">No possible contacts found for @Model.CompanyName.</div>
                     </div>
                 </div>
             }
@@ -221,29 +291,6 @@ else
                     </tbody>
                 </table>
             </div>
-
-            <nav aria-label="Company pagination">
-                <ul class="pagination justify-content-center">
-                    @if (Model.PageNumber > 1)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" href="?page=@(Model.PageNumber - 1)">Previous</a>
-                        </li>
-                    }
-                    @for (int i = 1; i <= Model.TotalPages; i++)
-                    {
-                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                            <a class="page-link" href="?page=@i">@i</a>
-                        </li>
-                    }
-                    @if (Model.PageNumber < Model.TotalPages)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" href="?page=@(Model.PageNumber + 1)">Next</a>
-                        </li>
-                    }
-                </ul>
-            </nav>
         }
     </div>
 }
