@@ -83,6 +83,14 @@
         list-style: none;
         padding-left: 0;
     }
+
+    .sticky-pagination {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #f4f6fb;
+        padding-top: 1rem;
+    }
     .page-item .page-link {
         border-radius: 6px;
         border: 1px solid #e0e6ef;
@@ -115,8 +123,30 @@
     }
 </style>
 
+<!-- Top Pagination Bar -->
+<nav aria-label="Company pagination" class="mb-4 sticky-pagination">
+    <ul class="pagination justify-content-center">
+        @if (Model.PageNumber > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?page=@(Model.PageNumber - 1)">Previous</a>
+            </li>
+        }
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <a class="page-link" href="?page=@i">@i</a>
+            </li>
+        }
+        @if (Model.PageNumber < Model.TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?page=@(Model.PageNumber + 1)">Next</a>
+            </li>
+        }
+    </ul>
+</nav>
 <h2 class="mb-4">Recent Job Listings</h2>
-
 @if (Model.TotalCount > 0)
 {
     <div class="alert alert-info d-flex align-items-center mb-4">
@@ -179,25 +209,3 @@ else
         }
     </div>
 }
-
-<nav aria-label="Job pagination" class="mt-4">
-    <ul class="pagination justify-content-center">
-        @if (Model.PageNumber > 1)
-        {
-            <li class="page-item">
-                <a class="page-link" href="?page=@(Model.PageNumber - 1)">Previous</a>
-            </li>
-        }
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                <a class="page-link" href="?page=@i">@i</a>
-            </li>
-        }
-        @if (Model.PageNumber < Model.TotalPages)
-        {
-            <li class="page-item">
-                <a class="page-link" href="?page=@(Model.PageNumber + 1)">Next</a>
-            </li>
-        }
-    </ul>
