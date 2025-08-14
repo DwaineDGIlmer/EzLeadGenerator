@@ -158,8 +158,8 @@ public class SearpApiSourceServiceTest
     }
 
     [Theory]
-    [InlineData("Jane Doe", "Unknown")]
-    [InlineData("Data Architect", "Unknown")]
+    [InlineData("Jane Doe", "")]
+    [InlineData("Data Architect", "")]
     [InlineData("John Smith", "John Smith")]
     [InlineData("Chad Pumpernickel", "Chad Pumpernickel")]
     public void UpdateName_ReturnsCorrectName(string input, string expected)
@@ -174,6 +174,12 @@ public class SearpApiSourceServiceTest
         });
 
         // Assert
+        if (string.IsNullOrEmpty(expected))
+        {
+            Assert.Empty(result.OrgHierarchy);
+            return;
+        }
+
         Assert.NotNull(result);
         Assert.Single(result.OrgHierarchy);
 
@@ -202,16 +208,11 @@ public class SearpApiSourceServiceTest
         var result = SearpApiSourceService.UpdateName(input);
 
         // Assert
-        Assert.Equal("Unknown", result.OrgHierarchy[0].Name);
-        Assert.Equal("Unknown", result.OrgHierarchy[1].Name);
-        Assert.Equal("Unknown", result.OrgHierarchy[2].Name);
-        Assert.Equal("Alice", result.OrgHierarchy[3].Name);
+        Assert.Single(result.OrgHierarchy);
+        Assert.Equal("Alice", result.OrgHierarchy[0].Name);
 
         // Titles should be trimmed
-        Assert.Equal("Director", result.OrgHierarchy[0].Title);
-        Assert.Equal("VP", result.OrgHierarchy[1].Title);
-        Assert.Equal("Practice", result.OrgHierarchy[2].Title);
-        Assert.Equal("Manager", result.OrgHierarchy[3].Title);
+        Assert.Equal("Manager", result.OrgHierarchy[0].Title);
     }
 
     [Fact]

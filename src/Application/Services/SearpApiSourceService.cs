@@ -25,7 +25,7 @@ public class SearpApiSourceService : IJobSourceService
 {
     private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "their"];
     private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so"];
-    private static readonly List<string> _wordsNotInNames = ["data", "architect", "doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering"];
+    private static readonly List<string> _wordsNotInNames = ["chief", "information", "officer", "data", "architect", "doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering", "unknown", "n/a", "not applicable", "no data", "none", "null"];
     private static readonly List<string> _titleWords = ["engineer", "engineering", "aws", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation", "architect"];
     private static readonly List<string> _tokens =
     [
@@ -407,7 +407,18 @@ public class SearpApiSourceService : IJobSourceService
     /// <returns>The updated <see cref="HierarchyResults"/> object with modified names and trimmed titles.</returns>
     public static HierarchyResults UpdateName(HierarchyResults results)
     {
-        foreach (var item in results?.OrgHierarchy ?? [])
+        if (results is null)
+        {
+            return new();
+        }
+
+        if (results.OrgHierarchy is null || results.OrgHierarchy.Count == 0)
+        {
+            return results;
+        }
+
+        List<HierarchyItem> newResults = [];
+        foreach (var item in results.OrgHierarchy ?? [])
         {
             item.Title = item.Title.Trim();
             var nameWords = item.Name.Split([' ', '&'], StringSplitOptions.RemoveEmptyEntries);
@@ -417,10 +428,12 @@ public class SearpApiSourceService : IJobSourceService
                 nameWords.Any(w => _wordsNotInNames.Contains(w, StringComparer.CurrentCultureIgnoreCase))
             )
             {
-                item.Name = "Unknown";
+                continue;
             }
+            newResults.Add(item);
         }
-        return results ?? new HierarchyResults();
+        results.OrgHierarchy = newResults;
+        return results;
     }
 
     /// <summary>

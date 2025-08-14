@@ -296,7 +296,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
         try
         {
             string path = GetFilePath(job.JobId, jobDirectory);
-            if(!File.Exists(path))
+            if (!File.Exists(path))
             {
                 logger.LogWarning("Job profile file not found: {Path}", path);
                 return job;
