@@ -148,22 +148,19 @@
 }
 
 <h2 class="mb-4">Talent Demand Insights</h2>
-
+<div class="alert alert-info mb-3">
+    <h5>How to Use Talent Demand Insights</h5>
+    <ul>
+        <li><strong>Search for Roles:</strong> Enter a job title or keyword (e.g., "AI Engineer"). For best results, use at least 4 characters.</li>
+        <li><strong>Search as exact phrase:</strong> If checked, the search will look for the exact phrase; otherwise, it will match any of the words.</li>
+        <li><strong>Location:</strong> Enter a city, state, or "Remote" to filter results.</li>
+        <li><strong>Include job descriptions:</strong> Check to display job descriptions in the results.</li>
+        <li><strong>Results:</strong> Jobs are grouped by company and can be downloaded as a CSV file.</li>
+    </ul>
+    <strong>Tip:</strong> Enter a job title and location to find relevant jobs. For more precise results, check "Search as exact phrase" to match the exact job title and location together.
+</div>
 <div class="card">
-    <div class="alert alert-info mb-3">
-        <h5>How to Use Talent Demand Insights</h5>
-        <ul>
-            <li><strong>Search for Roles:</strong> Enter a job title or keyword (e.g., "AI Engineer"). For best results, use at least 4 characters.</li>
-            <li><strong>Search as exact phrase:</strong> If checked, the search will look for the exact phrase; otherwise, it will match any of the words.</li>
-            <li><strong>Location:</strong> Enter a city, state, or "Remote" to filter results.</li>
-            <li><strong>Include job descriptions:</strong> Check to display job descriptions in the results.</li>
-            <li><strong>Results:</strong> Jobs are grouped by company and can be downloaded as a CSV file.</li>
-        </ul>
-    </div>
     <form method="post">
-        <div class="alert alert-info mb-3">
-            <strong>Tip:</strong> Enter a job title and location to find relevant jobs. For more precise results, check "Search as exact phrase" to match the exact job title and location together.
-        </div>
         <div class="mb-3">
             <label class="form-label">Search for Roles:</label>
             <input asp-for="JobTitle" class="form-control" placeholder="e.g. Data Engineer" style="max-width: 500px;" />

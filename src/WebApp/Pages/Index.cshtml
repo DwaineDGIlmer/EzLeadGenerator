@@ -21,33 +21,52 @@
     .navbar-brand:hover, .nav-link:hover {
         color: #ffd700 !important;
     }
-    .card {
-        background: #eef3f7 !important;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
-        margin-bottom: 30px;
-        padding: 24px 32px;
-    }
-    .table-bordered {
-        border: 1px solid #e0e6ef !important;
-    }
-    .table-bordered th,
-    .table-bordered td {
-        border: 1px solid #e0e6ef !important;
+
+    .footer {
+        background-color: #2b5876;
+        color: #fff;
     }
 
+    .footer a {
+        color: #ffd700;
+    }
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(44,62,80,0.08);
+        margin-bottom: 2rem;
+        padding: 1.5rem 2rem;
+    }
     .alert-info, .alert-danger {
         border-radius: 8px;
         box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
         border-left: 5px solid #2b5876;
         background-color: #e3f2fd;
         color: #2b5876;
+        margin-bottom: 1.5rem;
     }
-
+    .table-bordered {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #e0e6ef !important;
+        padding: 0.7rem 1rem;
+        background: #fff;
+    }
+    .table-bordered th {
+        background: #f4f6fb;
+        color: #2b5876;
+        font-weight: 600;
+        width: 160px;
+    }
     .job-description {
         white-space: pre-line;
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background: #eef3f7 !important;
+        background: #eef3f7;
         border-radius: 4px;
         padding: 8px 10px;
         margin-top: 4px;
@@ -56,14 +75,52 @@
         font-weight: 400;
         display: block;
     }
+    .pagination {
+        margin: 2rem 0 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        list-style: none;
+        padding-left: 0;
+    }
+    .page-item .page-link {
+        border-radius: 6px;
+        border: 1px solid #e0e6ef;
+        padding: 0.4rem 0.9rem;
+        color: #2b5876;
+        background: #f4f6fb;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+    .page-item.active .page-link,
+    .page-item .page-link:hover {
+        background: #2b5876;
+        color: #fff;
+        border-color: #2b5876;
+        }
+
+    h1, h2, h3, h5 {
+        color: #2b5876;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    @@media (max-width: 900px) {
+        .card {
+            padding: 1rem 0.5rem;
+        }
+        .table-bordered th,
+        .table-bordered td {
+            font-size: 0.95rem;
+            padding: 0.5rem 0.5rem;
+        }
+    }
 </style>
 
-<h2 class="mt-3 mb-2">Recent Job Listings</h2>
+<h2 class="mb-4">Recent Job Listings</h2>
 
 @if (Model.TotalCount > 0)
 {
     <div class="alert alert-info d-flex align-items-center mb-4">
-        <span class="me-2"><i class="bi bi-briefcase-fill"></i></span>
+        <span class="me-2">&#128188;</span>
         <strong>@Model.TotalCount</strong>&nbsp;Data Engineer jobs found in the last 30 days
     </div>
 }
@@ -82,31 +139,31 @@ else
         {
             <div class="card mb-4">
                 <h3 class="mb-3">@job.CompanyName</h3>
-                <table class="table-bordered" style="width:100%">
+                <table class="table-bordered" style="background: #e3f2fd; border-radius: 8px; box-shadow: none;">
                     <tbody>
                         <tr>
-                            <th style="width: 160px;">Job Title</th>
-                            <td>@job.JobTitle</td>
+                            <th style="background: #e3f2fd; color: #2b5876;">Job Title</th>
+                             <td style="background: #e3f2fd;">@job.JobTitle</td>
                         </tr>
                         <tr>
-                            <th>Hiring Agency</th>
-                            <td>@job.HiringAgency</td>
+                            <th style="background: #e3f2fd; color: #2b5876;">Hiring Agency</th>
+                            <td style="background: #e3f2fd;">@job.HiringAgency</td>
                         </tr>
                         <tr>
-                            <th>Published</th>
-                            <td>@job.PostedDate.ToString("MMM dd, yyyy")</td>
+                            <th style="background: #e3f2fd; color: #2b5876;">Published</th>
+                            <td style="background: #e3f2fd;">@job.PostedDate.ToString("MMM dd, yyyy")</td>
                         </tr>
                         <tr>
-                            <th>Location</th>
-                            <td>@job.Location</td>
+                            <th style="background: #e3f2fd; color: #2b5876;">Location</th>
+                            <td style="background: #e3f2fd;">@job.Location</td>
                         </tr>
                         <tr>
-                            <th>Division</th>
-                            <td>@job.Division</td>
+                            <th style="background: #e3f2fd; color: #2b5876;">Division</th>
+                            <td style="background: #e3f2fd;">@job.Division</td>
                         </tr>
                         <tr>
-                            <th>Source Link</th>
-                            <td>
+                            <th style="background: #e3f2fd; color: #2b5876;">Source Link</th>
+                            <td style="background: #e3f2fd;">
                                 <a href="@job.SourceLink" target="_blank" rel="noopener">
                                     @(new Uri(job.SourceLink).GetLeftPart(UriPartial.Authority))
                                 </a>
@@ -144,4 +201,3 @@ else
             </li>
         }
     </ul>
-</nav>

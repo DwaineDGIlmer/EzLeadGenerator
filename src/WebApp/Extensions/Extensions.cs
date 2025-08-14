@@ -1,7 +1,6 @@
 using Application.Models;
 using Core.Contracts;
 using Core.Extensions;
-using Core.Helpers;
 
 namespace WebApp.Extensions;
 
@@ -29,7 +28,7 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(logger);
 
-        var cacheKey = GetCacheKey("Job", jobId); 
+        var cacheKey = GetCacheKey("Job", jobId);
         var cachedJob = await cacheService.TryGetAsync<JobSummary>(cacheKey);
         if (cachedJob is not null)
         {

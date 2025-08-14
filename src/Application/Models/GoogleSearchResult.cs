@@ -213,60 +213,6 @@ public class SearchInformation
 }
 
 /// <summary>
-/// Represents an organic search result.
-/// </summary>
-public class OrganicResult
-{
-    /// <summary>
-    /// Gets or sets the position index within a collection.
-    /// </summary>
-    [JsonPropertyName("position")]
-    public int Position { get; set; }
-
-    /// <summary>
-    /// Gets or sets the title of the item.
-    /// </summary>
-    [JsonPropertyName("title")]
-    public string Title { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the hyperlink associated with the object.
-    /// </summary>
-    [JsonPropertyName("link")]
-    public string Link { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the displayed link associated with the object.
-    /// </summary>
-    [JsonPropertyName("displayed_link")]
-    public string DisplayedLink { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the URL of the thumbnail image.
-    /// </summary>
-    [JsonPropertyName("thumbnail")]
-    public string Thumbnail { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the date associated with the current object.
-    /// </summary>
-    [JsonPropertyName("date")]
-    public string Date { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the snippet of text associated with the JSON property.
-    /// </summary>
-    [JsonPropertyName("snippet")]
-    public string Snippet { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the list of words that are highlighted in the snippet.
-    /// </summary>
-    [JsonPropertyName("snippet_highlighted_words")]
-    public List<string> SnippetHighlightedWords { get; set; } = [];
-}
-
-/// <summary>
 /// Represents a related search.
 /// </summary>
 public class RelatedSearch

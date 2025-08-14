@@ -18,9 +18,9 @@
         color: #fff !important;
     }
 
-        .navbar-brand:hover, .nav-link:hover {
-            color: #ffd700 !important;
-        }
+    .navbar-brand:hover, .nav-link:hover {
+        color: #ffd700 !important;
+    }
 
     .footer {
         background-color: #2b5876;
@@ -30,36 +30,103 @@
     .footer a {
         color: #ffd700;
     }
+    .contact-container {
+        max-width: 700px;
+        margin-left: 0;
+        margin-right: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(44,62,80,0.08);
+        padding: 2rem 2.5rem;
+    }
+    .contact-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2b5876;
+        margin-bottom: 1rem;
+    }
+    .contact-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+    .contact-list li {
+        margin-bottom: 1.1rem;
+        font-size: 1.08rem;
+    }
+    .contact-label {
+        font-weight: 600;
+        color: #4e4376;
+        margin-right: 0.5rem;
+    }
+    .contact-link {
+        color: #2b5876;
+        word-break: break-all;
+        text-decoration: underline;
+        transition: color 0.2s;
+    }
+    .contact-link:hover {
+        color: #ffd700;
+    }
+    .contact-desc {
+        color: #4e4376;
+        font-size: 1.08rem;
+        margin-bottom: 1.5rem;
+    }
+    @@media (max-width: 900px) {
+        .contact-container {
+            padding: 1rem 0.5rem;
+            margin-left: 0;
+            margin-right: auto;
+        }
+    }
+
+    .footer {
+        background-color: #2b5876;
+        color: #fff;
+        text-align: center;
+        padding: 1.2rem 0;
+        margin-top: 3rem;
+    }
+
+    .footer a {
+        color: #ffd700;
+        text-decoration: underline;
+        }
+
+    h1, h2, h3, h5 {
+        color: #2b5876;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
 </style>
 
-<h2 class="mt-3 mb-2">Contact</h2>
-
-<div class="container mt-4">
-    <p class="mb-3 text-muted">
-        Connect with the Dwaine to learn more about this demo and using lead generation site, links below.
-    </p>
-    <ul class="list-unstyled">
+<h2 class="mb-4">Contact</h2>
+<div class="contact-container">
+    <div class="contact-desc">
+        Connect with Dwaine to learn more about this demo and the lead generation site. Use the links below.
+    </div>
+    <ul class="contact-list">
         <li>
-            <strong>LinkedIn:</strong>
-            <a href="https://www.linkedin.com/in/dwainedgilmer/" target="_blank" rel="noopener">
+            <span class="contact-label">LinkedIn:</span>
+            <a class="contact-link" href="https://www.linkedin.com/in/dwainedgilmer/" target="_blank" rel="noopener">
                 https://www.linkedin.com/in/dwainedgilmer/
             </a>
         </li>
         <li>
-            <strong>Email:</strong>
-            <a href="mailto:dwaine.gilmer@protonmail.com">dwaine.gilmer@protonmail.com</a>
+            <span class="contact-label">Email:</span>
+            <a class="contact-link" href="mailto:dwaine.gilmer@protonmail.com">dwaine.gilmer@protonmail.com</a>
         </li>
         <li>
-            <strong>GitHub Repository:</strong>
-            <a href="https://github.com/DwaineDGIlmer" target="_blank" rel="noopener">
+            <span class="contact-label">GitHub Repository:</span>
+            <a class="contact-link" href="https://github.com/DwaineDGIlmer" target="_blank" rel="noopener">
                 https://github.com/DwaineDGIlmer
             </a>
         </li>
         <li>
-            <strong>Azure Web App:</strong>
-            <a href="https://intelligentlogging-fcgtc5gfazcaaeej.centralus-01.azurewebsites.net/" target="_blank" rel="noopener">
+            <span class="contact-label">Azure Web App:</span>
+            <a class="contact-link" href="https://intelligentlogging-fcgtc5gfazcaaeej.centralus-01.azurewebsites.net/" target="_blank" rel="noopener">
                 https://intelligentlogging.centralus-01.azurewebsites.net/
             </a>
         </li>
     </ul>
-</div>
+ </div>
