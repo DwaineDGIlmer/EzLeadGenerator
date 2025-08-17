@@ -1068,6 +1068,11 @@ $.extend( $.validator, {
 			return this.groups[ element.name ] || ( this.checkable( element ) ? element.name : element.id || element.name );
 		},
 
+		/**
+		 * Returns the validation target for the given element.
+		 * Only accepts DOM elements; strings and jQuery objects wrapping strings are rejected for security.
+		 * If a string or non-DOM object is passed, returns undefined and logs a warning.
+		 */
 		validationTargetFor: function( element ) {
 
 			// If radio/checkbox, validate first element in group instead
@@ -1075,7 +1080,7 @@ $.extend( $.validator, {
 				element = this.findByName( element.name );
 			}
 
-			// Only accept DOM elements or jQuery objects; reject strings to prevent XSS
+			// Only accept DOM elements; reject strings to prevent XSS
 			if (typeof element === "string") {
 				if (window.console) {
 					console.warn("Unsafe string passed to validationTargetFor; ignoring for security.");
@@ -1085,6 +1090,13 @@ $.extend( $.validator, {
 			// If it's a jQuery object, extract the first DOM element
 			if (element && element.jquery) {
 				element = element[0];
+			}
+			// Ensure it's a DOM element (nodeType === 1)
+			if (!element || typeof element !== "object" || element.nodeType !== 1) {
+				if (window.console) {
+					console.warn("Non-DOM element passed to validationTargetFor; ignoring for security.");
+				}
+				return undefined;
 			}
 			// Always apply ignore filter
 			return $(element).not(this.settings.ignore)[0];
