@@ -684,6 +684,13 @@ $.extend( $.validator, {
 		},
 
 		clean: function( selector ) {
+			// Only accept DOM elements or jQuery objects; reject strings to prevent XSS
+			if (typeof selector === "string") {
+				if (window.console) {
+					console.warn("Unsafe string passed to clean; ignoring for security.");
+				}
+				return undefined;
+			}
 			return $( selector )[ 0 ];
 		},
 
