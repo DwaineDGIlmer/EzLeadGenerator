@@ -684,6 +684,13 @@ $.extend( $.validator, {
 		},
 
 		clean: function( selector ) {
+			// Only accept DOM elements or jQuery objects; reject strings to prevent XSS
+			if (typeof selector === "string") {
+				if (window.console) {
+					console.warn("Unsafe string passed to clean; ignoring for security.");
+				}
+				return undefined;
+			}
 			return $( selector )[ 0 ];
 		},
 
@@ -1068,8 +1075,19 @@ $.extend( $.validator, {
 				element = this.findByName( element.name );
 			}
 
+			// Only accept DOM elements or jQuery objects; reject strings to prevent XSS
+			if (typeof element === "string") {
+				if (window.console) {
+					console.warn("Unsafe string passed to validationTargetFor; ignoring for security.");
+				}
+				return undefined;
+			}
+			// If it's a jQuery object, extract the first DOM element
+			if (element && element.jquery) {
+				element = element[0];
+			}
 			// Always apply ignore filter
-			return $( element ).not( this.settings.ignore )[ 0 ];
+			return $(element).not(this.settings.ignore)[0];
 		},
 
 		checkable: function( element ) {
