@@ -68,7 +68,14 @@ public class CompanyResearchModel : PageModel
             _logger.LogWarning("No company summaries found.");
             return;
         }
-        await Task.CompletedTask;
+    public Task OnGetAsync()
+    {
+        if (CompanySummaries == null || CompanySummaries.Count == 0)
+        {
+            _logger.LogWarning("No company summaries found.");
+            return Task.CompletedTask;
+        }
+        return Task.CompletedTask;
     }
 }
 
