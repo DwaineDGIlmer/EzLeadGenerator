@@ -67,13 +67,6 @@ public class CompanyResearchModel : PageModel
     /// <remarks>Logs a warning if no company summaries are available. This method is typically
     /// invoked  as part of a page lifecycle in an ASP.NET Core Razor Pages application.</remarks>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public async Task OnGetAsync()
-    {
-        if (CompanySummaries == null || CompanySummaries.Count == 0)
-        {
-            _logger.LogWarning("No company summaries found.");
-            return;
-        }
     public Task OnGetAsync()
     {
         if (CompanySummaries == null || CompanySummaries.Count == 0)
