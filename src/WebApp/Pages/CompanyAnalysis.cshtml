@@ -2,29 +2,28 @@
 @model WebApp.Pages.CompanyAnalysisPage
 @{
     ViewData["Title"] = "Company Summaries";
+    Layout = null;
 }
 
 <style>
     body {
         background-color: #f4f6fb;
         font-family: 'Segoe UI', Arial, sans-serif;
-    }
-
-    .navbar {
-        background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
-    }
-
-    .navbar-brand, .nav-link {
-        color: #fff !important;
-    }
-
-    .navbar-brand:hover, .nav-link:hover {
-        color: #ffd700 !important;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
     }
 
     .footer {
         background-color: #2b5876;
         color: #fff;
+        width: 100%;
+        text-align: center;
+        margin-top: 2rem;
+        padding: 1rem 0;
     }
 
     .footer a {
@@ -137,14 +136,12 @@
         pointer-events: auto;
     }
 
-    .sticky-pagination {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #f4f6fb;
-    padding-top: 1rem;
+    .icon-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-    
+
     @@media (max-width: 900px) {
         .card {
             padding: 1rem 0.5rem;
@@ -167,39 +164,16 @@ else if (!Model.CompanySummaries.Any())
 }
 else
 {
-    <div>
-        <!-- Top Pagination Bar -->
-        <nav aria-label="Company pagination" class="mb-4 sticky-pagination">
-            <ul class="pagination justify-content-center">
-                @if (Model.PageNumber > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="?page=@(Model.PageNumber - 1)">Previous</a>
-                    </li>
-                }
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                        <a class="page-link" href="?page=@i">@i</a>
-                    </li>
-                }
-                @if (Model.PageNumber < Model.TotalPages)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="?page=@(Model.PageNumber + 1)">Next</a>
-                    </li>
-                }
-            </ul>
-        </nav>
+    <div>     
         @foreach (var company in Model.CompanySummaries)
         {
             @if (string.IsNullOrEmpty(company.Link))
             {
-                <h3 class="mb-3">@company.CompanyName</h3>
+                <h2 class="mb-3">@company.CompanyName</h2>
             }
             else
             {
-                <h3 class="mb-3"><a href="@company.Link" class="result-title text-decoration-none" target="_blank" rel="noopener">@company.CompanyName</a></h3>
+                <h2 class="mb-3"><a href="@company.Link" class="result-title text-decoration-none" target="_blank" rel="noopener">@company.CompanyName</a></h2>
             }
 
             @if (company.HierarchyResults.OrgHierarchy.Count > 0)
@@ -207,14 +181,14 @@ else
                 <div class="alert alert-info mb-4">
                     <div class="small text-muted mt-1 text-center">
                         <span class="contacts-hover">
-                            <span style="font-size:1.8em;vertical-align:middle;">&#128101;</span>
+                            <span class="icon-center" style="font-size:1.8em;vertical-align:middle;">&#128101;</span>
                             <span class="contacts-label">Possible contacts at @company.CompanyName.</span>
                         </span>
                         <table class="table-bordered" style="background: #e3f2fd; border-radius: 8px; box-shadow: none; margin: 1rem auto 0 auto;">
                             <thead>
                                 <tr>
-                                    <th style="background: #e3f2fd; color: #2b5876;">Title</th>
-                                    <th style="background: #e3f2fd; color: #2b5876;">Name</th>
+                                    <th style="background: #e3f2fd; color: #2b5876; text-align: left;">Title</th>
+                                    <th style="background: #e3f2fd; color: #2b5876; text-align: left;">Name</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -234,7 +208,7 @@ else
             {
                 <div class="alert alert-info d-flex align-items-center mb-4" style="min-height:120px;">
                     <div class="w-100 text-center">
-                        <span style="font-size:2em; color:#b0b8c1;">&#128100;</span>
+                        <span class="icon-center" style="font-size:2em; color:#b0b8c1;">&#128100;</span>
                         <div class="mt-2" style="color:#b0b8c1;">No possible contacts found for @company.CompanyName.</div>
                     </div>
                 </div>
