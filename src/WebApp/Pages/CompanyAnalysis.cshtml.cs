@@ -24,11 +24,6 @@ public class CompanyAnalysisPage : PageModel
     private readonly ILogger<CompanyAnalysisPage> _logger;
 
     /// <summary>
-    /// The name of the company to display in the header.
-    /// </summary>
-    public string CompanyName { get; set; } = string.Empty;
-
-    /// <summary>
     /// Gets the current page number in a paginated list or document.
     /// </summary>
     public int PageNumber { get; private set; } = 1;
@@ -37,11 +32,6 @@ public class CompanyAnalysisPage : PageModel
     /// Gets the number of items to display per page.
     /// </summary>
     public int PageSize { get; private set; } = 1;
-
-    /// <summary>
-    /// Gets the total number of pages available.
-    /// </summary>
-    public int TotalPages { get; private set; }
 
     /// <summary>
     /// Gets the total count of items processed.
@@ -82,9 +72,7 @@ public class CompanyAnalysisPage : PageModel
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task OnGetAsync([FromQuery] int page = 1)
     {
-
         TotalCount = _displayRepository.GetJobCount(DateTime.Now.AddDays(-30));
-        TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
         PageNumber = page < 1 ? 1 : page;
         CompanySummaries = [.. _displayRepository.GetPaginatedCompanies(DateTime.Now.AddDays(-30), PageNumber, PageSize)];
         if (CompanySummaries == null || CompanySummaries.Count == 0)
@@ -100,9 +88,9 @@ public class CompanyAnalysisPage : PageModel
             return;
         }
 
-        CompanyName = result.CompanyName;
         Sections.Clear();
         Sections = [.. GetCompanyResults(result, _search)
+            .OrderBy(item => item.Date)   
             .GroupBy(item => item.Type)
             .Select(group => new SectionVm
             {

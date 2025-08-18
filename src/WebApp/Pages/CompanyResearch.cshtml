@@ -1,0 +1,152 @@
+﻿@page
+@model WebApp.Pages.CompanyResearchModel
+<style>
+    body {
+        background-color: #f4f6fb;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .navbar {
+        background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+    }
+
+    .navbar-brand, .nav-link {
+        color: #fff !important;
+    }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #ffd700 !important;
+        }
+
+    .footer {
+        background-color: #2b5876;
+        color: #fff;
+    }
+
+    .footer a {
+        color: #ffd700;
+    }
+
+    h1, h2, h3, h5 {
+        color: #2b5876;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .page-link {
+        padding: 8px 12px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        color: #2b5876;
+        background: #f4f6fb;
+        border-radius: 6px;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .page-link.active,
+    .page-link:hover {
+        background-color: #2b5876;
+        color: #fff;
+        border-color: #2b5876;
+    }
+
+    .company-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .company-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+        transition: box-shadow 0.2s, transform 0.2s;
+        padding: 1.2rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .company-card:hover {
+        box-shadow: 0 6px 24px rgba(44,62,80,0.18);
+        transform: translateY(-4px) scale(1.02);
+    }
+
+    .company-card-header h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.15rem;
+        color: #2b5876;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .company-link {
+        text-decoration: none;
+        color: #2b5876;
+        transition: color 0.2s;
+    }
+
+    .company-link:hover {
+        color: #4e4376;
+        text-decoration: underline;
+    }
+
+    .company-card-body {
+        margin-top: 0.5rem;
+    }
+
+    .btn-research {
+        display: inline-block;
+        background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+        color: #fff;
+        padding: 0.45em 1.1em;
+        border-radius: 6px;
+        font-size: 1em;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 1px 4px rgba(44,62,80,0.08);
+    }
+
+    .btn-research:hover {
+        background: linear-gradient(90deg, #4e4376 0%, #2b5876 100%);
+        box-shadow: 0 2px 8px rgba(44,62,80,0.14);
+    }
+
+    @@media (max-width: 900px) {
+        .company-card {
+            padding: 1rem 0.5rem;
+        }
+    }
+</style>
+<h2>These are the @Model.TotalCount companies with opening for Data Services</h2>
+
+<!-- Show items for selected letter -->
+<div class="items-section">
+    @if(Model.Profiles.Any())
+    {
+        <div class="company-grid">
+            @foreach (var item in Model.Profiles)
+            {
+                <div class="company-card">
+                    <div class="company-card-header">
+                        <h4>
+                            <a href="@item.CompanyProfile.Link" target="_blank" class="company-link">
+                                @item.CompanyProfile.CompanyName
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="company-card-body">
+                        <a href="CompanyAnalysis?page=@item.CurrentIndex" class="btn-research" target="_blank">Research</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <h3>There are no companies to display at this time."</h3>
+    }
+</div>

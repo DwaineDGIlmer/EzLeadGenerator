@@ -1,0 +1,32 @@
+rules:
+  - name: Require Status Checks
+    applies_to: pull_request
+    conditions:
+      - type: require_status_checks
+        checks:
+          - build
+          - test
+
+  - name: Restrict Force Pushes
+    applies_to: branch
+    conditions:
+      - type: restrict_force_pushes
+        allow: false
+
+  - name: Require Linear History
+    applies_to: branch
+    conditions:
+      - type: require_linear_history
+        allow: true
+
+  - name: Require Signed Commits
+    applies_to: branch
+    conditions:
+      - type: require_signed_commits
+        allow: true
+
+  - name: Restrict Deletions
+    applies_to: branch
+    conditions:
+      - type: restrict_deletions
+        allow: false
