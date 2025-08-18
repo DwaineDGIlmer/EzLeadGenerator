@@ -50,9 +50,15 @@ public class CompanyResearchModel : PageModel
         _displayRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        TotalCount = _displayRepository.GetJobCount(DateTime.Now.AddDays(-30));
-        CompanySummaries = [.. _displayRepository.GetPaginatedCompanies(DateTime.Now.AddDays(-30), PageNumber, TotalCount)];
-        Profiles = [.. CompanySummaries.Select((item, index) => new CompanyProfileResult(item, index))];
+        var sinceDate = DateTime.UtcNow.AddDays(-30);
+        TotalCount = _displayRepository.GetJobCount(sinceDate);
+
+        var companies = _displayRepository.GetPaginatedCompanies(sinceDate, PageNumber, TotalCount);
+        if (companies is not null && companies.Any())
+        {
+            CompanySummaries = [.. companies];
+            Profiles = [.. companies.Select((item, index) => new CompanyProfileResult(item, index))];
+        }
     }
 
     /// <summary>
