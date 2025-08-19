@@ -265,6 +265,22 @@ else
                     </tbody>
                 </table>
             </div>
+            @if (Model.RelatedSearches != null && Model.RelatedSearches.Any())
+            {
+                <div class="card mb-4">
+                    <h5 class="mb-3" style="color:#2b5876;">Related Searches</h5>
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var related in Model.RelatedSearches)
+                        {
+                            <li class="mb-2">
+                                <a href="@related.Link" target="_blank" rel="noopener" class="result-title text-decoration-none">
+                                    @related.Query
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
         }
     </div>
 }

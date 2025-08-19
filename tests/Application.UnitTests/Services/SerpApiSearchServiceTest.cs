@@ -38,38 +38,13 @@ public class SerpApiSearchServiceTest
     }
 
     [Fact]
-    public async Task FetchOrganicResults_ReturnsCachedResults_IfAvailable()
-    {
-        // Arrange
-        var organicResults = new List<OrganicResult> { new() { Title = "Test" } };
-        _cacheServiceMock.Setup(c => c.TryGetAsync<IEnumerable<OrganicResult>>(It.IsAny<string>()))
-            .ReturnsAsync(organicResults);
-
-        var service = new SerpApiSearchService(
-            _optionsMock.Object,
-            _cacheServiceMock.Object,
-            _httpClientFactoryMock.Object,
-            _loggerMock.Object);
-
-        // Act
-        var result = await service.FetchOrganicResults("test query", "United States");
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result!);
-        Assert.Equal("Test", result!.First().Title);
-        _cacheServiceMock.Verify(c => c.TryGetAsync<IEnumerable<OrganicResult>>(It.IsAny<string>()), Times.Once);
-    }
-
-    [Fact]
     public async Task FetchOrganicResults_PerformsHttpRequest_IfNoCache()
     {
         // Arrange
-        _cacheServiceMock.Setup(c => c.TryGetAsync<IEnumerable<OrganicResult>>(It.IsAny<string>()))
-            .ReturnsAsync((IEnumerable<OrganicResult>?)null);
+        _cacheServiceMock.Setup(c => c.TryGetAsync<IEnumerable<GoogleSearchResult>>(It.IsAny<string>()))
+            .ReturnsAsync((IEnumerable<GoogleSearchResult>?)null);
 
-        var organicResults = new List<OrganicResult> { new() { Title = "Result" } };
-        var googleSearchResult = new GoogleSearchResult { OrganicResults = organicResults };
+        var googleSearchResult = new GoogleSearchResult() { OrganicResults = new List<OrganicResult> { new() { Title = "Result" } } };
         var json = JsonSerializer.Serialize(googleSearchResult);
 
         var httpMessageHandler = new Mock<HttpMessageHandler>();
@@ -95,19 +70,84 @@ public class SerpApiSearchServiceTest
             _loggerMock.Object);
 
         // Act
-        var result = await service.FetchOrganicResults("test query", "United States");
+        var result = await service.FetchOrganicResults<OrganicResult>("test query", "United States");
 
         // Assert
         Assert.NotNull(result);
         Assert.Single(result!);
-        Assert.Equal("Result", result!.First().Title);
+        Assert.Equal("Result", result!.First()!.Title);
     }
 
     [Fact]
-    public async Task FetchOrganicResults_ReturnsNull_OnHttpFailure()
+    public async Task FetchSearchResults_ReturnsCachedResult_IfAvailable()
     {
-        _cacheServiceMock.Setup(c => c.TryGetAsync<IEnumerable<OrganicResult>>(It.IsAny<string>()))
-            .ReturnsAsync((IEnumerable<OrganicResult>?)null);
+        // Arrange
+        var cachedResult = new GoogleSearchResult { OrganicResults = [] };
+        _cacheServiceMock.Setup(c => c.TryGetAsync<GoogleSearchResult>(It.IsAny<string>()))
+            .ReturnsAsync(cachedResult);
+
+        var service = new SerpApiSearchService(
+            _optionsMock.Object,
+            _cacheServiceMock.Object,
+            _httpClientFactoryMock.Object,
+            _loggerMock.Object);
+
+        // Act
+        var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result!);
+        Assert.Equal(cachedResult, result!.First());
+        _cacheServiceMock.Verify(c => c.TryGetAsync<GoogleSearchResult>(It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task FetchSearchResults_PerformsHttpRequest_IfNoCache()
+    {
+        // Arrange
+        _cacheServiceMock.Setup(c => c.TryGetAsync<GoogleSearchResult>(It.IsAny<string>()))
+            .ReturnsAsync((GoogleSearchResult?)null);
+
+        var googleSearchResult = new GoogleSearchResult { OrganicResults = [] };
+        var json = JsonSerializer.Serialize(googleSearchResult);
+
+        var httpMessageHandler = new Mock<HttpMessageHandler>();
+        httpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(json)
+            });
+
+        var httpClient = new HttpClient(httpMessageHandler.Object);
+        _httpClientFactoryMock.Setup(f => f.CreateClient(_settings.HttpClientName)).Returns(httpClient);
+
+        var service = new SerpApiSearchService(
+            _optionsMock.Object,
+            _cacheServiceMock.Object,
+            _httpClientFactoryMock.Object,
+            _loggerMock.Object);
+
+        // Act
+        var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result!);
+        _cacheServiceMock.Verify(c => c.CreateEntryAsync(It.IsAny<string>(), It.IsAny<GoogleSearchResult>(), It.IsAny<TimeSpan>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task FetchSearchResults_ReturnsNull_OnHttpFailure()
+    {
+        _cacheServiceMock.Setup(c => c.TryGetAsync<GoogleSearchResult>(It.IsAny<string>()))
+            .ReturnsAsync((GoogleSearchResult?)null);
 
         var httpMessageHandler = new Mock<HttpMessageHandler>();
         httpMessageHandler
@@ -130,16 +170,16 @@ public class SerpApiSearchServiceTest
             _httpClientFactoryMock.Object,
             _loggerMock.Object);
 
-        var result = await service.FetchOrganicResults("test query", "United States");
+        var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
 
-        Assert.Null(result);
+        Assert.Empty(result);
     }
 
     [Fact]
-    public async Task FetchOrganicResults_ReturnsNull_IfContentIsEmpty()
+    public async Task FetchSearchResults_ReturnsNull_IfContentIsEmpty()
     {
-        _cacheServiceMock.Setup(c => c.TryGetAsync<IEnumerable<OrganicResult>>(It.IsAny<string>()))
-            .ReturnsAsync((IEnumerable<OrganicResult>?)null);
+        _cacheServiceMock.Setup(c => c.TryGetAsync<GoogleSearchResult>(It.IsAny<string>()))
+            .ReturnsAsync((GoogleSearchResult?)null);
 
         var httpMessageHandler = new Mock<HttpMessageHandler>();
         httpMessageHandler
@@ -163,16 +203,16 @@ public class SerpApiSearchServiceTest
             _httpClientFactoryMock.Object,
             _loggerMock.Object);
 
-        var result = await service.FetchOrganicResults("test query", "United States");
+        var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
 
-        Assert.Null(result);
+        Assert.Empty(result);
     }
 
     [Fact]
-    public async Task FetchOrganicResults_ReturnsNull_IfDeserializationFails()
+    public async Task FetchSearchResults_ReturnsNull_IfDeserializationFails()
     {
-        _cacheServiceMock.Setup(c => c.TryGetAsync<IEnumerable<OrganicResult>>(It.IsAny<string>()))
-            .ReturnsAsync((IEnumerable<OrganicResult>?)null);
+        _cacheServiceMock.Setup(c => c.TryGetAsync<GoogleSearchResult>(It.IsAny<string>()))
+            .ReturnsAsync((GoogleSearchResult?)null);
 
         var httpMessageHandler = new Mock<HttpMessageHandler>();
         httpMessageHandler
@@ -196,8 +236,8 @@ public class SerpApiSearchServiceTest
             _httpClientFactoryMock.Object,
             _loggerMock.Object);
 
-        var result = await service.FetchOrganicResults("test query", "United States");
+        var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
 
-        Assert.Null(result);
+        Assert.Empty(result);
     }
 }

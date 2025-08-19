@@ -17,19 +17,6 @@ namespace WebApp.UnitTests.Extensions;
 
 public class ServiceCollectionExtensionsTest
 {
-    private static IServiceCollection CreateServiceCollection()
-    {
-        return new ServiceCollection();
-    }
-
-    private static IConfiguration CreateConfiguration(Action<IConfigurationBuilder>? configure = null)
-    {
-        var builder = new ConfigurationBuilder();
-        builder.AddInMemoryCollection();
-        configure?.Invoke(builder);
-        return builder.Build();
-    }
-
     [Fact]
     public void AddCompanyProfileStore_RegistersLocalCompanyProfileStore_WhenNotProduction()
     {
@@ -83,7 +70,7 @@ public class ServiceCollectionExtensionsTest
 
         services.AddLogging();
         services.AddSingleton(Mock.Of<IWebHostEnvironment>());
-        services.AddSingleton(Mock.Of<ISearch<OrganicResult>>());
+        services.AddSingleton(Mock.Of<ISearch>());
         services.AddSingleton(Mock.Of<IJobsRetrieval<JobResult>>());
         services.AddSingleton(Mock.Of<IJobsRepository>());
         services.AddSingleton(Mock.Of<ICompanyRepository>());
@@ -189,7 +176,7 @@ public class ServiceCollectionExtensionsTest
     {
         var services = CreateServiceCollection();
         services.AddLogging();
-        services.AddSingleton(Mock.Of<ISearch<OrganicResult>>());
+        services.AddSingleton(Mock.Of<ISearch>());
         services.AddSingleton(Mock.Of<IJobsRetrieval<JobResult>>());
         services.AddSingleton(Mock.Of<IJobsRepository>());
         services.AddSingleton(Mock.Of<ICompanyRepository>());
@@ -229,7 +216,20 @@ public class ServiceCollectionExtensionsTest
         services.AddSearchService();
 
         var provider = services.BuildServiceProvider();
-        var search = provider.GetService<ISearch<OrganicResult>>();
+        var search = provider.GetService<ISearch>();
         Assert.NotNull(search);
+    }
+
+    private static ServiceCollection CreateServiceCollection()
+    {
+        return new ServiceCollection();
+    }
+
+    private static IConfiguration CreateConfiguration(Action<IConfigurationBuilder>? configure = null)
+    {
+        var builder = new ConfigurationBuilder();
+        builder.AddInMemoryCollection();
+        configure?.Invoke(builder);
+        return builder.Build();
     }
 }

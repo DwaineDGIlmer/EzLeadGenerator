@@ -270,7 +270,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The updated <see cref="IServiceCollection"/> with the <see cref="IDisplayRepository"/> service registered.</returns>
     public static IServiceCollection AddSearchService(this IServiceCollection services)
     {
-        services.AddSingleton<ISearch<OrganicResult>, SerpApiSearchService>();
+        services.AddSingleton<ISearch, SerpApiSearchService>();
         return services;
     }
 }

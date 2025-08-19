@@ -12,16 +12,25 @@ namespace WebApp.Pages;
 /// <remarks>This class is designed to interact with a company repository to fetch and display a paginated
 /// list of company profiles. It initializes with a specified repository and provides an asynchronous method to load
 /// the first page of company summaries.</remarks>
-public class CompanyAnalysisPage : PageModel
+/// <remarks>
+/// Initializes a new instance of the <see cref="IndexModel"/> class with the specified company repository.
+/// </remarks>
+/// <param name="repository">The repository used to access company data. Cannot be null.</param>
+/// <param name="search">The search service used to perform searches for company-related data. Cannot be null.</param>
+/// <param name="logger">The logger used for logging information and errors. Cannot be null.</param>
+public class CompanyAnalysisPage(
+    IDisplayRepository repository,
+    ISearch search,
+    ILogger<CompanyAnalysisPage> logger) : PageModel
 {
     private readonly static List<string> _jobKeywords = ["pay", "career", "careers", "job", "jobs", "position", "employment", "work", "vacancy", "opening", "opportunity", "hiring"];
     private readonly static List<string> _newsKeywords = ["innovation", "win", "partner", "strategic", "news", "update", "announcement", "press release", "report", "article", "story", "coverage", "media"];
     private readonly static List<string> _programKeywords = ["innovations", "compliant", "education", "invest", "design", "government", "collaborate", "support ", "program", "initiative", "project", "campaign", "strategy", "plan", "effort", "action", "activity"];
     private readonly static char[] _spltOptions = [' ', ',', '.', ';', ':', '-', '!', '?', '/', '\\'];
 
-    private readonly IDisplayRepository _displayRepository;
-    private readonly ISearch<OrganicResult> _search;
-    private readonly ILogger<CompanyAnalysisPage> _logger;
+    private readonly IDisplayRepository _displayRepository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ISearch _search = search ?? throw new ArgumentNullException(nameof(search));
+    private readonly ILogger<CompanyAnalysisPage> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <summary>
     /// Gets the current page number in a paginated list or document.
@@ -39,7 +48,7 @@ public class CompanyAnalysisPage : PageModel
     public int TotalCount { get; private set; }
 
     /// <summary>
-    /// The sections of results displayed on the page, each containing a list of items.
+    /// The companyresults of results displayed on the page, each containing a list of items.
     /// </summary>
     public List<SectionVm> Sections { get; set; } = [];
 
@@ -49,20 +58,9 @@ public class CompanyAnalysisPage : PageModel
     public List<CompanyProfile> CompanySummaries { get; private set; } = [];
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="IndexModel"/> class with the specified company repository.
+    /// Gets or sets the collection of related search results.
     /// </summary>
-    /// <param name="repository">The repository used to access company data. Cannot be null.</param>
-    /// <param name="search">The search service used to perform searches for company-related data. Cannot be null.</param>
-    /// <param name="logger">The logger used for logging information and errors. Cannot be null.</param>
-    public CompanyAnalysisPage(
-        IDisplayRepository repository,
-        ISearch<OrganicResult> search,
-        ILogger<CompanyAnalysisPage> logger)
-    {
-        _displayRepository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _search = search ?? throw new ArgumentNullException(nameof(search));
-    }
+    public List<RelatedSearch> RelatedSearches { get; set; } = [];
 
     /// <summary>
     /// Asynchronously retrieves a paginated list of company summaries.
@@ -88,40 +86,40 @@ public class CompanyAnalysisPage : PageModel
             return;
         }
 
-        Sections.Clear();
-        Sections = [.. GetCompanyResults(result, _search)
-            .OrderBy(item => item.Date)   
-            .GroupBy(item => item.Type)
-            .Select(group => new SectionVm
-            {
-                Title = group.Key,
-                Items = [.. group]
-            })];
-
-        _logger.LogInformation("Retrieved {Count} company summaries for page {PageNumber}.", CompanySummaries.Count, PageNumber);
-        await Task.CompletedTask;
+        await GetCompanyResults(result);
     }
 
     /// <summary>
-    /// Retrieves a list of search results related to a company's data analytics and services.
+    /// Retrieves a list of organic search results related to the specified company's profile, focusing on data
+    /// analytics and services.
     /// </summary>
-    /// <remarks>The method fetches up to 10 organic search results based on a query that focuses on the
-    /// company's  data analytics and services. Each result includes details such as the title, URL, source, and
-    /// snippet.</remarks>
-    /// <param name="companyProfile">The profile of the company, including its name, to be used in the search query.</param>
-    /// <param name="search">An implementation of <see cref="ISearch{OrganicResult}"/> used to perform the search operation.</param>
-    /// <returns>A list of <see cref="OrganicResultItem"/> objects representing the top search results.  Returns an empty list if no
-    /// results are found.</returns>
-    public static List<OrganicResultItem> GetCompanyResults(CompanyProfile companyProfile, ISearch<OrganicResult> search)
+    /// <remarks>The method uses the provided search service to query for recent information about the
+    /// company,  focusing on topics related to data analytics and services. The results are limited to the top 10 items
+    /// and include details such as title, URL, source, and snippet.</remarks>
+    /// <param name="companyProfile">The profile of the company for which search results are to be retrieved. Must not be null.</param>
+    /// 
+    /// <returns>A list of <see cref="OrganicResultItem"/> objects representing the top 10 relevant search results.  Returns an
+    /// empty list if no results are found.</returns>
+    public async Task GetCompanyResults(CompanyProfile companyProfile)
     {
-        List<OrganicResultItem> resultItemVms = new List<OrganicResultItem>();
-        var result = search.FetchOrganicResults($"All recent information on the company \"{companyProfile.CompanyName}\", focusing on Data analytics and services.", "NC");
-        if (result == null || result.Result == null || !result.Result.Any())
+        List<OrganicResultItem> resultItemVms = [];
+        var searchResults = await _search.FetchSearchResults<GoogleSearchResult>($"All recent information on the company \"{companyProfile.CompanyName}\", focusing on Data analytics and services.", "NC");
+        if (searchResults is null || !searchResults.Any())
         {
-            return resultItemVms;
+            return;
         }
 
-        foreach (var item in result.Result.Take(10))
+        var searchResult = searchResults?.FirstOrDefault();
+        RelatedSearches = searchResult?.RelatedSearches ?? [];
+
+        var result = searchResult?.OrganicResults;
+        if (result is null)
+        {
+            return;
+        }
+
+        Sections.Clear();
+        foreach (var item in result.Take(10))
         {
             resultItemVms.Add(new OrganicResultItem
             {
@@ -130,12 +128,22 @@ public class CompanyAnalysisPage : PageModel
                 Source = item.Source,
                 DisplayedLink = item.DisplayedLink,
                 Date = item.Date,
+                MustInclude = item.MustInclude,
                 Snippet = item.Snippet,
                 Type = GetTitle(item.Snippet, item.Link.ToString()),
                 Tags = GetTags(companyProfile.CompanyName, item.SnippetHighlightedWords, item.Snippet, item.Link.ToString())
             });
         }
-        return resultItemVms;
+
+        Sections = [.. resultItemVms
+            .OrderBy(item => item.Date)
+            .GroupBy(item => item.Type)
+            .Select(group => new SectionVm
+            {
+                Title = group.Key,
+                Items = [.. group]
+            })];
+        _logger.LogInformation("Retrieved {Count} company summaries for page {PageNumber}.", CompanySummaries.Count, PageNumber); ;
     }
 
     /// <summary>

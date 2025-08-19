@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using Application.Contracts;
 using Moq;
 using Moq.Protected;
 using System.Net;
@@ -113,5 +114,26 @@ public class UnitTestsBase
         var mockFactory = new Mock<IHttpClientFactory>();
         mockFactory.Setup(f => f.CreateClient(clientName)).Returns(httpClient);
         return mockFactory.Object;
+    }
+
+    /// <summary>
+    /// Provides a mock implementation of the <see cref="ISearch"/> interface for testing purposes.
+    /// </summary>
+    /// <remarks>This class is designed to simulate search functionality by returning a predefined result of
+    /// type <typeparamref name="T"/>. It is useful for unit testing scenarios where a real search implementation is not
+    /// required or available.</remarks>
+    /// <typeparam name="T">The type of the search result returned by the mock implementation.</typeparam>
+    public class MockSearch<P>(P result) : ISearch
+    {
+        private readonly P _result = result;
+
+        public Task<IEnumerable<T>> FetchOrganicResults<T>(string query, string location)
+        {
+            return Task.FromResult((IEnumerable<T>)_result);
+        }
+        public Task<IEnumerable<T>> FetchSearchResults<T>(string query, string location)
+        {
+            return Task.FromResult((IEnumerable<T>)_result);
+        }
     }
 }
