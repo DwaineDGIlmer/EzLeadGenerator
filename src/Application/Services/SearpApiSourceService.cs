@@ -49,7 +49,7 @@ public class SearpApiSourceService : IJobSourceService
     ];
     private readonly ILogger _logger;
     private readonly ICacheService _cacheService;
-    private readonly ISearch<OrganicResult> _searchService;
+    private readonly ISearch _searchService;
     private readonly IJobsRetrieval<JobResult> _jobsRetrieval;
     private readonly IOpenAiChatService _aiChatService;
     private readonly ICompanyRepository _companyRepository;
@@ -85,7 +85,7 @@ public class SearpApiSourceService : IJobSourceService
     public SearpApiSourceService(
         IOptions<SerpApiSettings> options,
         ICacheService cacheService,
-        ISearch<OrganicResult> searchService,
+        ISearch searchService,
         IOpenAiChatService aiChatService,
         IJobsRetrieval<JobResult> jobsRetrieval,
         IJobsRepository jobsRepository,
@@ -142,7 +142,7 @@ public class SearpApiSourceService : IJobSourceService
                 }
 
                 var prompt = $"{job.CompanyName} official site";
-                var googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
+                var googleResults = await _searchService.FetchOrganicResults<OrganicResult>(prompt, _settings.Location);
                 if (googleResults is null || !googleResults.Any())
                 {
                     _logger.LogWarning("No Google results found for company: {CompanyName}", job.CompanyName);
@@ -188,7 +188,7 @@ public class SearpApiSourceService : IJobSourceService
                     prompt = $"{job.CompanyName} organizational structure data engineering leadership team";
                 }
 
-                googleResults = await _searchService.FetchOrganicResults(prompt, _settings.Location);
+                googleResults = await _searchService.FetchOrganicResults<OrganicResult>(prompt, _settings.Location);
                 if (googleResults is null || !googleResults.Any())
                 {
                     _logger.LogWarning("No Google results found for company: {CompanyName}", job.CompanyName);

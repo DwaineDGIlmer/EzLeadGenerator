@@ -11,7 +11,7 @@ namespace Application.UnitTests.Services;
 public class SearpApiSourceServiceTest
 {
     private readonly Mock<ICacheService> _cacheServiceMock = new();
-    private readonly Mock<ISearch<OrganicResult>> _searchServiceMock = new();
+    private readonly Mock<ISearch> _searchServiceMock = new();
     private readonly Mock<IJobsRetrieval<JobResult>> _jobsRetrievalMock = new();
     private readonly Mock<IOpenAiChatService> _aiChatServiceMock = new();
     private readonly Mock<ICompanyRepository> _companyRepositoryMock = new();
@@ -170,10 +170,10 @@ public class SearpApiSourceServiceTest
         // Act
         var result = SearpApiSourceService.UpdateName(new HierarchyResults()
         {
-            OrgHierarchy = new List<HierarchyItem>
-            {
-                new HierarchyItem { Name = input, Title = "Some Title" }
-            }
+            OrgHierarchy =
+            [
+                new() { Name = input, Title = "Some Title" }
+            ]
         });
 
         // Assert
