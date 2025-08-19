@@ -48,7 +48,7 @@ public class CompanyAnalysisPage(
     public int TotalCount { get; private set; }
 
     /// <summary>
-    /// The companyresults of results displayed on the page, each containing a list of items.
+    /// The company results displayed on the page, each containing a list of items.
     /// </summary>
     public List<SectionVm> Sections { get; set; } = [];
 
