@@ -152,7 +152,7 @@ public class SerpApiSearchService : ISearch
         var googleSearch = await FetchSearchResults<GoogleSearchResult>(query, location);
         if (googleSearch is null || !googleSearch.Any())
         {
-            _logger.LogWarning("FetchOrganicResults to find results for query: {Query} and location: {Location}", query, location);
+            _logger.LogWarning("FetchOrganicResults failed to find results for query: {Query} and location: {Location}", query, location);
             return [];
         }
 
