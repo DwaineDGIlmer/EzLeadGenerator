@@ -143,7 +143,7 @@ public class CompanyAnalysisPage(
                 Title = group.Key,
                 Items = [.. group]
             })];
-        _logger.LogInformation("Retrieved {Count} company summaries for page {PageNumber}.", CompanySummaries.Count, PageNumber); ;
+        _logger.LogInformation("Retrieved {Count} company summaries for page {PageNumber}.", CompanySummaries.Count, PageNumber);
     }
 
     /// <summary>
