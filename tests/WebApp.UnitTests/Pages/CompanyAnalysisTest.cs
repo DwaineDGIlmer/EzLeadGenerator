@@ -284,7 +284,6 @@ public class CompanyAnalysisTest
     }
 
 
-    // Assert
     [Fact]
     public async Task GetCompanyResults_Returns_Correct_Type_For_Program()
     {
