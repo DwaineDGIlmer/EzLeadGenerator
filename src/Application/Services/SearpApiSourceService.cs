@@ -25,7 +25,8 @@ public class SearpApiSourceService : IJobSourceService
 {
     private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "their"];
     private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so", "not"];
-    private static readonly List<string> _wordsNotInNames = ["role", "provided", "chief", "information", "officer", "data", "architect", "doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering", "unknown", "n/a", "not applicable", "no data", "none", "null"];
+    private static readonly List<string> _wordsNotInNames = ["mike johnson", "john smith", "jane smith", "lifelong", "lastname", "firstname", "executive", "role", "provided", "chief", "information", "officer", "data", "architect", "doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering", "unknown", "n/a", "not applicable", "no data", "none", "null"];
+    private static readonly List<string> _invalidNames = ["mike johnson", "john smith", "jane smith"];
     private static readonly List<string> _titleWords = ["engineer", "engineering", "aws", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation", "architect"];
     private static readonly List<string> _tokens =
     [
@@ -420,6 +421,14 @@ public class SearpApiSourceService : IJobSourceService
         List<HierarchyItem> newResults = [];
         foreach (var item in results.OrgHierarchy ?? [])
         {
+            if(item is null || 
+                string.IsNullOrWhiteSpace(item.Name) || 
+                string.IsNullOrWhiteSpace(item.Title) ||
+                _invalidNames.Any(w => item.Name.Equals(w, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                continue;
+            }
+
             item.Title = item.Title.Trim();
             var nameWords = item.Name.Split([' ', '&'], StringSplitOptions.RemoveEmptyEntries);
             if (
