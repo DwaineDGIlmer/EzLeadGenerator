@@ -421,8 +421,8 @@ public class SearpApiSourceService : IJobSourceService
         List<HierarchyItem> newResults = [];
         foreach (var item in results.OrgHierarchy ?? [])
         {
-            if(item is null || 
-                string.IsNullOrWhiteSpace(item.Name) || 
+            if (item is null ||
+                string.IsNullOrWhiteSpace(item.Name) ||
                 string.IsNullOrWhiteSpace(item.Title) ||
                 _invalidNames.Any(w => item.Name.Equals(w, StringComparison.CurrentCultureIgnoreCase)))
             {

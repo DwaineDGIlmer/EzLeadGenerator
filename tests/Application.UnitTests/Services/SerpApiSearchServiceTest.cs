@@ -172,7 +172,7 @@ public class SerpApiSearchServiceTest
 
         var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
 
-        Assert.Empty(result);
+        Assert.Empty(result!);
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class SerpApiSearchServiceTest
 
         var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
 
-        Assert.Empty(result);
+        Assert.Empty(result!);
     }
 
     [Fact]
@@ -238,6 +238,6 @@ public class SerpApiSearchServiceTest
 
         var result = await service.FetchSearchResults<GoogleSearchResult>("test query", "United States");
 
-        Assert.Empty(result);
+        Assert.Empty(result!);
     }
 }
