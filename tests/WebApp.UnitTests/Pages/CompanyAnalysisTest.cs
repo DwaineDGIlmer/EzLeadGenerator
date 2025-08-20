@@ -127,7 +127,7 @@ public class CompanyAnalysisTest
         var mockSearch = new MockSearch<List<GoogleSearchResult>>(organicResults);
         var mockDisplayRepository = new Mock<IDisplayRepository>();
         var mockLogger = new Mock<ILogger<CompanyAnalysisPage>>();
-        var service  = new CompanyAnalysisPage(mockDisplayRepository.Object, mockSearch, mockLogger.Object);
+        var service = new CompanyAnalysisPage(mockDisplayRepository.Object, mockSearch, mockLogger.Object);
 
         // Act
         await service.GetCompanyResults(companyProfile);
