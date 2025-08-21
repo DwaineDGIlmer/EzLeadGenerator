@@ -273,15 +273,18 @@ else
                         <tbody>
                         @foreach (var related in Model.RelatedSearches)
                         {
-                            <tr>
-                                <td>
-                                    <div>                                                       
-                                    <a href="@related.Link" target="_blank" rel="noopener" class="result-title text-decoration-none">
-                                        @related.Query
-                                    </a>                             
-                                </div>
-                                </td>
-                            </tr>
+                            @if (!string.IsNullOrEmpty(related.Query) && !string.IsNullOrEmpty(related.Link))
+                            {
+                                <tr>
+                                    <td>
+                                        <div>                                                       
+                                            <a href="@related.Link" target="_blank" rel="noopener" class="result-title text-decoration-none">
+                                            @related.Query
+                                         </a>                             
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         }
                         </tbody>
                     </table>

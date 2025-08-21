@@ -317,6 +317,7 @@ public class SearpApiSourceServiceTest
     [InlineData("TestCo", "desc", "New York, NY", "Engineer", false)] // Not in NC/SC
     [InlineData("TestCo", "desc", "Charlotte, NC", "Engineer", true)] // Valid
     [InlineData("TestCo", "desc", "Columbia, SC", "Engineer", true)] // Valid
+    [InlineData("Jobright.ai", "desc", "Charlotte, NC", "Engineer", false)] // Invalid Recruiting company
     public void IsValid_ReturnsExpectedResult(
         string companyName,
         string description,
