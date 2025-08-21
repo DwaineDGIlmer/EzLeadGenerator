@@ -28,7 +28,8 @@ public class SearpApiSourceService : IJobSourceService
     private static readonly List<string> _wordsNotInNames = ["lifelong", "lastname", "firstname", "executive", "role", "provided", "chief", "information", "officer", "data", "architect", "doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering", "unknown", "n/a", "not applicable", "no data", "none", "null"];
     private static readonly List<string> _invalidNames = ["mike johnson", "john smith", "jane smith"];
     private static readonly List<string> _titleWords = ["engineer", "engineering", "aws", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation", "architect"];
-    private static readonly List<string>_recruitingCompanies =     [
+    private static readonly List<string>_recruitingCompanies =     
+    [
         "Recruit",
         "Yeah! Global",
         "Motion Recruitment",
