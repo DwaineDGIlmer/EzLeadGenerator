@@ -196,49 +196,6 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Used to add file caching service to the specified <see cref="IServiceCollection"/>.
-    /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection"/> to which the service is added.</param>
-    /// <param name="configuration">The <see cref="IConfiguration"/>used for adding the services to.</param>
-    /// <remarks>The name should be the class name.</remarks>
-    /// <returns>IServiceCollection instance.</returns>
-    public static IServiceCollection AddCachingService(this IServiceCollection services, IConfiguration configuration)
-    {
-        var settingsSection = configuration.GetSection(nameof(AiEventSettings));
-        var settings = new AiEventSettings();
-        settingsSection.Bind(settings);
-
-        if (settings.CachingType == Core.Enums.CachingTypes.InMemory)
-        {
-            services.AddMemoryCache();
-            services.AddSingleton<ICacheService>(sp =>
-            {
-                var cacheLogger = sp.GetRequiredService<ILogger<MemoryCacheService>>();
-                var memoryCache = sp.GetRequiredService<IMemoryCache>();
-                return new MemoryCacheService(memoryCache, true);
-            });
-        }
-        if (settings.CachingType == Core.Enums.CachingTypes.FileSystem)
-        {
-            services.AddSingleton<ICacheService>(sp =>
-            {
-                var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                if (dir is not null && !string.IsNullOrEmpty(dir.ToString()))
-                {
-                    settings.CacheLocation = Path.Combine(dir.ToString()!, "cache");
-                }
-                else
-                {
-                    settings.CacheLocation = Path.Combine(AppContext.BaseDirectory, "cache");
-                }
-                var cacheLogger = sp.GetRequiredService<ILogger<FileCacheService>>();
-                return new FileCacheService(cacheLogger, settings.CacheLocation, true);
-            });
-        }
-        return services;
-    }
-
-    /// <summary>
     /// Adds the <see cref="IDisplayRepository"/> service to the specified <see cref="IServiceCollection"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to which the service is added.</param>

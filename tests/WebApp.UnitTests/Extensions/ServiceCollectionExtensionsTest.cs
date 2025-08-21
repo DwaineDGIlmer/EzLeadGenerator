@@ -120,44 +120,6 @@ public class ServiceCollectionExtensionsTest
     }
 
     [Fact]
-    public void AddCachingService_RegistersMemoryCacheService_WhenInMemory()
-    {
-        var services = CreateServiceCollection();
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddInMemoryCollection(
-        [
-            new KeyValuePair<string, string>("AiEventSettings:CachingType", ((int)CachingTypes.InMemory).ToString())!
-        ]);
-        var configuration = configBuilder.Build();
-
-        services.AddLogging();
-        services.AddCachingService(configuration);
-
-        var provider = services.BuildServiceProvider();
-        var cacheService = provider.GetService<ICacheService>();
-        Assert.NotNull(cacheService);
-    }
-
-    [Fact]
-    public void AddCachingService_RegistersFileCacheService_WhenFileSystem()
-    {
-        var services = CreateServiceCollection();
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddInMemoryCollection(
-        [
-            new KeyValuePair<string, string?>("AiEventSettings:CachingType", ((int)CachingTypes.FileSystem).ToString())
-        ]);
-        var configuration = configBuilder.Build();
-
-        services.AddLogging();
-        services.AddCachingService(configuration);
-
-        var provider = services.BuildServiceProvider();
-        var cacheService = provider.GetService<ICacheService>();
-        Assert.NotNull(cacheService);
-    }
-
-    [Fact]
     public void AddDisplayRepository_RegistersDisplayRepository()
     {
         var services = CreateServiceCollection();
