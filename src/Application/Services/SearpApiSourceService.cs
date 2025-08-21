@@ -28,6 +28,18 @@ public class SearpApiSourceService : IJobSourceService
     private static readonly List<string> _wordsNotInNames = ["lifelong", "lastname", "firstname", "executive", "role", "provided", "chief", "information", "officer", "data", "architect", "doe", "relevant", "practice", "vp", "director", "lead", "closest", "likely", "staff", "engineer", "engineering", "unknown", "n/a", "not applicable", "no data", "none", "null"];
     private static readonly List<string> _invalidNames = ["mike johnson", "john smith", "jane smith"];
     private static readonly List<string> _titleWords = ["engineer", "engineering", "aws", "level", "lead", "manager", "supervisor", "principal", "analyst", "hybrid", "remote", "analytics", "automation", "architect"];
+    private static readonly List<string>_recruitingCompanies =     [
+        "Recruit",
+        "Yeah! Global",
+        "Motion Recruitment",
+        "Jobs via Dice",
+        "Insight Global",
+        "Jobright.ai",
+        "CyberCoders",
+        "Recruitment",
+        "Talent",
+        "Staffing"
+    ];
     private static readonly List<string> _tokens =
     [
         "lead",
@@ -382,14 +394,7 @@ public class SearpApiSourceService : IJobSourceService
         }
 
         // Check if the job is coming from a recruitment company
-        if (job.CompanyName.Equals("Yeah! Global", StringComparison.CurrentCultureIgnoreCase) ||
-            job.CompanyName.Equals("Motion Recruitment", StringComparison.CurrentCultureIgnoreCase) ||
-            job.CompanyName.Equals("Jobs via Dice", StringComparison.CurrentCultureIgnoreCase) ||
-            job.CompanyName.Equals("Insight Global", StringComparison.CurrentCultureIgnoreCase) ||
-            job.CompanyName.Contains("recruit", StringComparison.CurrentCultureIgnoreCase) ||
-            job.CompanyName.Contains("talent", StringComparison.CurrentCultureIgnoreCase) ||
-            job.CompanyName.Contains("staffing", StringComparison.CurrentCultureIgnoreCase) ||
-            job.CompanyName.Contains("cybercoder", StringComparison.CurrentCultureIgnoreCase))
+        if (_recruitingCompanies.Any(c => job.CompanyName.Contains(c, StringComparison.CurrentCultureIgnoreCase)))
         {
             logger.LogWarning("Job with ID {JobId} is a possible recruitment company, skipping.", job.JobId);
             return false;
