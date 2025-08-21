@@ -4,6 +4,7 @@ using Core.Configuration;
 using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq.Protected;
 using System.Net;
 using System.Text.Json;
 
