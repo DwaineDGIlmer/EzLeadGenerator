@@ -3,7 +3,6 @@ using Core.Configuration;
 using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
 
 namespace Application.UnitTests.Services;
 

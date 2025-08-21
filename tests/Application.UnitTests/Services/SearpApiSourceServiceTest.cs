@@ -5,7 +5,6 @@ using Core.Configuration;
 using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
 namespace Application.UnitTests.Services;
 
 public class SearpApiSourceServiceTest
@@ -305,8 +304,10 @@ public class SearpApiSourceServiceTest
     }
 
     [Theory]
+#pragma warning disable xUnit1012 // Null should only be used for nullable parameters
     [InlineData(null, "desc", "Charlotte, NC", "Engineer", false)] // Missing company name
     [InlineData("TestCo", null, "Charlotte, NC", "Engineer", false)] // Missing description
+#pragma warning restore xUnit1012 // Null should only be used for nullable parameters
     [InlineData("TestCo", "desc", "Remote", "Engineer", false)] // Remote job
     [InlineData("TestCo", "desc", "Charlotte, NC", "Data Center Engineer", false)] // Title contains "center"
     [InlineData("Recruiting Inc", "desc", "Charlotte, NC", "Engineer", false)] // CompanyName contains "recruit"

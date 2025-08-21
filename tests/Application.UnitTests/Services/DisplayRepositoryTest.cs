@@ -2,7 +2,6 @@ using Application.Contracts;
 using Application.Models;
 using Application.Services;
 using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace Application.UnitTests.Services;
 

@@ -4,7 +4,6 @@ using Core.Configuration;
 using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -13,6 +12,7 @@ namespace Application.UnitTests.Services;
 
 public class SerpApiSearchJobsServiceTest
 {
+    private readonly JsonSerializerOptions _options = new() { PropertyNamingPolicy = null };
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock = new();
     private readonly Mock<ICacheService> _cacheServiceMock = new();
     private readonly Mock<ILogger<SerpApiSearchJobsService>> _loggerMock = new();
@@ -99,7 +99,7 @@ public class SerpApiSearchJobsServiceTest
         {
             JobsResults = [new JobResult { Title = "API Job" }]
         };
-        var json = JsonSerializer.Serialize(jobsResult, new JsonSerializerOptions { PropertyNamingPolicy = null });
+        var json = JsonSerializer.Serialize(jobsResult, _options);
         var response = new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent(json, Encoding.UTF8, "application/json")

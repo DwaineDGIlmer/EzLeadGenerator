@@ -19,7 +19,7 @@ public class SectionVmTests
     {
         var items = new List<OrganicResultItem>
     {
-        new OrganicResultItem { Title = "Test", Url = "http://test.com" }
+        new() { Title = "Test", Url = "http://test.com" }
     };
 
         var section = new SectionVm
