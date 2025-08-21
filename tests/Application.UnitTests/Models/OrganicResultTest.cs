@@ -40,12 +40,12 @@ public class OrganicResultTest
             Thumbnail = "http://image.com/thumb.jpg",
             Date = "2024-06-01",
             Snippet = "This is a snippet.",
-            SnippetHighlightedWords = new List<string> { "snippet", "test" },
+            SnippetHighlightedWords = ["snippet", "test"],
             RichSnippet = new TopInfo
             {
                 Top = new TopDetails
                 {
-                    Extensions = new List<string> { ".pdf", ".docx" }
+                    Extensions = [".pdf", ".docx"]
                 }
             },
             MustInclude = new MustInclude
@@ -64,10 +64,10 @@ public class OrganicResultTest
         Assert.Equal("http://image.com/thumb.jpg", result.Thumbnail);
         Assert.Equal("2024-06-01", result.Date);
         Assert.Equal("This is a snippet.", result.Snippet);
-        Assert.Equal(new List<string> { "snippet", "test" }, result.SnippetHighlightedWords);
+        Assert.Equal(["snippet", "test"], result.SnippetHighlightedWords);
         Assert.NotNull(result.RichSnippet);
         Assert.NotNull(result.RichSnippet.Top);
-        Assert.Equal(new List<string> { ".pdf", ".docx" }, result.RichSnippet.Top.Extensions);
+        Assert.Equal([".pdf", ".docx"], result.RichSnippet.Top.Extensions);
         Assert.NotNull(result.MustInclude);
         Assert.Equal("important", result.MustInclude.Word);
         Assert.Equal("http://word.com", result.MustInclude.Link);

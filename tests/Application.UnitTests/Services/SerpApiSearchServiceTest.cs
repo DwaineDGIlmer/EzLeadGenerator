@@ -4,7 +4,6 @@ using Core.Configuration;
 using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
 using Moq.Protected;
 using System.Net;
 using System.Text.Json;
@@ -44,7 +43,7 @@ public class SerpApiSearchServiceTest
         _cacheServiceMock.Setup(c => c.TryGetAsync<IEnumerable<GoogleSearchResult>>(It.IsAny<string>()))
             .ReturnsAsync((IEnumerable<GoogleSearchResult>?)null);
 
-        var googleSearchResult = new GoogleSearchResult() { OrganicResults = new List<OrganicResult> { new() { Title = "Result" } } };
+        var googleSearchResult = new GoogleSearchResult() { OrganicResults = [new() { Title = "Result" }] };
         var json = JsonSerializer.Serialize(googleSearchResult);
 
         var httpMessageHandler = new Mock<HttpMessageHandler>();

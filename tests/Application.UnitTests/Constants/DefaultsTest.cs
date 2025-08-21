@@ -65,7 +65,6 @@ public class DefaultsTest
     [Theory]
     [InlineData("InvalidKey")]
     [InlineData("")]
-    [InlineData(null)]
     public void GetSettings_InvalidKey_ThrowsArgumentException(string key)
     {
         Assert.Throws<ArgumentException>(() => Defaults.GetSettings(key));

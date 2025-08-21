@@ -11,7 +11,7 @@ public class ClientResult<T>(T value)
 
 public class ClientResultJsonConverterTest
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options = new()
     {
         PropertyNameCaseInsensitive = true,
         Converters = { new ClientResultJsonConverter<string>() }

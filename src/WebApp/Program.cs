@@ -5,7 +5,7 @@ using WebApp.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add the cache service to the service collection
-builder.Services.AddCachingService(builder.Configuration);
+builder.Services.AddCacheService(builder.Configuration);
 
 // Initialize the logging services
 builder.Services.InitializeServices(builder.Configuration);

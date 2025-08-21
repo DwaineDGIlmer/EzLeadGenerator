@@ -1,6 +1,7 @@
+using Application.Models;
 using System.Text.Json;
 
-namespace Application.Models.Tests;
+namespace Application.UnitTests.Models;
 
 public class GoogleSearchResultTest
 {

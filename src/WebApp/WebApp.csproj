@@ -28,13 +28,13 @@
 		<None Remove="wwwroot\**\*.br" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.25.0" />
-    <PackageReference Include="Chart.js" Version="3.7.1" />
-    <PackageReference Include="Core" Version="1.2.7" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Azure.Data.Tables" />
+		<PackageReference Include="Azure.Storage.Blobs" />
+		<PackageReference Include="Chart.js" />
+		<PackageReference Include="HtmlAgilityPack" />
+		<PackageReference Include="Core" />
+	</ItemGroup>
 
   <ItemGroup>
     <Content Update="appsettings.json">
