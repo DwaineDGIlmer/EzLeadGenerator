@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace WebApp.Pages
+﻿namespace WebApp.Pages
 {
     /// <summary>
     /// Represents the model for the Privacy page in an ASP.NET Core Razor Pages application.

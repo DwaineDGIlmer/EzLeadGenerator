@@ -1,11 +1,8 @@
 using Application.Constants;
 using Core.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 
 namespace WebApp.Pages;
 

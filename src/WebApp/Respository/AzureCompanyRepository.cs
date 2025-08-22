@@ -5,8 +5,6 @@ using Application.Models;
 using Azure;
 using Azure.Data.Tables;
 using Core.Contracts;
-using Microsoft.Extensions.Options;
-using System.Text.Json;
 using WebApp.Extensions;
 
 namespace WebApp.Respository;

@@ -3,9 +3,7 @@ using Application.Contracts;
 using Application.Models;
 using Core.Contracts;
 using Core.Helpers;
-using Microsoft.Extensions.Options;
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using WebApp.Extensions;
 

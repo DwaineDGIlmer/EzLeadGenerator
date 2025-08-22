@@ -3,7 +3,6 @@ using Application.Contracts;
 using Application.Models;
 using Core.Configuration;
 using Core.Contracts;
-using Core.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
