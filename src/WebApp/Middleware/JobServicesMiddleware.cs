@@ -1,6 +1,5 @@
 ﻿using Application.Configurations;
 using Application.Contracts;
-using Microsoft.Extensions.Options;
 
 namespace WebApp.Middleware
 {

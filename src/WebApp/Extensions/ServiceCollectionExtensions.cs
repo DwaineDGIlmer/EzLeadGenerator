@@ -3,13 +3,10 @@ using Application.Constants;
 using Application.Contracts;
 using Application.Models;
 using Application.Services;
-using Core.Caching;
 using Core.Configuration;
 using Core.Contracts;
 using Core.Extensions;
 using Core.Services;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using WebApp.Respository;
 
 namespace WebApp.Extensions;

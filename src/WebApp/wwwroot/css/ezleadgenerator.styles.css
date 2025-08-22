@@ -1,0 +1,349 @@
+﻿/* Main page styles */
+body {
+    background-color: #f4f6fb;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+
+}
+
+.navbar {
+    background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+}
+
+.navbar-brand, .nav-link {
+    color: #fff !important;
+}
+
+.navbar-brand:hover, .nav-link:hover {
+    color: #ffd700 !important;
+}
+
+.footer {
+    background-color: #2b5876;
+    color: #fff;
+}
+
+.footer a {
+    color: #ffd700;
+}
+
+h1, h2, h3, h5 {
+    color: #2b5876;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.page-link {
+    padding: 8px 12px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    color: #2b5876;
+    background: #f4f6fb;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.page-link.active,
+.page-link:hover {
+    background-color: #2b5876;
+    color: #fff;
+    border-color: #2b5876;
+}
+
+/* CompanyResearchModel page styles */
+.company-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.company-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+    transition: box-shadow 0.2s, transform 0.2s;
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.company-card:hover {
+    box-shadow: 0 6px 24px rgba(44,62,80,0.18);
+    transform: translateY(-4px) scale(1.02);
+}
+
+.company-card-header h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.15rem;
+    color: #2b5876;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.company-link {
+    text-decoration: none;
+    color: #2b5876;
+    transition: color 0.2s;
+}
+
+.company-link:hover {
+    color: #4e4376;
+    text-decoration: underline;
+}
+
+.company-card-body {
+    margin-top: 0.5rem;
+}
+
+.btn-research {
+    display: inline-block;
+    background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+    color: #fff;
+    padding: 0.45em 1.1em;
+    border-radius: 6px;
+    font-size: 1em;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(44,62,80,0.08);
+}
+
+.btn-research:hover {
+    background: linear-gradient(90deg, #4e4376 0%, #2b5876 100%);
+    box-shadow: 0 2px 8px rgba(44,62,80,0.14);
+}
+
+@media (max-width: 900px) {
+    .company-card {
+        padding: 1rem 0.5rem;
+    }
+    .card {
+        padding: 16px 8px;
+    }
+
+    table, th, td {
+        font-size: 0.95rem;
+    }
+}
+
+/* Index page styles */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(44,62,80,0.08);
+    margin-bottom: 2rem;
+    padding: 1.5rem 2rem;
+}
+
+.alert-info, .alert-danger {
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+    border-left: 5px solid #2b5876;
+    background-color: #e3f2fd;
+    color: #2b5876;
+    margin-bottom: 1.5rem;
+}
+
+.table-bordered {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #e0e6ef !important;
+    padding: 0.7rem 1rem;
+    background: #fff;
+}
+
+.table-bordered th {
+    background: #f4f6fb;
+    color: #2b5876;
+    font-weight: 600;
+    width: 160px;
+}
+
+.job-description {
+    white-space: pre-line;
+    background: #eef3f7;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-top: 4px;
+    font-size: 1em;
+    color: #222;
+    font-weight: 400;
+    display: block;
+}
+
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding-left: 0;
+}
+
+.sticky-pagination {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f4f6fb;
+    padding-top: 1rem;
+}
+
+.page-item .page-link {
+    border-radius: 6px;
+    border: 1px solid #e0e6ef;
+    padding: 0.4rem 0.9rem;
+    color: #2b5876;
+    background: #f4f6fb;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.page-item.active .page-link,
+.page-item .page-link:hover {
+    background: #2b5876;
+    color: #fff;
+    border-color: #2b5876;
+}
+
+h1, h2, h3, h5 {
+    color: #2b5876;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Contact page style */
+.contact-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2b5876;
+    margin-bottom: 1rem;
+}
+
+.contact-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.contact-list li {
+    margin-bottom: 1.1rem;
+    font-size: 1.08rem;
+}
+
+.contact-label {
+    font-weight: 600;
+    color: #4e4376;
+    margin-right: 0.5rem;
+}
+
+.contact-link {
+    color: #2b5876;
+    word-break: break-all;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.contact-link:hover {
+    color: #ffd700;
+}
+
+.contact-desc {
+    color: #4e4376;
+    font-size: 1.08rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Privacy form styles */
+.privacy-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #4e4376;
+    margin-top: 2rem;
+    margin-bottom: 0.7rem;
+}
+
+.privacy-list {
+    margin-bottom: 1.5rem;
+    padding-left: 1.2rem;
+}
+
+.privacy-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* Talent demand styles */
+.note-box {
+    background-color: #e0f7fa;
+    padding: 10px;
+    border: 1px solid #00acc1;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    color: #006064;
+}
+
+.tip-box {
+    background: #f4f6fb !important;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    border-left: 5px solid #ffd600;
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    color: #2b5876;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #2b5876;
+}
+
+.form-control, .form-check-input {
+    border-radius: 6px;
+    border: 1px solid #bdbdbd;
+    margin-bottom: 12px;
+}
+
+.btn-primary, .btn-success {
+    border-radius: 6px;
+    padding: 8px 24px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+}
+
+th, td {
+    padding: 10px 12px;
+    text-align: left;
+}
+
+th {
+    background: #f4f6fb;
+    color: #2b5876;
+    font-weight: 600;
+}
+
+tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+tr:nth-child(odd) {
+    background: #fff;
+}

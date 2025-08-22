@@ -1,6 +1,5 @@
 using Application.Contracts;
 using Application.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp.Pages;
 
@@ -33,7 +32,7 @@ public class CompanyResearchModel : PageModel
     /// <summary>
     /// The sections of results displayed on the page, each containing a list of items.
     /// </summary>
-    public List<CompanyProfileResult> Profiles { get; set; } = new();
+    public List<CompanyProfileResult> Profiles { get; set; } = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CompanyResearchModel"/> class,  which provides data for company
