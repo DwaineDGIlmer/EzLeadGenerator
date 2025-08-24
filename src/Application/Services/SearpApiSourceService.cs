@@ -31,6 +31,7 @@ public class SearpApiSourceService : IJobSourceService
     private static readonly List<string> _recruitingCompanies =
     [
         "Recruit",
+        "JobGet",
         "Yeah! Global",
         "Motion Recruitment",
         "Jobs via Dice",
