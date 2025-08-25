@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
     /// Adds a local company profile store to the service collection.
     /// </summary>
     /// <param name="services">The service collection to add the store to.</param>
-    /// <param name="configuration">Configuration settings for the application, used to retrieve Azure settings and connection strings.</param>
+    /// <param name="configuration">Configuration ezSettings for the application, used to retrieve Azure ezSettings and connection strings.</param>
     /// <returns>The updated service collection.</returns>
     public static IServiceCollection AddCompanyProfileStore(
         this IServiceCollection services,
@@ -57,12 +57,13 @@ public static class ServiceCollectionExtensions
                 var logger = sp.GetRequiredService<ILogger<AzureCompanyRepository>>();
                 var cachingService = sp.GetRequiredService<ICacheService>();
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
+                var ezSettings = sp.GetRequiredService<IOptions<EzLeadSettings>>();
                 var connectionString = config.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.CompanyProfileTableName) ?
                 Defaults.CompanyProfileTableName : settings.CompanyProfileTableName;
                 var tabl = new Azure.Data.Tables.TableClient(connectionString, tableName);
 
-                return new AzureCompanyRepository(tabl, cachingService, options, logger);
+                return new AzureCompanyRepository(tabl, cachingService, options, ezSettings, logger);
             });
         }
         return services;
@@ -74,7 +75,7 @@ public static class ServiceCollectionExtensions
     /// <remarks>In non-production environments, a local jobs repository store is added. In
     /// production, an Azure company repository is used.</remarks>
     /// <param name="services">The service collection to which the jobs profile store will be added.</param>
-    /// <param name="configuration">Configuration settings for the application, used to retrieve Azure settings and connection strings.</param>
+    /// <param name="configuration">Configuration ezSettings for the application, used to retrieve Azure ezSettings and connection strings.</param>
     /// <returns>The updated service collection with the jobs profile store configured.</returns>
     public static IServiceCollection AddJobsProfileStore(
        this IServiceCollection services, IConfiguration configuration)
@@ -107,45 +108,42 @@ public static class ServiceCollectionExtensions
                 var config = builder.AddUserSecrets<Program>().Build();
                 var cachingService = sp.GetRequiredService<ICacheService>();
                 var logger = sp.GetRequiredService<ILogger<AzureJobsRepository>>();
-                var options = sp.GetRequiredService<IOptions<AzureSettings>>();
+                var azSettings = sp.GetRequiredService<IOptions<AzureSettings>>();
+                var ezSettings = sp.GetRequiredService<IOptions<EzLeadSettings>>();
                 var connectionString = config.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.JobSummaryTableName) ?
                 Defaults.JobSummaryTableName : settings.JobSummaryTableName;
                 var tbl = new Azure.Data.Tables.TableClient(connectionString, tableName);
 
-                return new AzureJobsRepository(tbl, cachingService, options, logger);
+                return new AzureJobsRepository(tbl, cachingService, azSettings, ezSettings, logger);
             });
         }
         return services;
     }
 
     /// <summary>
-    /// Configures the SerpApi settings for the application by binding configuration values and applying environment
+    /// Configures the SerpApi ezSettings for the application by binding configuration values and applying environment
     /// variable overrides.
     /// </summary>
-    /// <remarks>This method binds the SerpApi settings from the application's configuration and applies
-    /// default values and environment variable overrides where applicable. It ensures that the settings are properly
+    /// <remarks>This method binds the SerpApi ezSettings from the application's configuration and applies
+    /// default values and environment variable overrides where applicable. It ensures that the ezSettings are properly
     /// configured for use in the application.  The method expects a configuration section named <c>SerpApiSettings</c>
     /// to exist in the application's configuration. If certain values are missing, defaults or environment variables
     /// may be used.</remarks>
-    /// <param name="services">The <see cref="IServiceCollection"/> to which the SerpApi settings will be added.</param>
-    /// <param name="configuration">The application's configuration source used to retrieve SerpApi settings.</param>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which the SerpApi ezSettings will be added.</param>
+    /// <param name="configuration">The application's configuration source used to retrieve SerpApi ezSettings.</param>
     /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
     public static IServiceCollection ConfigureSerpApiSettings(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var settingsSection = configuration.GetSection(nameof(SerpApiSettings));
-        var settings = new SerpApiSettings();
-        settingsSection.Bind(settings);
-
         services.Configure<SerpApiSettings>(options =>
         {
-            // Bind configuration values to options
+            // Bind configuration values to azSettings
             configuration.GetSection(nameof(SerpApiSettings)).Bind(options);
 
             var settings = configuration.GetSection(nameof(AzureSettings));
-            options.CacheExpirationInMinutes = settings.GetValue<int>(nameof(AzureSettings.CacheExpirationInMinutes), Defaults.CacheExpirationInMinutes);
+            options.CacheExpirationInMinutes = settings.GetValue<int>(nameof(EzLeadSettings.SerpApiQueryExpirationInMinutes), Defaults.SerpApiQueryExpirationInMinutes);
 
             // Apply environment variable and default overrides
             if (options.IsEnabled)
@@ -163,9 +161,9 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <remarks>This method configures the <see cref="SerpApiSettings"/> from the application's
     /// configuration and registers the <see cref="SerpApiSearchJobsService"/> as a singleton service. It also sets up a
-    /// resilient HTTP client with the specified base address from the settings.</remarks>
+    /// resilient HTTP client with the specified base address from the ezSettings.</remarks>
     /// <param name="services">The <see cref="IServiceCollection"/> to which the service is added.</param>
-    /// <param name="configuration">The application's configuration, used to retrieve settings for the service.</param>
+    /// <param name="configuration">The application's configuration, used to retrieve ezSettings for the service.</param>
     /// <returns>The updated <see cref="IServiceCollection"/> with the jobs retrieval service registered.</returns>
     public static IServiceCollection AddJobsRetrivalService(this IServiceCollection services, IConfiguration configuration)
     {

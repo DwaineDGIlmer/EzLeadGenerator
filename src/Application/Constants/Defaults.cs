@@ -73,11 +73,25 @@
         public const string JobSummaryPartionKey = "jobsummary";
 
         /// <summary>
-        /// Represents the default cache expiration time, in minutes.
+        /// Represents the number of days before the company cache expires.
+        /// </summary>
+        /// <remarks>This constant is used to define the default expiration period for cached company
+        /// data.</remarks>
+        public const int CompanyCacheExpirationInDays = 5;
+
+        /// <summary>
+        /// Represents the default cache expiration time, in hours.
         /// </summary>
         /// <remarks>This constant defines the duration for which cached items are considered valid. It
         /// can be used to configure caching mechanisms or as a default value for cache expiration.</remarks>
-        public const int CacheExpirationInMinutes = 60;
+        public const int JobsCacheExpirationInHours = 8;
+
+        /// <summary>
+        /// Represents the expiration time, in minutes, for a SerpApi query.
+        /// </summary>
+        /// <remarks>The value is set to 1440 minutes, which corresponds to 24 hours. This constant can be
+        /// used to define the duration after which a SerpApi query is considered expired.</remarks>
+        public const int SerpApiQueryExpirationInMinutes = 1440;
 
         /// <summary>
         /// Represents the configuration key for EzLeads settings.

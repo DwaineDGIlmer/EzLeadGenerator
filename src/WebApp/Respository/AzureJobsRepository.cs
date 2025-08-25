@@ -19,17 +19,19 @@ namespace WebApp.Respository;
 /// <param name="tableClient">The <see cref="TableClient"/> used to interact with the Azure Table storage.</param>
 /// <param name="cachingService">The <see cref="ICacheService"/> used for caching company profiles.</param>
 /// <param name="options">Configuration settings for Azure services, including connection strings and other relevant settings.</param>
+/// <param name="settings">Configuration settings specific to the EzLead application.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
 public class AzureJobsRepository(
     TableClient tableClient,
     ICacheService cachingService,
     IOptions<AzureSettings> options,
+    IOptions<EzLeadSettings> settings,
     ILogger<AzureJobsRepository> logger) : IJobsRepository
 {
     private readonly ICacheService _cachingService = cachingService ?? throw new ArgumentNullException(nameof(cachingService));
     private readonly TableClient _tableClient = tableClient ?? throw new ArgumentNullException(nameof(tableClient));
     private readonly string _partionKey = options?.Value.JobSummaryPartionKey ?? Defaults.JobSummaryPartionKey;
-    private readonly int _cacheExpirationInMinutes = options?.Value?.CacheExpirationInMinutes ?? Defaults.CacheExpirationInMinutes;
+    private readonly int _cacheExpirationInMinutes = settings?.Value?.JobsCacheExpirationInHours ?? Defaults.JobsCacheExpirationInHours;
     private readonly ILogger<AzureJobsRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly JsonSerializerOptions _options = new()
     {

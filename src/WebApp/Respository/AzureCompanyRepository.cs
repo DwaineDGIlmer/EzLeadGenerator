@@ -18,19 +18,21 @@ namespace WebApp.Respository;
 /// </remarks>
 /// <param name="tableClient">The <see cref="TableClient"/> used to interact with the Azure Table storage.</param>
 /// <param name="cachingService">The <see cref="ICacheService"/> used for caching company profiles.</param>
-/// <param name="options">Configuration options for Azure settings, including the table name.</param>
+/// <param name="azSettings">Configuration settings from Azure settings, including the table name.</param>
+/// <param name="ezSettings">Configuration settings from EzLead settings.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
 public class AzureCompanyRepository(
     TableClient tableClient,
     ICacheService cachingService,
-    IOptions<AzureSettings> options,
+    IOptions<AzureSettings> azSettings,
+    IOptions<EzLeadSettings> ezSettings,
     ILogger<AzureCompanyRepository> logger) : ICompanyRepository
 {
     private readonly TableClient _tableClient = tableClient ?? throw new ArgumentNullException(nameof(tableClient));
     private readonly ICacheService _cachingService = cachingService ?? throw new ArgumentNullException(nameof(cachingService));
     private readonly ILogger<AzureCompanyRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    private readonly string _partionKey = options?.Value?.CompanyProfilePartionKey ?? Defaults.CompanyProfilePartionKey;
-    private readonly int _cacheExpirationInMinutes = options?.Value?.CacheExpirationInMinutes ?? Defaults.CacheExpirationInMinutes;
+    private readonly string _partionKey = azSettings?.Value?.CompanyProfilePartionKey ?? Defaults.CompanyProfilePartionKey;
+    private readonly int _cacheExpirationInDays = ezSettings?.Value?.CompanyCacheExpirationInDays ?? Defaults.CompanyCacheExpirationInDays;
     private readonly JsonSerializerOptions _options = new()
     {
         PropertyNameCaseInsensitive = true
@@ -78,7 +80,7 @@ public class AzureCompanyRepository(
             {
                 _logger.LogInformation("Successfully retrieved company profile for {CompanyId}", CompanyId);
 
-                await _cachingService.AddCompanyAsync(profile, _cacheExpirationInMinutes);
+                await _cachingService.AddCompanyAsync(profile, _cacheExpirationInDays);
                 _logger.LogDebug("Added company profile for {CompanyId} to cache", CompanyId);
             }
             return profile ?? null;
@@ -136,7 +138,7 @@ public class AzureCompanyRepository(
                 if (companies.Count != 0)
                 {
                     _logger.LogDebug("Caching company profiles for partition key: {PartitionKey}", _partionKey);
-                    await _cachingService.AddCompaniesAsync(companies, fromDate, _cacheExpirationInMinutes);
+                    await _cachingService.AddCompaniesAsync(companies, fromDate, _cacheExpirationInDays);
                 }
             }
             catch (Exception ex)

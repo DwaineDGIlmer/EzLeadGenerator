@@ -77,7 +77,7 @@ public class JobSummary
     public string Reasoning { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the date when the job was posted.
+    /// Gets or sets the link from the source of the job posting.
     /// </summary>
     public string SourceLink { get; set; } = string.Empty;
 

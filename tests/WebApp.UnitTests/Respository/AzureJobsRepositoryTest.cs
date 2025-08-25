@@ -15,16 +15,17 @@ public class AzureJobsRepositoryTest
     private readonly Mock<TableClient> _tableClientMock = new();
     private readonly Mock<ILogger<AzureJobsRepository>> _loggerMock = new();
     private readonly Mock<ICacheService> _cacheServiceMock = new(); // Add cache service mock
-    private readonly IOptions<AzureSettings> _options = Options.Create(new AzureSettings { JobSummaryPartionKey = "TestPartition" });
+    private readonly IOptions<AzureSettings> _azOptions = Options.Create(new AzureSettings { JobSummaryPartionKey = "TestPartition" });
+    private readonly IOptions<EzLeadSettings> _ezOptions = Options.Create(new EzLeadSettings());
     private AzureJobsRepository CreateRepository()
-    => new(_tableClientMock.Object, _cacheServiceMock.Object, _options, _loggerMock.Object);
+    => new(_tableClientMock.Object, _cacheServiceMock.Object, _azOptions, _ezOptions, _loggerMock.Object);
 
     [Fact]
     public async Task GetJobsAsync_ById_ReturnsJob_WhenFound()
     {
         var jobId = "job123";
         var job = new JobSummary { JobId = jobId, PostedDate = DateTime.UtcNow };
-        var entity = new TableEntity(_options.Value.JobSummaryPartionKey, jobId)
+        var entity = new TableEntity(_azOptions.Value.JobSummaryPartionKey, jobId)
         {
             { "Data", System.Text.Json.JsonSerializer.Serialize(job) }
         };
@@ -32,7 +33,7 @@ public class AzureJobsRepositoryTest
 
         _cacheServiceMock.Setup(x => x.TryGetAsync<JobSummary>(jobId)).ReturnsAsync((JobSummary?)null);
         _tableClientMock
-            .Setup(c => c.GetEntityAsync<TableEntity>(_options.Value.JobSummaryPartionKey, jobId, null, default))
+            .Setup(c => c.GetEntityAsync<TableEntity>(_azOptions.Value.JobSummaryPartionKey, jobId, null, default))
             .ReturnsAsync(responseMock);
 
         var repo = CreateRepository();
@@ -63,7 +64,7 @@ public class AzureJobsRepositoryTest
     {
         var jobId = "notfound";
         _tableClientMock
-            .Setup(c => c.GetEntityAsync<TableEntity>(_options.Value.JobSummaryPartionKey, jobId, null, default))
+            .Setup(c => c.GetEntityAsync<TableEntity>(_azOptions.Value.JobSummaryPartionKey, jobId, null, default))
             .ThrowsAsync(new RequestFailedException(404, "Not found"));
 
         var repo = CreateRepository();
@@ -83,7 +84,7 @@ public class AzureJobsRepositoryTest
         };
         var entities = jobs.Select(j =>
         {
-            var e = new TableEntity(_options.Value.JobSummaryPartionKey, j.JobId)
+            var e = new TableEntity(_azOptions.Value.JobSummaryPartionKey, j.JobId)
             {
                 ["Data"] = System.Text.Json.JsonSerializer.Serialize(j)
             };
@@ -124,14 +125,14 @@ public class AzureJobsRepositoryTest
     public async Task UpdateJobAsync_UpdatesEntity_WhenExists()
     {
         var job = new JobSummary { JobId = "update1", PostedDate = DateTime.UtcNow };
-        var entity = new TableEntity(_options.Value.JobSummaryPartionKey, job.JobId)
+        var entity = new TableEntity(_azOptions.Value.JobSummaryPartionKey, job.JobId)
         {
             { "CreatedAt", DateTime.UtcNow.ToString("o") }
         };
         var responseMock = Response.FromValue(entity, null!);
 
         _tableClientMock
-            .Setup(c => c.GetEntityAsync<TableEntity>(_options.Value.JobSummaryPartionKey, job.JobId, null, default))
+            .Setup(c => c.GetEntityAsync<TableEntity>(_azOptions.Value.JobSummaryPartionKey, job.JobId, null, default))
             .ReturnsAsync(responseMock);
 
         _tableClientMock
@@ -150,7 +151,7 @@ public class AzureJobsRepositoryTest
     {
         var job = new JobSummary { JobId = "notfound", PostedDate = DateTime.UtcNow };
         _tableClientMock
-            .Setup(c => c.GetEntityAsync<TableEntity>(_options.Value.JobSummaryPartionKey, job.JobId, null, default))
+            .Setup(c => c.GetEntityAsync<TableEntity>(_azOptions.Value.JobSummaryPartionKey, job.JobId, null, default))
             .ThrowsAsync(new RequestFailedException(404, "Not found"));
 
         var repo = CreateRepository();
@@ -162,7 +163,7 @@ public class AzureJobsRepositoryTest
     {
         var job = new JobSummary { JobId = "delete1", PostedDate = DateTime.UtcNow };
         _tableClientMock
-            .Setup(c => c.DeleteEntityAsync(_options.Value.JobSummaryPartionKey, job.JobId, ETag.All, default))
+            .Setup(c => c.DeleteEntityAsync(_azOptions.Value.JobSummaryPartionKey, job.JobId, ETag.All, default))
             .Returns(Task.FromResult<Response>(null!))
             .Verifiable();
 
