@@ -57,12 +57,13 @@ public static class ServiceCollectionExtensions
                 var logger = sp.GetRequiredService<ILogger<AzureCompanyRepository>>();
                 var cachingService = sp.GetRequiredService<ICacheService>();
                 var options = sp.GetRequiredService<IOptions<AzureSettings>>();
+                var ezSettings = sp.GetRequiredService<IOptions<EzLeadSettings>>();
                 var connectionString = config.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.CompanyProfileTableName) ?
                 Defaults.CompanyProfileTableName : settings.CompanyProfileTableName;
                 var tabl = new Azure.Data.Tables.TableClient(connectionString, tableName);
 
-                return new AzureCompanyRepository(tabl, cachingService, options, logger);
+                return new AzureCompanyRepository(tabl, cachingService, options, ezSettings, logger);
             });
         }
         return services;
@@ -107,13 +108,14 @@ public static class ServiceCollectionExtensions
                 var config = builder.AddUserSecrets<Program>().Build();
                 var cachingService = sp.GetRequiredService<ICacheService>();
                 var logger = sp.GetRequiredService<ILogger<AzureJobsRepository>>();
-                var options = sp.GetRequiredService<IOptions<AzureSettings>>();
+                var azSettings = sp.GetRequiredService<IOptions<AzureSettings>>();
+                var ezSettings = sp.GetRequiredService<IOptions<EzLeadSettings>>();
                 var connectionString = config.GetConnectionString("AzureTableStorage");
                 var tableName = string.IsNullOrEmpty(settings.JobSummaryTableName) ?
                 Defaults.JobSummaryTableName : settings.JobSummaryTableName;
                 var tbl = new Azure.Data.Tables.TableClient(connectionString, tableName);
 
-                return new AzureJobsRepository(tbl, cachingService, options, logger);
+                return new AzureJobsRepository(tbl, cachingService, azSettings, ezSettings, logger);
             });
         }
         return services;
@@ -135,17 +137,17 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var settingsSection = configuration.GetSection(nameof(SerpApiSettings));
-        var settings = new SerpApiSettings();
+        var settingsSection = configuration.GetSection(nameof(EzLeadSettings));
+        var settings = new EzLeadSettings();
         settingsSection.Bind(settings);
 
         services.Configure<SerpApiSettings>(options =>
         {
-            // Bind configuration values to options
+            // Bind configuration values to azSettings
             configuration.GetSection(nameof(SerpApiSettings)).Bind(options);
 
             var settings = configuration.GetSection(nameof(AzureSettings));
-            options.CacheExpirationInMinutes = settings.GetValue<int>(nameof(AzureSettings.CacheExpirationInMinutes), Defaults.CacheExpirationInMinutes);
+            options.CacheExpirationInMinutes = settings.GetValue<int>(nameof(EzLeadSettings.SerpApiQueryExpirationInMinutes), Defaults.SerpApiQueryExpirationInMinutes);
 
             // Apply environment variable and default overrides
             if (options.IsEnabled)

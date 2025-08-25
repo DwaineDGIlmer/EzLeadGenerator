@@ -158,7 +158,7 @@ public class LocalCompanyProfileStoreTest
         Assert.NotNull(result);
         Assert.True(updated.UpdatedAt > original.UpdatedAt);
         Assert.NotNull(result?.HierarchyResults);
-        Assert.True(result.HierarchyResults.OrgHierarchy.Count == 2);
+        Assert.Equal(2, result.HierarchyResults.OrgHierarchy.Count);
 
         var resultHierarchy = result.HierarchyResults?.OrgHierarchy?.Where(r => r.Title == "Queen");
         Assert.NotNull(resultHierarchy);
@@ -264,7 +264,7 @@ public class LocalCompanyProfileStoreTest
         var options = Options.Create(new EzLeadSettings
         {
             FileCompanyProfileDirectory = "profiles",
-            CacheExpirationInMinutes = 10
+            CompanyCacheExpirationInDays = 10
         });
 
         var store = new LocalCompanyProfileStore(cacheService.Object, options, logger.Object);

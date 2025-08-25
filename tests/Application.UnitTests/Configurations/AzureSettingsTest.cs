@@ -5,6 +5,7 @@ namespace Application.UnitTests.Configurations;
 
 public class AzureSettingsTest
 {
+
     [Fact]
     public void AzureTableName_ShouldHaveDefaultValue()
     {

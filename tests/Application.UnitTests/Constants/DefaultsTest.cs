@@ -5,6 +5,36 @@ namespace Application.UnitTests.Constants;
 public class DefaultsTest
 {
     [Fact]
+    public void SerpApiQueryExpirationInMinutes_ShouldBeCorrect()
+    {
+        Assert.Equal(10, Defaults.SerpApiQueryExpirationInMinutes);
+    }
+
+    [Fact]
+    public void JobsCacheExpirationInHours_ShouldBeCorrect()
+    {
+        Assert.Equal(8, Defaults.JobsCacheExpirationInHours);
+    }
+
+    [Fact]
+    public void CompanyCacheExpirationInDays_ShouldBeCorrect()
+    {
+        Assert.Equal(5, Defaults.CompanyCacheExpirationInDays);
+    }
+
+    [Fact]
+    public void JobSummaryPartionKey_ShouldBeCorrect()
+    {
+        Assert.Equal("jobsummary", Defaults.JobSummaryPartionKey);
+    }
+
+    [Fact]
+    public void CompanyProfilePartionKey_ShouldBeCorrect()
+    {
+        Assert.Equal("companyprofile", Defaults.CompanyProfilePartionKey);
+    }
+
+    [Fact]
     public void EnvSearchApiUrl_ShouldBeCorrect()
     {
         Assert.Equal("SEARCH_SERPAPI_API_URL", Defaults.EnvSearchApiUrl);

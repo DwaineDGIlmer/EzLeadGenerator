@@ -78,20 +78,20 @@ public static class Extensions
     /// <param name="cacheService">The cache service used to store the job summaries. Cannot be <see langword="null"/>.</param>
     /// <param name="jobs">The collection of job summaries to be cached. If <see langword="null"/>, an empty collection will be cached.</param>
     /// <param name="fromDate">The date used to generate the cache key. Cannot be <see langword="null"/>.</param>
-    /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry will remain valid.</param>
+    /// <param name="cacheExpirationInHours">The duration, in hours, for which the cache entry will remain valid.</param>
     /// 
     /// <returns>A task that represents the asynchronous operation.</returns>
     public static async Task AddJobsAsync(
     this ICacheService cacheService,
     IEnumerable<JobSummary> jobs,
     DateTime fromDate,
-    int cacheExpirationInMinutes)
+    int cacheExpirationInHours)
     {
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(fromDate);
 
         var cacheKey = GetCacheKey("Jobs", fromDate);
-        await cacheService.CreateEntryAsync(cacheKey, jobs, TimeSpan.FromMinutes(cacheExpirationInMinutes));
+        await cacheService.CreateEntryAsync(cacheKey, jobs, TimeSpan.FromHours(cacheExpirationInHours));
     }
 
 
@@ -100,19 +100,19 @@ public static class Extensions
     /// </summary>
     /// <param name="cacheService">The cache service used to store the job summaries.</param>
     /// <param name="job"> The job profile to be cached. Cannot be <see langword="null"/>.</param>
-    /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry remains valid.</param>
+    /// <param name="cacheExpirationInHours">The duration, in hours, for which the cache entry remains valid.</param>
     /// 
     /// <returns>A task that represents the asynchronous operation of adding the job summaries to the cache.</returns>
     public static async Task AddJobAsync(
     this ICacheService cacheService,
     JobSummary job,
-    int cacheExpirationInMinutes)
+    int cacheExpirationInHours)
     {
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(job);
 
         var cacheKey = GetCacheKey("Job", job.JobId);
-        await cacheService.CreateEntryAsync(cacheKey, job, TimeSpan.FromMinutes(cacheExpirationInMinutes));
+        await cacheService.CreateEntryAsync(cacheKey, job, TimeSpan.FromHours(cacheExpirationInHours));
     }
 
     /// <summary>
@@ -181,44 +181,44 @@ public static class Extensions
     /// </summary>
     /// <param name="cacheService">The cache service used to store the job summaries.</param>
     /// <param name="company"> The company profile to be cached. Cannot be <see langword="null"/>.</param>
-    /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry remains valid.</param>
+    /// <param name="cacheExpirationInDays">The duration, in days, for which the cache entry remains valid.</param>
     /// 
     /// <returns>A task that represents the asynchronous operation of adding the job summaries to the cache.</returns>
     public static async Task AddCompanyAsync(
     this ICacheService cacheService,
     CompanyProfile company,
-    int cacheExpirationInMinutes)
+    int cacheExpirationInDays)
     {
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(company);
 
         var cacheKey = GetCacheKey("Company", company.CompanyId);
-        await cacheService.CreateEntryAsync(cacheKey, company, TimeSpan.FromMinutes(cacheExpirationInMinutes));
+        await cacheService.CreateEntryAsync(cacheKey, company, TimeSpan.FromDays(cacheExpirationInDays));
     }
 
     /// <summary>
     /// Adds a collection of job summaries to the cache with a specified expiration time.
     /// </summary>
     /// <remarks>The cache key is generated using the provided <paramref name="fromDate"/> and includes a hash
-    /// string and timestamp. Ensure that <paramref name="cacheExpirationInMinutes"/> is a positive value to avoid
+    /// string and timestamp. Ensure that <paramref name="cacheExpirationInDays"/> is a positive value to avoid
     /// unintended behavior.</remarks>
     /// <param name="cacheService">The cache service used to store the job summaries.</param>
     /// <param name="companies">The collection of company profiles to be cached. Can be empty but must not be null.</param>
     /// <param name="fromDate">The date used to generate the cache key. Cannot be null.</param>
-    /// <param name="cacheExpirationInMinutes">The duration, in minutes, for which the cache entry remains valid.</param>
+    /// <param name="cacheExpirationInDays">The duration, in days, for which the cache entry remains valid.</param>
     /// 
     /// <returns>A task that represents the asynchronous operation of adding the job summaries to the cache.</returns>
     public static async Task AddCompaniesAsync(
     this ICacheService cacheService,
     IEnumerable<CompanyProfile> companies,
     DateTime fromDate,
-    int cacheExpirationInMinutes)
+    int cacheExpirationInDays)
     {
         ArgumentNullException.ThrowIfNull(cacheService);
         ArgumentNullException.ThrowIfNull(fromDate);
 
         var cacheKey = GetCacheKey("Companies", fromDate);
-        await cacheService.CreateEntryAsync(cacheKey, companies, TimeSpan.FromMinutes(cacheExpirationInMinutes));
+        await cacheService.CreateEntryAsync(cacheKey, companies, TimeSpan.FromDays(cacheExpirationInDays));
     }
 
     /// <summary>

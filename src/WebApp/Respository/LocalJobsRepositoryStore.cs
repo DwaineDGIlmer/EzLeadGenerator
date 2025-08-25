@@ -19,7 +19,7 @@ namespace WebApp.Respository;
 public class LocalJobsRepositoryStore : IJobsRepository
 {
     private readonly string _jobsProfileDirectory;
-    private readonly int _cacheExpirationInMinutes;
+    private readonly int _cacheExpirationInHours;
     private readonly ICacheService _cachingService;
     private readonly ILogger<LocalJobsRepositoryStore> _logger;
     private readonly JsonSerializerOptions _options = new()
@@ -47,7 +47,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
         ArgumentNullException.ThrowIfNull(options.Value.FileJobProfileDirectory, nameof(options.Value.FileJobProfileDirectory));
 
         _cachingService = cacheService;
-        _cacheExpirationInMinutes = options.Value.CacheExpirationInMinutes;
+        _cacheExpirationInHours = options.Value.JobsCacheExpirationInHours;
         _jobsProfileDirectory = GetJobsDirectory(options.Value).Replace('/', '\\');
         _logger = logger;
 
@@ -93,7 +93,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
             if (job is not null)
             {
                 _logger.LogDebug("Creating job for cache for {JobId}", jobId);
-                await _cachingService.AddJobAsync(job, _cacheExpirationInMinutes);
+                await _cachingService.AddJobAsync(job, _cacheExpirationInHours);
             }
             return job ?? null;
         }
@@ -152,7 +152,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
 
         if (jobs.Count != 0)
         {
-            await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInMinutes);
+            await _cachingService.AddJobsAsync(jobs, fromDate, _cacheExpirationInHours);
         }
         return jobs;
     }

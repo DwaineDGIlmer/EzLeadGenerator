@@ -15,7 +15,8 @@ namespace WebApp.UnitTests.Respository;
 public class AzureCompanyRepositoryTest
 {
     private readonly Mock<TableClient> _tableClientMock = new();
-    private readonly Mock<IOptions<AzureSettings>> _optionsMock = new();
+    private readonly Mock<IOptions<AzureSettings>> _azOptionsMock = new();
+    private readonly Mock<IOptions<EzLeadSettings>> _ezOptionsMock = new();
     private readonly Mock<ILogger<AzureCompanyRepository>> _loggerMock = new();
     private readonly Mock<ICacheService> _cacheServiceMock = new(); // Add cache service mock
     private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
@@ -163,11 +164,12 @@ public class AzureCompanyRepositoryTest
 
     private AzureCompanyRepository CreateRepository(string partitionKey = "TestPartition")
     {
-        _optionsMock.Setup(o => o.Value).Returns(new AzureSettings { CompanyProfilePartionKey = partitionKey });
+        _azOptionsMock.Setup(o => o.Value).Returns(new AzureSettings { CompanyProfilePartionKey = partitionKey });
         return new AzureCompanyRepository(
             _tableClientMock.Object,
             _cacheServiceMock.Object, // Pass cache service mock
-            _optionsMock.Object,
+            _azOptionsMock.Object,
+            _ezOptionsMock.Object,
             _loggerMock.Object
         );
     }

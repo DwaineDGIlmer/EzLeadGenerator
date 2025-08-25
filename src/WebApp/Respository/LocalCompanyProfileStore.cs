@@ -15,7 +15,7 @@ namespace WebApp.Respository;
 public class LocalCompanyProfileStore : ICompanyRepository
 {
     private readonly string _companyProfileDirectory;
-    private readonly int _cacheExpirationMinutes;
+    private readonly int _cacheExpirationDays;
     private readonly ICacheService _cachingService;
     private readonly ILogger<LocalCompanyProfileStore> _logger;
     private readonly JsonSerializerOptions _options = new()
@@ -41,7 +41,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
         ArgumentNullException.ThrowIfNull(options, nameof(options));
 
         _cachingService = cacheService;
-        _cacheExpirationMinutes = options.Value.CacheExpirationInMinutes;
+        _cacheExpirationDays = options.Value.CompanyCacheExpirationInDays;
         _companyProfileDirectory = GetProfileDirectory(options.Value).Replace('/', '\\');
         _logger = logger;
 
@@ -86,7 +86,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
             {
                 _logger.LogInformation("Successfully retrieved company profile for {companyId}", companyId);
 
-                await _cachingService.AddCompanyAsync(profile, _cacheExpirationMinutes);
+                await _cachingService.AddCompanyAsync(profile, _cacheExpirationDays);
                 _logger.LogDebug("Caching all company profile, company id: {companyId}", companyId);
             }
             return profile ?? null;
@@ -143,7 +143,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
         if (allCompanies.Count != 0)
         {
             _logger.LogDebug("Caching all company profiles with count: {Count}", allCompanies.Count);
-            await _cachingService.AddCompaniesAsync(allCompanies, fromDate, _cacheExpirationMinutes);
+            await _cachingService.AddCompaniesAsync(allCompanies, fromDate, _cacheExpirationDays);
         }
         return allCompanies;
     }
@@ -189,7 +189,7 @@ public class LocalCompanyProfileStore : ICompanyRepository
     {
         ArgumentNullException.ThrowIfNull(profile, nameof(profile));
         if (string.IsNullOrWhiteSpace(profile.CompanyId))
-            throw new ArgumentException("Company ID cannot be null or empty.", nameof(profile.CompanyId));
+            throw new ArgumentException("Company ID cannot be null or empty.", nameof(profile));
 
         try
         {

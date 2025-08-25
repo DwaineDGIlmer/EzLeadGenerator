@@ -1,4 +1,6 @@
-﻿namespace Application.Configurations
+﻿using Application.Constants;
+
+namespace Application.Configurations
 {
     /// <summary>
     /// Represents the configuration settings for job execution in the EzLead system.
@@ -23,8 +25,21 @@
         public string FileJobProfileDirectory { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the cache expiration.
+        /// Gets or sets the cache expiration time, in minutes.
         /// </summary>
-        public int CacheExpirationInMinutes { get; set; } = 1440;
+        public int CompanyCacheExpirationInDays { get; set; } = Defaults.CompanyCacheExpirationInDays;
+
+        /// <summary>
+        /// Gets or sets the duration, in hours, for which job data is cached.
+        /// </summary>
+        /// <remarks>Adjust this value to control how frequently the cached job data is refreshed.  A
+        /// higher value reduces the frequency of cache updates, while a lower value ensures more up-to-date
+        /// data.</remarks>
+        public int JobsCacheExpirationInHours { get; set; } = Defaults.JobsCacheExpirationInHours;
+
+        /// <summary>
+        /// Gets or sets the number of minutes after which a SERP API query result expires.
+        /// </summary>
+        public int SerpApiQueryExpirationInMinutes { get; set; } = Defaults.SerpApiQueryExpirationInMinutes;
     }
 }
