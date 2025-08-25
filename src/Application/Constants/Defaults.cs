@@ -80,7 +80,7 @@
         public const int CompanyCacheExpirationInDays = 5;
 
         /// <summary>
-        /// Represents the default cache expiration time, in minutes.
+        /// Represents the default cache expiration time, in hours.
         /// </summary>
         /// <remarks>This constant defines the duration for which cached items are considered valid. It
         /// can be used to configure caching mechanisms or as a default value for cache expiration.</remarks>

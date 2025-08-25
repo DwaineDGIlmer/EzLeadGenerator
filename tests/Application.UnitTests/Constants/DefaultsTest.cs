@@ -7,7 +7,7 @@ public class DefaultsTest
     [Fact]
     public void SerpApiQueryExpirationInMinutes_ShouldBeCorrect()
     {
-        Assert.Equal(10, Defaults.SerpApiQueryExpirationInMinutes);
+        Assert.Equal(1440, Defaults.SerpApiQueryExpirationInMinutes);
     }
 
     [Fact]
