@@ -8,7 +8,7 @@ using WebApp.Middleware;
 
 namespace WebApp.UnitTests.Middleware;
 
-public class JobServicesMiddlewareTest
+public class JobServicesMiddlewareTest : UnitTestsBase
 {
     private readonly Mock<IJobSourceService> _jobSourceServiceMock = new();
     private readonly Mock<ILogger<JobServicesMiddleware>> _loggerMock = new();
@@ -208,5 +208,38 @@ public class JobServicesMiddlewareTest
         _jobSourceServiceMock.Verify(s => s.UpdateCompanyProfilesAsync(), Times.Once);
         _jobSourceServiceMock.Verify(s => s.UpdateJobSourceAsync(), Times.Once);
         _nextMock.Verify(n => n(context), Times.Once);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_LogsUserInformation_WhenUserIsAnonymousOrAuthenticated()
+    {
+        // Arrange
+        JobServicesMiddleware.LastExecution = default;
+        var mockLogger = new MockLogger<JobServicesMiddleware>(LogLevel.Information);
+        var middleware = new JobServicesMiddleware(
+            _nextMock.Object,
+            CreateOptions(10),
+            _jobSourceServiceMock.Object,
+            mockLogger);
+
+        // Anonymous user
+        var anonymousContext = new DefaultHttpContext();
+        anonymousContext.User = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity());
+
+        // Authenticated user
+        var identity = new System.Security.Claims.ClaimsIdentity("TestAuthType");
+        identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "TestUser"));
+        identity = new System.Security.Claims.ClaimsIdentity(identity.Claims, "TestAuthType", identity.NameClaimType, identity.RoleClaimType);
+        identity = new System.Security.Claims.ClaimsIdentity(identity.Claims, "TestAuthType", identity.NameClaimType, identity.RoleClaimType);
+        var authenticatedContext = new DefaultHttpContext();
+        authenticatedContext.User = new System.Security.Claims.ClaimsPrincipal(identity);
+
+        // Act
+        await middleware.InvokeAsync(anonymousContext);
+        await middleware.InvokeAsync(authenticatedContext);
+
+        // Assert
+        Assert.True(mockLogger.Contains("[Warning] User logged in: Anonymous"));
+        Assert.True(mockLogger.Contains("[Warning] User logged in: TestUser"));
     }
 }

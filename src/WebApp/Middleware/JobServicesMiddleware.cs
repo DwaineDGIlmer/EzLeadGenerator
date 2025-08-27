@@ -1,5 +1,6 @@
 ﻿using Application.Configurations;
 using Application.Contracts;
+using Application.Logging;
 
 namespace WebApp.Middleware
 {
@@ -68,6 +69,10 @@ namespace WebApp.Middleware
             await _semaphore.WaitAsync();
             try
             {
+                var userName = context?.User?.Identity?.IsAuthenticated == true
+                    ? context.User.Identity.Name ?? "Unknown" : "Anonymous";
+                _logger.UserLoggedIn(userName);
+
                 if (LastExecution == default)
                 {
                     _logger.LogInformation("Initial updating job sources and company profiles at {Time}", DateTime.UtcNow);

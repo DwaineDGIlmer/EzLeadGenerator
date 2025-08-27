@@ -9,6 +9,37 @@
     public static class Defaults
     {
         /// <summary>
+        /// Represents the name of the "EzLeadGenerator" feature or module.
+        /// </summary>
+        /// <remarks>This constant can be used as an identifier or key for referencing the
+        /// "EzLeadGenerator" feature in the application. It is intended to provide a consistent and centralized value
+        /// for use across the codebase.</remarks>
+        public const string EzLeadGenerator = "EzLeadGenerator";
+
+        /// <summary>
+        /// The name of the container used for storing application logs.
+        /// </summary>
+        /// <remarks>This constant is typically used to reference the logging container in storage-related
+        /// operations.</remarks>
+        public const string LoggingContainerName = "app-logs";
+
+        /// <summary>
+        /// The default name of the blob file used to store application logs.
+        /// </summary>
+        /// <remarks>This constant represents the name of the log file, typically stored in a blob storage
+        /// container. The file is in JSON Lines format (.jsonl), which allows for efficient appending of log
+        /// entries.</remarks>
+        public const string LoggingBlobName = "EzLeadGenerator-Logs.json";
+
+        /// <summary>
+        /// Represents the name of the environment variable used to specify the environment  in which an ASP.NET Core
+        /// application is running.
+        /// </summary>
+        /// <remarks>The value of this constant is "ASPNETCORE_ENVIRONMENT". It is commonly used to 
+        /// determine the runtime environment, such as "Development", "Staging", or "Production".</remarks>
+        public const string AspNetCoreEnvironment = "ASPNETCORE_ENVIRONMENT";
+
+        /// <summary>
         /// Represents the environment variable key for the Search API URL.
         /// </summary>
         /// <remarks>This constant is used to retrieve the URL of the Search API from the environment

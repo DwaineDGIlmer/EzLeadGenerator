@@ -1,4 +1,5 @@
 ﻿using Application.Constants;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Configurations
 {
@@ -41,5 +42,55 @@ namespace Application.Configurations
         /// Gets or sets the number of minutes after which a SERP API query result expires.
         /// </summary>
         public int SerpApiQueryExpirationInMinutes { get; set; } = Defaults.SerpApiQueryExpirationInMinutes;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether logging is enabled.
+        /// </summary>
+        public bool LoggingEnabled { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the logging level for the application.
+        /// </summary>
+        /// <remarks>The logging level determines the minimum severity of log messages that will be
+        /// recorded. For example, setting this property to <see cref="LogLevel.Warning"/> will ensure that only
+        /// warnings, errors, and critical messages are logged, while informational and debug messages are
+        /// ignored.</remarks>
+        public LogLevel LoggingLevel { get; set; } = LogLevel.Warning;
+
+        /// <summary>
+        /// Gets or sets the unique identifier for the application.
+        /// </summary>
+        public string ApplicationId { get; set; } = Defaults.EzLeadGenerator;
+
+        /// <summary>
+        /// Gets or sets the unique identifier for the component.
+        /// </summary>
+        public string ComponentId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the name of the blob used for logging.
+        /// </summary>
+        public string LoggingBlobName { get; set; } = Defaults.LoggingBlobName;
+
+        /// <summary>
+        /// Gets or sets the name of the container used for logging.
+        /// </summary>
+        public string LoggingContainerName { get; set; } = Defaults.LoggingContainerName;
+
+        /// <summary>
+        /// Gets or sets the name of the environment in which the application is running.
+        /// </summary>
+        public string Environment { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EzLeadSettings"/> class.
+        /// </summary>
+        /// <remarks>The constructor sets the <see cref="Environment"/> property to the value of the
+        /// "ASPNETCORE_ENVIRONMENT" environment variable, or defaults to "Production" if the variable is not
+        /// set.</remarks>
+        public EzLeadSettings()
+        {
+            Environment = System.Environment.GetEnvironmentVariable(Defaults.AspNetCoreEnvironment) ?? "Production";
+        }
     }
 }

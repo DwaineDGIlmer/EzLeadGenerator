@@ -1,4 +1,5 @@
 using Application.Configurations;
+using Application.Constants;
 using Application.Contracts;
 using Application.Models;
 using Core.Configuration;
@@ -19,7 +20,7 @@ public class ServiceCollectionExtensionsTest
     [Fact]
     public void AddCompanyProfileStore_RegistersLocalCompanyProfileStore_WhenNotProduction()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        Environment.SetEnvironmentVariable(Defaults.AspNetCoreEnvironment, "Development");
         var services = CreateServiceCollection();
         var configuration = CreateConfiguration();
 
@@ -41,7 +42,7 @@ public class ServiceCollectionExtensionsTest
     [Fact]
     public void AddCompanyProfileStore_RegistersAzureCompanyRepository_WhenProduction()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
+        Environment.SetEnvironmentVariable(Defaults.AspNetCoreEnvironment, "Production");
         var services = CreateServiceCollection();
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddInMemoryCollection(
@@ -63,7 +64,7 @@ public class ServiceCollectionExtensionsTest
     [Fact]
     public void AddJobsProfileStore_RegistersLocalJobsRepositoryStore_WhenNotProduction()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        Environment.SetEnvironmentVariable(Defaults.AspNetCoreEnvironment, "Development");
         var services = CreateServiceCollection();
         var configuration = CreateConfiguration();
 
@@ -99,7 +100,7 @@ public class ServiceCollectionExtensionsTest
     [Fact]
     public void AddJobsProfileStore_RegistersAzureJobsRepository_WhenProduction()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
+        Environment.SetEnvironmentVariable(Defaults.AspNetCoreEnvironment, "Production");
         var services = CreateServiceCollection();
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddInMemoryCollection(

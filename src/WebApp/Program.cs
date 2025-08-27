@@ -7,8 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add the cache service to the service collection
 builder.Services.AddCacheService(builder.Configuration);
 
-// Initialize the logging services
+// Initialize the Core services
 builder.Services.InitializeServices(builder.Configuration);
+
+// Add Azure Logging
+builder.Services.AddAzureLogging();
 
 // Configure the application settings first
 builder.Services.ConfigureSerpApiSettings(builder.Configuration);
