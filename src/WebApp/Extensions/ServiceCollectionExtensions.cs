@@ -1,12 +1,15 @@
 ﻿using Application.Configurations;
 using Application.Constants;
 using Application.Contracts;
+using Application.Logging;
 using Application.Models;
 using Application.Services;
+using Azure.Storage.Blobs;
 using Core.Configuration;
 using Core.Contracts;
 using Core.Extensions;
 using Core.Services;
+using Loggers.Models;
 using WebApp.Respository;
 
 namespace WebApp.Extensions;
@@ -17,6 +20,53 @@ namespace WebApp.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Adds Azure-based logging services to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <remarks>This method registers the <see cref="AzureLoggerProvider"/> as a singleton <see
+    /// cref="ILoggerProvider"/> in the dependency injection container. It assumes that the required dependencies, such
+    /// as <see cref="ICacheBlobClient"/>, <see cref="ILogEvent"/>, and <see cref="IOptions{TOptions}"/> for <see
+    /// cref="EzLeadSettings"/>, are already registered in the service collection.</remarks>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which the Azure logging services will be added.</param>
+    /// <param name="configuration">The application's configuration source used to retrieve ezSettings for the logger provider.</param>
+    /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
+    public static IServiceCollection AddAzureLogging(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Bind EzLeadSettings from configuration
+        var settingsSection = configuration.GetSection(nameof(EzLeadSettings));
+        services.Configure<EzLeadSettings>(settingsSection);
+
+        // Create an instance to validate
+        var ezSettings = new EzLeadSettings();
+        settingsSection.Bind(ezSettings);
+
+        // Configure memory cache settings for logging
+        var memSettings = Core.Extensions.ServiceCollectionExtensions.GetMemoryCacheSettings(configuration);
+        memSettings.BlobName = ezSettings.LoggingBlobName;
+        memSettings.Container = ezSettings.LoggingContainerName;
+        memSettings.Prefix = ezSettings.LoggingPrefix;
+
+        services.AddSingleton<ILoggerProvider, AzureLoggerProvider>(sp =>
+        {
+            ILogEvent logEventFactory() => sp.GetService<ILogEvent>() ?? new OtelLogEvents();
+            var options = sp.GetRequiredService<IOptions<EzLeadSettings>>();
+
+            // We want to use a BlobClient specifically for the log provider.
+            var blobClient = new BlobCachingService(new BlobServiceClient(memSettings.AccountUrl), Options.Create(memSettings));
+            return new AzureLoggerProvider(logEventFactory, blobClient, options);
+        });
+
+        services.AddSingleton(new BlobContainerClient(memSettings.AccountUrl, Defaults.LoggingContainerName));
+        services.AddScoped<LogBlobReaderService>();
+
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddFilter<AzureLoggerProvider>("", LogLevel.Information);
+        });
+
+        return services;
+    }
+
     /// <summary>
     /// Adds a local company profile store to the service collection.
     /// </summary>
@@ -32,7 +82,7 @@ public static class ServiceCollectionExtensions
         settingsSection.Bind(settings);
         services.Configure<AzureSettings>(configuration.GetSection(nameof(AzureSettings)));
 
-        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        var env = Environment.GetEnvironmentVariable(Defaults.AspNetCoreEnvironment) ?? "Production";
         if (!env.Equals("Production"))
         {
             services.AddSingleton<ICompanyRepository>(sp =>
@@ -85,7 +135,7 @@ public static class ServiceCollectionExtensions
         settingsSection.Bind(settings);
         services.Configure<AzureSettings>(configuration.GetSection(nameof(AzureSettings)));
 
-        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        var env = Environment.GetEnvironmentVariable(Defaults.AspNetCoreEnvironment) ?? "Production";
         if (!env.Equals("Production"))
         {
             services.AddSingleton<IJobsRepository>(sp =>
@@ -143,7 +193,7 @@ public static class ServiceCollectionExtensions
             configuration.GetSection(nameof(SerpApiSettings)).Bind(options);
 
             var settings = configuration.GetSection(nameof(AzureSettings));
-            options.CacheExpirationInMinutes = settings.GetValue<int>(nameof(EzLeadSettings.SerpApiQueryExpirationInMinutes), Defaults.SerpApiQueryExpirationInMinutes);
+            options.CacheExpirationInMinutes = settings.GetValue(nameof(EzLeadSettings.SerpApiQueryExpirationInMinutes), Defaults.SerpApiQueryExpirationInMinutes);
 
             // Apply environment variable and default overrides
             if (options.IsEnabled)

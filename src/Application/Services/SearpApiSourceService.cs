@@ -31,6 +31,8 @@ public class SearpApiSourceService : IJobSourceService
     private static readonly List<string> _recruitingCompanies =
     [
         "Recruit",
+        "Hirevouch",
+        "tekshapers",
         "JobGet",
         "Yeah! Global",
         "Motion Recruitment",
@@ -212,7 +214,7 @@ public class SearpApiSourceService : IJobSourceService
                 var organicResults = string.Join("\r\n", googleResults.Select(r => r.Snippet));
                 if (!_tokens.Any(s => organicResults.Contains(s, StringComparison.CurrentCultureIgnoreCase)))
                 {
-                    _logger.LogWarning("No titles found for company: {CompanyName}", job.CompanyName);
+                    _logger.LogInformation("No titles found for company: {CompanyName}", job.CompanyName);
                     continue;
                 }
 
@@ -369,14 +371,14 @@ public class SearpApiSourceService : IJobSourceService
         // Check the Job summary for missing information
         if (string.IsNullOrWhiteSpace(job.CompanyName) || string.IsNullOrWhiteSpace(job.Description))
         {
-            logger.LogWarning("Job with ID {JobId} has missing company name or description, skipping.", job.JobId);
+            logger.LogInformation("Job with ID {JobId} has missing company name or description, skipping.", job.JobId);
             return false;
         }
 
         // Check if the job is remote
         if (job.Location.Contains("remote", StringComparison.CurrentCultureIgnoreCase))
         {
-            logger.LogWarning("Job with ID {JobId} is remote, skipping.", job.JobId);
+            logger.LogInformation("Job with ID {JobId} is remote, skipping.", job.JobId);
             return false;
         }
 
@@ -384,21 +386,21 @@ public class SearpApiSourceService : IJobSourceService
         if (!job.Location.Contains(", nc", StringComparison.CurrentCultureIgnoreCase) &&
             !job.Location.Contains(", sc", StringComparison.CurrentCultureIgnoreCase))
         {
-            logger.LogWarning("Job with ID {JobId} is not in area, skipping.", job.JobId);
+            logger.LogInformation("Job with ID {JobId} is not in area, skipping.", job.JobId);
             return false;
         }
 
         // This is to catch Data Center Engineer, etc
         if (job.Title.Contains("center", StringComparison.CurrentCultureIgnoreCase))
         {
-            logger.LogWarning("Job with ID {JobId} is not relevant, skipping.", job.JobId);
+            logger.LogInformation("Job with ID {JobId} is not relevant, skipping.", job.JobId);
             return false;
         }
 
         // Check if the job is coming from a recruitment company
         if (_recruitingCompanies.Any(c => job.CompanyName.Contains(c, StringComparison.CurrentCultureIgnoreCase)))
         {
-            logger.LogWarning("Job with ID {JobId} is a possible recruitment company, skipping.", job.JobId);
+            logger.LogInformation("Job with ID {JobId} is a possible recruitment company, skipping.", job.JobId);
             return false;
         }
         return true;

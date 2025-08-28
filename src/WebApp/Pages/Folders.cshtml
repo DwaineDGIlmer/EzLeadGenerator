@@ -1,0 +1,13 @@
+﻿@page "{folder}"
+@model WebApp.Pages.FolderModel
+<h2>Files in @Model.Folder</h2>
+<!-- Foundational style sheet -->
+<link rel="stylesheet" href="~/css/ezleadgenerator.styles.css" />
+<ul>
+    @foreach (var file in Model.Files)
+    {
+        <li>
+            <a asp-page="Log" asp-route-folder="@Model.Folder" asp-route-file="@file">@file</a>
+        </li>
+    }
+</ul>

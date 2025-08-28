@@ -28,7 +28,6 @@
 		<PackageReference Include="Azure.Storage.Blobs" />
 		<PackageReference Include="Chart.js" />
 		<PackageReference Include="HtmlAgilityPack" />
-		<PackageReference Include="Core" />
 	</ItemGroup>
 
   <ItemGroup>

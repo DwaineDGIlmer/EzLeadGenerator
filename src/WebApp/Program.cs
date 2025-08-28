@@ -1,14 +1,24 @@
+using Application.Configurations;
+using Application.Services;
+using Core.Contracts;
 using Core.Extensions;
 using WebApp.Extensions;
 using WebApp.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Used for testing
+builder.Services.Configure<EzLeadSettings>(builder.Configuration.GetSection(nameof(EzLeadSettings)));
+builder.Services.AddSingleton<ICacheLoader, NullCacheLoader>();
+
 // Add the cache service to the service collection
 builder.Services.AddCacheService(builder.Configuration);
 
-// Initialize the logging services
+// Initialize the Core services
 builder.Services.InitializeServices(builder.Configuration);
+
+// Add Azure Logging
+builder.Services.AddAzureLogging(builder.Configuration);
 
 // Configure the application settings first
 builder.Services.ConfigureSerpApiSettings(builder.Configuration);

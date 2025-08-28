@@ -82,7 +82,7 @@ public class LocalJobsRepositoryStore : IJobsRepository
         string path = GetFilePath(jobId, _jobsProfileDirectory);
         if (!File.Exists(path))
         {
-            _logger.LogWarning("Profile not found for job: {JobId}", jobId);
+            _logger.LogInformation("Profile not found for job: {JobId}", jobId);
             return null;
         }
 

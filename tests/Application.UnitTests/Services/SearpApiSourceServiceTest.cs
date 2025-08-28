@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 namespace Application.UnitTests.Services;
 
-public class SearpApiSourceServiceTest
+public class SearpApiSourceServiceTest : UnitTestsBase
 {
     private readonly Mock<ICacheService> _cacheServiceMock = new();
     private readonly Mock<ISearch> _searchServiceMock = new();
@@ -99,12 +99,12 @@ public class SearpApiSourceServiceTest
 
         _loggerMock.Verify(
             x => x.Log(
-                LogLevel.Warning,
+                LogLevel.Information,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => true),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+            Times.AtLeastOnce);
 
         Assert.True(result);
     }
@@ -355,20 +355,13 @@ public class SearpApiSourceServiceTest
             Title = "Engineer",
             JobId = "1"
         };
-        var loggerMock = new Mock<ILogger>();
+        var loggerMock = new MockLogger<SearpApiSourceService>(LogLevel.Information);
 
         // Act
-        var result = SearpApiSourceService.IsValid(job, loggerMock.Object);
+        var result = SearpApiSourceService.IsValid(job, loggerMock);
 
         // Assert
         Assert.False(result);
-        loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        Assert.True(loggerMock.Contains("[Information] Job with ID 1 has missing company name or description, skipping."));
     }
 }
