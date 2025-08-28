@@ -30,6 +30,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Loggers" />
+		<PackageReference Include="Core" />
 	</ItemGroup>
 
 	<ItemGroup>
