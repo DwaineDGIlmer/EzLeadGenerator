@@ -23,7 +23,7 @@ public class LogBlobReaderService
     private readonly string _loggingPrefix;
     private const string _delimiter = "/";
     private readonly BlobContainerClient _containerClient;
-    ILogger<LogBlobReaderService> _logger;
+    private readonly ILogger<LogBlobReaderService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogBlobReaderService"/> class.
@@ -69,11 +69,11 @@ public class LogBlobReaderService
     /// <summary>
     /// Asynchronously retrieves a list of log file names from the specified folder.
     /// </summary>
-    /// <remarks>The method searches for log files within the specified folder using a predefined prefix
-    /// format. Only the file names are returned, excluding the folder path.</remarks>
-    /// <param name="folder">The name of the folder to search for log files. This value cannot be null or empty.</param>
+    /// <remarks>The method filters blobs in the container using the specified folder name as a prefix. Only
+    /// the file names, excluding the folder path, are returned.</remarks>
+    /// <param name="folder">The name of the folder to search for log files. This value is used as a prefix to filter the results.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a list of log file names found in
-    /// the specified folder. If no files are found, the list will be empty.</returns>
+    /// the specified folder.</returns>
     public async Task<List<string>> ListLogFilesAsync(string folder)
     {
         var prefix = $"{_loggingPrefix}/{folder}/";

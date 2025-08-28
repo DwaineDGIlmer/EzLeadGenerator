@@ -32,7 +32,7 @@ public class LogModel(LogBlobReaderService logService) : PageModel
     /// <summary>
     /// Handles the GET request by retrieving the log event for the specified folder and file.
     /// </summary>
-    /// <remarks>This method sets the <see cref="Folder"/> and <see cref="File"/> properties to the provided
+    /// <remarks>This method sets the <see cref="Folder"/> and <see cref="FileName"/> properties to the provided
     /// values  and retrieves the log event using the specified folder and file. The retrieved log event is stored  in
     /// the <see cref="LogEvent"/> property.</remarks>
     /// <param name="folder">The name of the folder containing the log file. Cannot be null or empty.</param>

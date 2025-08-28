@@ -21,7 +21,7 @@ namespace Application.Services
         private readonly string _bloblCacheKey;
 
         /// <summary>
-        /// Used to develop
+        /// Initializes a new instance of the <see cref="NullCacheLoader"/> class for development and testing purposes.
         /// </summary>
         /// <param name="memOptions">MemoryCacheSettings options.</param>
         /// <param name="ezOptions">EzLeadSettings options.</param>

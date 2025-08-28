@@ -230,7 +230,6 @@ public class JobServicesMiddlewareTest : UnitTestsBase
         var identity = new System.Security.Claims.ClaimsIdentity("TestAuthType");
         identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "TestUser"));
         identity = new System.Security.Claims.ClaimsIdentity(identity.Claims, "TestAuthType", identity.NameClaimType, identity.RoleClaimType);
-        identity = new System.Security.Claims.ClaimsIdentity(identity.Claims, "TestAuthType", identity.NameClaimType, identity.RoleClaimType);
         var authenticatedContext = new DefaultHttpContext();
         authenticatedContext.User = new System.Security.Claims.ClaimsPrincipal(identity);
 
