@@ -1,0 +1,53 @@
+﻿@page "{folder}/{file}"
+@model WebApp.Pages.LogModel
+<link rel="stylesheet" href="~/css/ezleadgenerator.styles.css" />
+
+<style>
+    .log-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: nowrap;
+    }
+    .log-filename {
+        font-size: 1.5rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80vw;
+    }
+    .log-container {
+        background: #222;
+        color: #eee;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        font-family: 'Fira Mono', 'Consolas', monospace;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+    }
+    .not-found {
+        color: #c00;
+        font-weight: 500;
+        margin-top: 2rem;
+    }
+</style>
+
+<div class="log-header">
+    <span class="log-filename" title="@Model.FileName">Log File: @Model.FileName</span>
+</div>
+
+@if (Model.LogEvent != null)
+{
+    <div class="log-container">
+        @System.Text.Json.JsonSerializer.Serialize(Model.LogEvent, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
+    </div>
+}
+else
+{
+    <div class="not-found">
+        Log file not found or could not be read.
+    </div>
+}

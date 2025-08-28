@@ -114,7 +114,7 @@ public class SerpApiSearchService : ISearch
         var content = await response.Content.ReadAsStringAsync();
         if (string.IsNullOrWhiteSpace(content))
         {
-            _logger.LogWarning("No results found for query: {Query} and location: {Location}", query, location);
+            _logger.LogInformation("No results found for query: {Query} and location: {Location}", query, location);
             return [];
         }
 

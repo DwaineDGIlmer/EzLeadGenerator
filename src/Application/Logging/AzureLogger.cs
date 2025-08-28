@@ -19,8 +19,6 @@ namespace Application.Logging;
 /// logging with enhanced context management.</remarks>
 public class AzureLogger : ILogger, IDisposable
 {
-    private static readonly string _loggingPrefix = $"{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Year}";
-
     /// <summary>
     /// Represents a client used for interacting with cached blob storage.
     /// </summary>
@@ -71,8 +69,7 @@ public class AzureLogger : ILogger, IDisposable
     /// <param name="cacheBlobClient">The cache blob client used for storing log events. Cannot be null.</param>
     /// <param name="settings">The application settings containing logging configuration. Cannot be null.</param>
     /// <param name="factory">A factory function used to create instances of <see cref="ILogEvent"/>. Cannot be null.</param>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="settings"/>, <paramref name="factory"/>, or <paramref name="categoryName"/> is
-    /// null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="settings"/>, <paramref name="factory"/> is null.</exception>
     public AzureLogger(
         ICacheBlobClient cacheBlobClient,
         IOptions<EzLeadSettings> settings,
@@ -132,47 +129,52 @@ public class AzureLogger : ILogger, IDisposable
         if (!IsEnabled(logLevel))
             return;
 
-        // Create a new log event using the factory method
-        var logEvent = LogEventFactory();
-
-        // Populate other logEvent properties as needed
-        logEvent.Id = DateTime.Now.Ticks.ToString();
-        logEvent.Body = formatter(state, exception); 
-        logEvent.Timestamp = DateTimeOffset.UtcNow;
-        logEvent.ApplicationId = Settings.ApplicationId ?? string.Empty;
-        logEvent.ComponentId = Settings.ComponentId ?? string.Empty;
-        logEvent.Environment = Settings.Environment ?? string.Empty;
-        logEvent.Level = logLevel;
-        logEvent.Exception = exception is not null ? new SerializableException(exception) : null;
-        logEvent.CorrelationId = Activity.Current?.RootId ?? Guid.NewGuid().ToString();
-        logEvent.TraceId = Activity.Current?.TraceId.ToString() ?? string.Empty;
-        logEvent.SpanId = Activity.Current?.SpanId.ToString() ?? string.Empty;
-        logEvent.InnerExceptions = ExceptionHelper.GetInnerExceptions(exception);
-
-        _ = Task.Run(() => Log(logEvent));
+        _ = Task.Run(() => LogAsync(logLevel, eventId, state, exception, formatter));
     }
 
     /// <summary>
-    /// Asynchronously logs the specified event by storing it in a blob storage.
+    /// Asynchronously logs an event with the specified details, including log level, event ID, state, exception, and a
+    /// custom formatter.
     /// </summary>
-    /// <remarks>The log event is serialized and stored in blob storage using a path derived from its
-    /// level and ID. If the operation fails, the failure is logged to the debug output.</remarks>
-    /// <param name="logEvent">The log event to be stored. Must not be <see langword="null"/>.</param>
-    /// <returns></returns>
-    public async Task Log(ILogEvent logEvent)
+    /// <remarks>This method creates a log event, populates its properties with the provided details, and
+    /// writes the serialized log entry to blob storage. If an error occurs during the logging process, the method
+    /// disables further logging by setting the <c>Enabled</c> property to <see langword="false"/>.</remarks>
+    /// <typeparam name="TState">The type of the state object to be logged.</typeparam>
+    /// <param name="logLevel">The severity level of the log entry.</param>
+    /// <param name="eventId">A unique identifier for the event being logged.</param>
+    /// <param name="state">The state object containing contextual information about the log entry.</param>
+    /// <param name="exception">An optional exception associated with the log entry. Can be <see langword="null"/> if no exception is present.</param>
+    /// <param name="formatter">A function that formats the <paramref name="state"/> and <paramref name="exception"/> into a log message string.
+    /// The function must not return <see langword="null"/>.</param>
+    /// <returns>A task that represents the asynchronous logging operation.</returns>
+    public async Task LogAsync<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        if (logEvent is not null)
+        try
         {
-            try
-            {
-                var loggedEvent = logEvent.Serialize();
-                await _cacheBlobClient.PutAsync(GetPath($"{logEvent.Level}.{logEvent.Id}", Settings), System.Text.Encoding.UTF8.GetBytes(logEvent.Serialize()));
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to write log event to blob storage: {ex}");
-                Enabled = false;
-            }
+            // Create a new log event using the factory method
+            var logEvent = LogEventFactory();
+
+            // Populate other logEvent properties as needed
+            logEvent.Id = DateTime.UtcNow.Ticks.ToString();
+            logEvent.Body = formatter(state, exception);
+            logEvent.Timestamp = DateTimeOffset.UtcNow;
+            logEvent.ApplicationId = Settings.ApplicationId ?? string.Empty;
+            logEvent.ComponentId = Settings.ComponentId ?? string.Empty;
+            logEvent.Environment = Settings.Environment ?? string.Empty;
+            logEvent.Level = logLevel;
+            logEvent.Exception = exception is not null ? new SerializableException(exception) : null;
+            logEvent.CorrelationId = Activity.Current?.RootId ?? Guid.NewGuid().ToString();
+            logEvent.TraceId = Activity.Current?.TraceId.ToString() ?? string.Empty;
+            logEvent.SpanId = Activity.Current?.SpanId.ToString() ?? string.Empty;
+            logEvent.InnerExceptions = ExceptionHelper.GetInnerExceptions(exception);
+
+            var loggedEvent = logEvent.Serialize();
+            await _cacheBlobClient.PutAsync(GetPath($"{logEvent.Level}.{logEvent.Id}", Settings), System.Text.Encoding.UTF8.GetBytes(logEvent.Serialize()));
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to write log event to blob storage: {ex}");
+            Enabled = false;
         }
     }
 
@@ -201,6 +203,6 @@ public class AzureLogger : ILogger, IDisposable
     /// the specified log name.</returns>
     public static string GetPath(string logName, EzLeadSettings settings)
     {
-        return $"{_loggingPrefix.TrimEnd('/')}/{logName}.{settings.LoggingBlobName}".TrimStart('/');
+        return $"/{$"{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Year}"}.{logName}.{settings.LoggingBlobName}".TrimStart('/');
     }
 }

@@ -73,9 +73,19 @@ namespace Application.Configurations
         public string LoggingBlobName { get; set; } = Defaults.LoggingBlobName;
 
         /// <summary>
+        /// Gets or sets the prefix name of the blob used for logging.
+        /// </summary>
+        public string LoggingPrefix { get; set; } = Defaults.LoggingPrefix;
+
+        /// <summary>
         /// Gets or sets the name of the container used for logging.
         /// </summary>
         public string LoggingContainerName { get; set; } = Defaults.LoggingContainerName;
+
+        /// <summary>
+        /// Local cache location.
+        /// </summary>
+        public string LoggingLocalCache { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the name of the environment in which the application is running.

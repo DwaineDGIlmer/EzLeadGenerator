@@ -12,30 +12,22 @@ namespace Application.Logging;
 /// <remarks>This class is designed to create loggers that interact with Azure services, leveraging the provided
 /// <see cref="ICacheBlobClient"/> for any necessary Azure storage or caching operations. It implements the <see
 /// cref="ILoggerProvider"/> interface, allowing it to be used in .NET logging frameworks.</remarks>
-public class AzureLoggerProvider : ILoggerProvider
+/// <remarks>
+/// Initializes a new instance of the <see cref="AzureLoggerProvider"/> class.
+/// </remarks>
+/// <param name="func">A factory function that creates instances of <see cref="ILogEvent"/>.</param>
+/// <param name="cacheBlobClient">The client used to interact with the cache blob storage.</param>
+/// <param name="options">The configuration options for the logger provider.</param>
+public class AzureLoggerProvider(
+    Func<ILogEvent> func,
+    ICacheBlobClient cacheBlobClient,
+    IOptions<EzLeadSettings> options) : ILoggerProvider
 {
-    private readonly ICacheBlobClient _cacheBlobClient;
-    private readonly ILogger<AzureLoggerProvider> _logger;
-    private readonly IOptions<EzLeadSettings> _options;
+    private readonly ICacheBlobClient _cacheBlobClient = cacheBlobClient;
+    private readonly ILogger<AzureLoggerProvider> _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<AzureLoggerProvider>();
+    private readonly IOptions<EzLeadSettings> _options = options;
     private readonly ConcurrentDictionary<string, ILogger> _loggers = new();
-    private readonly Func<ILogEvent> _logEventFactory;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AzureLoggerProvider"/> class.
-    /// </summary>
-    /// <param name="func">A factory function that creates instances of <see cref="ILogEvent"/>.</param>
-    /// <param name="cacheBlobClient">The client used to interact with the cache blob storage.</param>
-    /// <param name="options">The configuration options for the logger provider.</param>
-    public AzureLoggerProvider(
-        Func<ILogEvent> func,
-        ICacheBlobClient cacheBlobClient,
-        IOptions<EzLeadSettings> options)
-    {
-        _cacheBlobClient = cacheBlobClient;
-        _options = options;
-        _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<AzureLoggerProvider>();
-        _logEventFactory = func;
-    }
+    private readonly Func<ILogEvent> _logEventFactory = func;
 
     /// <summary>
     /// Creates and returns a logger instance for the specified category name.

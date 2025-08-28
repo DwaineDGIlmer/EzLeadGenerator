@@ -4,6 +4,8 @@ using Core.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+namespace Application.UnitTests.Logging;
+
 public class AzureLoggerProviderTest
 {
     [Fact]
@@ -17,7 +19,6 @@ public class AzureLoggerProviderTest
         var provider = new AzureLoggerProvider(
             logEventFactory,
             cacheBlobClientMock.Object,
-            loggerMock.Object,
             optionsMock);
 
         // Act
@@ -39,7 +40,6 @@ public class AzureLoggerProviderTest
         var provider = new AzureLoggerProvider(
             logEventFactory,
             cacheBlobClientMock.Object,
-            loggerMock.Object,
             optionsMock.Object);
 
         // Act
@@ -61,14 +61,13 @@ public class AzureLoggerProviderTest
         var provider = new AzureLoggerProvider(
             logEventFactory,
             cacheBlobClientMock.Object,
-            loggerMock.Object,
             optionsMock.Object);
 
         // Simulate exception by manipulating internal dictionary
         var categoryName = null as string;
 
         // Act
-        var logger = provider.CreateLogger(categoryName);
+        var logger = provider.CreateLogger(categoryName!);
 
         // Assert
         Assert.Equal(Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, logger);
@@ -85,7 +84,6 @@ public class AzureLoggerProviderTest
         var provider = new AzureLoggerProvider(
             logEventFactory,
             cacheBlobClientMock.Object,
-            loggerMock.Object,
             optionsMock.Object);
 
         // Act & Assert

@@ -24,6 +24,13 @@
         public const string LoggingContainerName = "app-logs";
 
         /// <summary>
+        /// Represents the prefix used for logging-related paths or keys.
+        /// </summary>
+        /// <remarks>This constant can be used as a base prefix for organizing or categorizing log-related
+        /// data, such as file paths, database keys, or cloud storage objects.</remarks>
+        public const string LoggingPrefix = "logs/";
+
+        /// <summary>
         /// The default name of the blob file used to store application logs.
         /// </summary>
         /// <remarks>This constant represents the name of the log file, typically stored in a blob storage

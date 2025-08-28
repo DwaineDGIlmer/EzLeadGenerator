@@ -10,7 +10,6 @@ using Core.Contracts;
 using Core.Extensions;
 using Core.Services;
 using Loggers.Models;
-using WebApp.Middleware;
 using WebApp.Respository;
 
 namespace WebApp.Extensions;
@@ -29,23 +28,36 @@ public static class ServiceCollectionExtensions
     /// as <see cref="ICacheBlobClient"/>, <see cref="ILogEvent"/>, and <see cref="IOptions{TOptions}"/> for <see
     /// cref="EzLeadSettings"/>, are already registered in the service collection.</remarks>
     /// <param name="services">The <see cref="IServiceCollection"/> to which the Azure logging services will be added.</param>
+    /// <param name="configuration">The application's configuration source used to retrieve ezSettings for the logger provider.</param>
     /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
-    public static IServiceCollection AddAzureLogging(this IServiceCollection services)
+    public static IServiceCollection AddAzureLogging(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ICacheBlobClient>(sp =>
-        {
-            IOptions<MemoryCacheSettings> memSettings = sp.GetRequiredService<IOptions<MemoryCacheSettings>>();
-            memSettings.Value.Container = Defaults.LoggingContainerName;
-            return new BlobCachingService(new BlobServiceClient(memSettings.Value.AccountUrl), memSettings);
-        });
+        // Bind EzLeadSettings from configuration
+        var settingsSection = configuration.GetSection(nameof(EzLeadSettings));
+        services.Configure<EzLeadSettings>(settingsSection);
+
+        // Create an instance to validate
+        var ezSettings = new EzLeadSettings();
+        settingsSection.Bind(ezSettings);
+
+        // Configure memory cache settings for logging
+        var memSettings = Core.Extensions.ServiceCollectionExtensions.GetMemoryCacheSettings(configuration);
+        memSettings.BlobName = ezSettings.LoggingBlobName;
+        memSettings.Container = ezSettings.LoggingContainerName;
+        memSettings.Prefix = ezSettings.LoggingPrefix;
 
         services.AddSingleton<ILoggerProvider, AzureLoggerProvider>(sp =>
         {
             ILogEvent logEventFactory() => sp.GetService<ILogEvent>() ?? new OtelLogEvents();
-            var blobClient = sp.GetRequiredService<ICacheBlobClient>();
             var options = sp.GetRequiredService<IOptions<EzLeadSettings>>();
+
+            // We want to use a BlobClient specifically for the log provider.
+            var blobClient = new BlobCachingService(new BlobServiceClient(memSettings.AccountUrl), Options.Create(memSettings));
             return new AzureLoggerProvider(logEventFactory, blobClient, options);
         });
+
+        services.AddSingleton(new BlobContainerClient(memSettings.AccountUrl, Defaults.LoggingContainerName));
+        services.AddScoped<LogBlobReaderService>();
 
         services.AddLogging(loggingBuilder =>
         {
