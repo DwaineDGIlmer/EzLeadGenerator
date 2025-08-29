@@ -62,7 +62,7 @@
     <script>
       function updateDateTime() {
         const now = new Date();
-        const formatted = now.toLocaleString();
+        const formatted = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
         document.getElementById('navbar-datetime').textContent = formatted;
       }
       const dateTimeIntervalId = setInterval(updateDateTime, 1000);
