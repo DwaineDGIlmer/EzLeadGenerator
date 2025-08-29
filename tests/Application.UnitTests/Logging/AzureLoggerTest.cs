@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Application.UnitTests.Logging;
 
-public class AzureLoggerTest
+public class AzureLoggerTest : UnitTestsBase
 {
     private static EzLeadSettings GetSettings(LogLevel logLevel = LogLevel.Information, bool enabled = true)
     {
@@ -112,30 +112,5 @@ public class AzureLoggerTest
         var settings = GetSettings();
         var path = AzureLogger.GetPath("logname", settings);
         Assert.Equal($"/{$"{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Year}"}.logname.{settings.LoggingBlobName}".TrimStart('/'), path);
-    }
-}
-
-public class MockCacheBlobClient : ICacheBlobClient
-{
-    public bool DeleteWasCalled { get; private set; } = false;
-    public bool GetWasCalled { get; private set; } = false;
-    public bool PutWasCalled { get; private set; } = false;
-
-    public Task DeleteAsync(string key, CancellationToken ct = default)
-    {
-        DeleteWasCalled = true;
-        return Task.CompletedTask;
-    }
-
-    public Task<byte[]?> GetAsync(string key, CancellationToken ct = default)
-    {
-        GetWasCalled = true;
-        return Task.FromResult<byte[]?>(null);
-    }
-
-    public Task<string> PutAsync(string key, byte[] data, string? ifMatchEtag = null, CancellationToken ct = default)
-    {
-        PutWasCalled = true;
-        return Task.FromResult(string.Empty);
     }
 }

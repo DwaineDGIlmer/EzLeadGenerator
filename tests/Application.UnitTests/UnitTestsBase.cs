@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using Core.Contracts;
 using Loggers.Contracts;
 using Loggers.Publishers;
 using Microsoft.Extensions.Logging;
@@ -86,4 +87,75 @@ public class UnitTestsBase
         }
     }
 
+}
+
+/// <summary>
+/// A mock implementation of the <see cref="ICacheBlobClient"/> interface for testing purposes.
+/// </summary>
+/// <remarks>This class is designed to simulate the behavior of a cache blob client in a controlled testing
+/// environment. It provides methods to mock the operations of deleting, retrieving, and storing data in a cache, while
+/// tracking whether each operation was called. The actual data operations are not performed; instead, the methods
+/// return predefined results.</remarks>
+public class MockCacheBlobClient : ICacheBlobClient
+{
+    /// <summary>
+    /// Gets a value indicating whether the delete operation has been invoked.
+    /// </summary>
+    public bool DeleteWasCalled { get; private set; } = false;
+
+    /// <summary>
+    /// Gets a value indicating whether the getter of this property has been called.
+    /// </summary>
+    public bool GetWasCalled { get; private set; } = false;
+
+    /// <summary>
+    /// Gets a value indicating whether the Put operation has been called.
+    /// </summary>
+    public bool PutWasCalled { get; private set; } = false;
+
+    /// <summary>
+    /// Deletes the specified item asynchronously.
+    /// </summary>
+    /// <remarks>This method completes immediately and does not perform any actual deletion. It is intended
+    /// for testing or mock scenarios.</remarks>
+    /// <param name="key">The unique identifier of the item to delete. Cannot be null or empty.</param>
+    /// <param name="ct">An optional <see cref="CancellationToken"/> to observe while waiting for the operation to complete.</param>
+    /// <returns>A task that represents the asynchronous delete operation.</returns>
+    public Task DeleteAsync(string key, CancellationToken ct = default)
+    {
+        DeleteWasCalled = true;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Asynchronously retrieves the value associated with the specified key.
+    /// </summary>
+    /// <param name="key">The key whose associated value is to be retrieved. Cannot be <see langword="null"/> or empty.</param>
+    /// <param name="ct">A <see cref="CancellationToken"/> to observe while waiting for the task to complete. Defaults to <see
+    /// cref="CancellationToken.None"/>.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the value as a byte array,  or <see
+    /// langword="null"/> if the key does not exist.</returns>
+    public Task<byte[]?> GetAsync(string key, CancellationToken ct = default)
+    {
+        GetWasCalled = true;
+        return Task.FromResult<byte[]?>(null);
+    }
+
+    /// <summary>
+    /// Asynchronously stores the specified data under the given key, with optional conditional behavior based on an
+    /// ETag.
+    /// </summary>
+    /// <param name="key">The unique identifier under which the data will be stored. Cannot be null or empty.</param>
+    /// <param name="data">The data to store, represented as a byte array. Cannot be null.</param>
+    /// <param name="ifMatchEtag">An optional ETag value used for conditional updates. If specified, the operation will only succeed if the
+    /// current ETag matches this value. Pass <see langword="null"/> to ignore conditional checks.</param>
+    /// <param name="ct">A <see cref="CancellationToken"/> to observe while waiting for the operation to complete. Defaults to <see
+    /// cref="CancellationToken.None"/>.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a string representing the outcome of
+    /// the operation.</returns>
+    public Task<string> PutAsync(string key, byte[] data, string? ifMatchEtag = null, CancellationToken ct = default)
+    {
+        PutWasCalled = true;
+        return Task.FromResult(string.Empty);
+    }
 }
