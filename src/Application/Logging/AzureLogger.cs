@@ -157,6 +157,10 @@ public class AzureLogger : ILogger, IDisposable
             // Populate other logEvent properties as needed
             logEvent.Id = DateTime.UtcNow.Ticks.ToString();
             logEvent.Body = formatter(state, exception);
+            if (exception is not null)
+            {
+                logEvent.Body += $"{Environment.NewLine}Exception: {exception.GetType().FullName}: {exception.Message}{Environment.NewLine}{exception.StackTrace}";
+            }
             logEvent.Timestamp = DateTimeOffset.UtcNow;
             logEvent.ApplicationId = Settings.ApplicationId ?? string.Empty;
             logEvent.ComponentId = Settings.ComponentId ?? string.Empty;
