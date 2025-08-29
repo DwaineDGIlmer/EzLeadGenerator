@@ -245,6 +245,7 @@ public class SearpApiSourceService : IJobSourceService
                     catch (JsonException jsonEx)
                     {
                         _logger.LogError("JSON parsing error for company: {CompanyName}. Error: {Message} \r\n Json: {sanitizedJson}", job.CompanyName, jsonEx.Message, sanitizedJson);
+                        return;
                     }
                 }
             }
