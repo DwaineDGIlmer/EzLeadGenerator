@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Application.UnitTests.Logging;
 
-public class AzureLoggerTest
+public class AzureLoggerTest : UnitTestsBase
 {
     private static EzLeadSettings GetSettings(LogLevel logLevel = LogLevel.Information, bool enabled = true)
     {
@@ -69,21 +69,17 @@ public class AzureLoggerTest
     [Fact]
     public async Task Log_StoresLogEvent_WhenEnabledAndLevelIsSufficient()
     {
-        var cacheBlobClient = new Mock<ICacheBlobClient>();
-        cacheBlobClient
-            .Setup(c => c.PutAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(string.Empty))
-            .Verifiable();
+        var cacheBlobClient = new MockCacheBlobClient();
 
         var logger = new AzureLogger(
-            cacheBlobClient.Object,
+            cacheBlobClient,
             Options.Create(GetSettings(LogLevel.Information, true)),
             () => GetLogEvent());
 
         logger.Log(LogLevel.Information, new EventId(1), "state", null, (s, e) => s.ToString());
         await Task.Delay(100); // Allow async log to run
 
-        cacheBlobClient.Verify(c => c.PutAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+        Assert.True(cacheBlobClient.PutWasCalled);
     }
 
     [Fact]
