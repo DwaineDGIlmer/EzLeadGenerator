@@ -144,7 +144,7 @@ public class SearpApiSourceService : IJobSourceService
             return false;
         }
 
-        foreach (var job in jobs)
+        var tasks = jobs.Select(async job =>
         {
             try
             {
@@ -155,7 +155,7 @@ public class SearpApiSourceService : IJobSourceService
                 if (companyProfile is not null && companyProfile.UpdatedAt >= DateTime.Now.AddDays(-3))
                 {
                     _logger.LogInformation("Company profile does not need updating: {CompanyName}", job.CompanyName);
-                    continue;
+                    return;
                 }
 
                 var prompt = $"{job.CompanyName} official site";
@@ -163,7 +163,7 @@ public class SearpApiSourceService : IJobSourceService
                 if (googleResults is null || !googleResults.Any())
                 {
                     _logger.LogWarning("No Google results found for company: {CompanyName}", job.CompanyName);
-                    continue;
+                    return;
                 }
 
                 var snippets = googleResults
@@ -209,13 +209,13 @@ public class SearpApiSourceService : IJobSourceService
                 if (googleResults is null || !googleResults.Any())
                 {
                     _logger.LogWarning("No Google results found for company: {CompanyName}", job.CompanyName);
-                    continue;
+                    return;
                 }
                 var organicResults = string.Join("\r\n", googleResults.Select(r => r.Snippet));
                 if (!_tokens.Any(s => organicResults.Contains(s, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     _logger.LogInformation("No titles found for company: {CompanyName}", job.CompanyName);
-                    continue;
+                    return;
                 }
 
                 var clientResult = await GetSearchResults(job, organicResults);
@@ -244,18 +244,17 @@ public class SearpApiSourceService : IJobSourceService
                     }
                     catch (JsonException jsonEx)
                     {
-                        // Log the JSON parsing error
                         _logger.LogError("JSON parsing error for company: {CompanyName}. Error: {Message} \r\n Json: {sanitizedJson}", job.CompanyName, jsonEx.Message, sanitizedJson);
-                        continue;
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception (not implemented here, but should be done in a real application)
                 _logger.LogError("Error updating company profiles: {Message}", ex.Message);
             }
-        }
+        });
+
+        await Task.WhenAll(tasks);
 
         var results = await _companyRepository.GetCompanyProfileAsync(timeStamp);
         return jobs.Count() == results.Count();

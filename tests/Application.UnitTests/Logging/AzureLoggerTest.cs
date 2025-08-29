@@ -77,7 +77,7 @@ public class AzureLoggerTest : UnitTestsBase
             () => GetLogEvent());
 
         logger.Log(LogLevel.Information, new EventId(1), "state", null, (s, e) => s.ToString());
-        await Task.Delay(100); // Allow async log to run
+        await Task.Delay(200); // Allow async log to run
 
         Assert.True(cacheBlobClient.PutWasCalled);
     }
