@@ -69,21 +69,17 @@ public class AzureLoggerTest
     [Fact]
     public async Task Log_StoresLogEvent_WhenEnabledAndLevelIsSufficient()
     {
-        var cacheBlobClient = new Mock<ICacheBlobClient>();
-        cacheBlobClient
-            .Setup(c => c.PutAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(string.Empty))
-            .Verifiable();
+        var cacheBlobClient = new MockCacheBlobClient();
 
         var logger = new AzureLogger(
-            cacheBlobClient.Object,
+            cacheBlobClient,
             Options.Create(GetSettings(LogLevel.Information, true)),
             () => GetLogEvent());
 
         logger.Log(LogLevel.Information, new EventId(1), "state", null, (s, e) => s.ToString());
         await Task.Delay(100); // Allow async log to run
 
-        cacheBlobClient.Verify(c => c.PutAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+        Assert.True(cacheBlobClient.PutWasCalled);
     }
 
     [Fact]
@@ -116,5 +112,30 @@ public class AzureLoggerTest
         var settings = GetSettings();
         var path = AzureLogger.GetPath("logname", settings);
         Assert.Equal($"/{$"{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Year}"}.logname.{settings.LoggingBlobName}".TrimStart('/'), path);
+    }
+}
+
+public class MockCacheBlobClient : ICacheBlobClient
+{
+    public bool DeleteWasCalled { get; private set; } = false;
+    public bool GetWasCalled { get; private set; } = false;
+    public bool PutWasCalled { get; private set; } = false;
+
+    public Task DeleteAsync(string key, CancellationToken ct = default)
+    {
+        DeleteWasCalled = true;
+        return Task.CompletedTask;
+    }
+
+    public Task<byte[]?> GetAsync(string key, CancellationToken ct = default)
+    {
+        GetWasCalled = true;
+        return Task.FromResult<byte[]?>(null);
+    }
+
+    public Task<string> PutAsync(string key, byte[] data, string? ifMatchEtag = null, CancellationToken ct = default)
+    {
+        PutWasCalled = true;
+        return Task.FromResult(string.Empty);
     }
 }
