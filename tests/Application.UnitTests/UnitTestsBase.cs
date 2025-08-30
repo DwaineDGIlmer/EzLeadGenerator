@@ -138,7 +138,7 @@ public class MockCacheBlobClient : ICacheBlobClient
     public Task<byte[]> GetAsync(string key, CancellationToken ct = default)
     {
         GetWasCalled = true;
-        return Task.FromResult<byte[]>(null);
+        return Task.FromResult(Array.Empty<byte>());
     }
 
     /// <summary>
