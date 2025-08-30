@@ -166,6 +166,8 @@ public class AzureLogger : ILogger, IDisposable
             logEvent.ComponentId = Settings.ComponentId ?? string.Empty;
             logEvent.Environment = Settings.Environment ?? string.Empty;
             logEvent.Level = logLevel;
+            logEvent.Tags = logEvent.Tags ?? new Dictionary<string, string>();
+            logEvent.Tags.Add("EventId", eventId.Id.ToString());
             logEvent.Exception = exception is not null ? new SerializableException(exception) : null;
             logEvent.CorrelationId = Activity.Current?.RootId ?? Guid.NewGuid().ToString();
             logEvent.TraceId = Activity.Current?.TraceId.ToString() ?? string.Empty;

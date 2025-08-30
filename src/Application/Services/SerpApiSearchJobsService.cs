@@ -91,6 +91,7 @@ public class SerpApiSearchJobsService : IJobsRetrieval<JobResult>
         {
             return cachedJobs.JobsResults;
         }
+
         try
         {
             var request = $"{Endpoint}?engine=google_jobs&q={Uri.EscapeDataString(query)}&location={Uri.EscapeDataString(location)}&api_key={ApiKey}&hl=en";
