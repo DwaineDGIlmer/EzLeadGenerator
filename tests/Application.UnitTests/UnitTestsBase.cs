@@ -135,10 +135,10 @@ public class MockCacheBlobClient : ICacheBlobClient
     /// cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the value as a byte array,  or <see
     /// langword="null"/> if the key does not exist.</returns>
-    public Task<byte[]?> GetAsync(string key, CancellationToken ct = default)
+    public Task<byte[]> GetAsync(string key, CancellationToken ct = default)
     {
         GetWasCalled = true;
-        return Task.FromResult<byte[]?>(null);
+        return Task.FromResult<byte[]>(null);
     }
 
     /// <summary>
@@ -153,7 +153,7 @@ public class MockCacheBlobClient : ICacheBlobClient
     /// cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a string representing the outcome of
     /// the operation.</returns>
-    public Task<string> PutAsync(string key, byte[] data, string? ifMatchEtag = null, CancellationToken ct = default)
+    public Task<string> PutAsync(string key, byte[] data, string ifMatchEtag = null, CancellationToken ct = default)
     {
         PutWasCalled = true;
         return Task.FromResult(string.Empty);

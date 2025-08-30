@@ -218,7 +218,7 @@ public class SearpApiSourceService : IJobSourceService
                     return;
                 }
 
-                var clientResult = await GetSearchResults(job, organicResults);
+                var clientResult = await GetHierarchyResults(job, organicResults);
                 if (clientResult is not null)
                 {
                     try
@@ -313,29 +313,30 @@ public class SearpApiSourceService : IJobSourceService
     /// determine the division of each job before adding it to the repository.</remarks>
     /// <returns><see langword="true"/> if the job source was successfully updated with at least one valid job; otherwise, <see
     /// langword="false"/>.</returns>
-    public async Task<bool> UpdateJobSourceAsync()
+    public async Task UpdateJobSourceAsync()
     {
         var jobs = await _jobsRetrieval.FetchJobs(_settings.Query, _settings.Location);
         if (jobs is null || !jobs.Any())
         {
-            return false;
+            _logger.LogInformation("No job found");
+            return;
         }
 
-        foreach (var job in jobs)
+        var tasks = jobs.Select(async job =>
         {
             try
             {
                 if (await _jobsRepository.GetJobAsync(job.JobId) is not null)
                 {
                     _logger.LogInformation("Job with ID {JobId} already exists, skipping.", job.JobId);
-                    continue;
+                    return;
                 }
 
                 // Validate the job
-                if (!IsValid(job, _logger))
+                if (!IsJobResultValid(job, _logger))
                 {
                     _logger.LogInformation("Job with ID {JobId} is not valid, skipping.", job.JobId);
-                    continue;
+                    return;
                 }
 
                 UpdateJobTitle(job);
@@ -354,10 +355,9 @@ public class SearpApiSourceService : IJobSourceService
             {
                 // Log the exception (not implemented here, but should be done in a real application)
                 _logger.LogError("Error updating job source: {Message}", ex.Message);
-                return false;
             }
-        }
-        return true;
+        });
+        await Task.WhenAll(tasks);
     }
 
     /// <summary>
@@ -366,7 +366,7 @@ public class SearpApiSourceService : IJobSourceService
     /// <param name="job">The job to validate.</param>
     /// <param name="logger">The Logger</param>
     /// <returns>True if valid otherwise false.</returns>
-    public static bool IsValid(JobResult job, ILogger logger)
+    public static bool IsJobResultValid(JobResult job, ILogger logger)
     {
         // Check the Job summary for missing information
         if (string.IsNullOrWhiteSpace(job.CompanyName) || string.IsNullOrWhiteSpace(job.Description))
@@ -415,7 +415,7 @@ public class SearpApiSourceService : IJobSourceService
     /// contain valid items to process.</remarks>
     /// <param name="results">The organizational hierarchy results to update. Cannot be null.</param>
     /// <returns>The updated <see cref="HierarchyResults"/> object with modified names and trimmed titles.</returns>
-    public static HierarchyResults UpdateName(HierarchyResults results)
+    public static HierarchyResults UpdateHierarchyResultsName(HierarchyResults results)
     {
         if (results is null)
         {
@@ -468,7 +468,7 @@ public class SearpApiSourceService : IJobSourceService
     /// <param name="organicResults">The company's public organizational structure data.</param>
     /// <returns>A <see cref="HierarchyResults"/> object containing the relevant organizational hierarchy, or  <see
     /// langword="null"/> if no valid results are found.</returns>
-    private async Task<HierarchyResults?> GetSearchResults(JobSummary job, string organicResults)
+    private async Task<HierarchyResults?> GetHierarchyResults(JobSummary job, string organicResults)
     {
         var cacheKey = CachingHelper.GenCacheKey(nameof(SearpApiSourceService), job.CompanyName, organicResults.GenHashString());
         var cachedSearch = await _cacheService.TryGetAsync<HierarchyResults>(cacheKey);
@@ -508,7 +508,7 @@ public class SearpApiSourceService : IJobSourceService
                     _logger.LogWarning("No valid organizational hierarchy found for company: {CompanyName}", job.CompanyName);
                     return null;
                 }
-                result = UpdateName(result);
+                result = UpdateHierarchyResultsName(result);
                 await _cacheService.CreateEntryAsync(cacheKey, result);
                 return result;
             }

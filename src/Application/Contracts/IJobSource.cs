@@ -32,6 +32,6 @@
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
         /// update was successful; otherwise, <see langword="false"/>.</returns>
-        public Task<bool> UpdateJobSourceAsync();
+        public Task UpdateJobSourceAsync();
     }
 }

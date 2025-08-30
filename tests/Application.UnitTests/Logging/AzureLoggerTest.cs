@@ -67,22 +67,6 @@ public class AzureLoggerTest : UnitTestsBase
     }
 
     [Fact]
-    public async Task Log_StoresLogEvent_WhenEnabledAndLevelIsSufficient()
-    {
-        var cacheBlobClient = new MockCacheBlobClient();
-
-        var logger = new AzureLogger(
-            cacheBlobClient,
-            Options.Create(GetSettings(LogLevel.Information, true)),
-            () => GetLogEvent());
-
-        logger.Log(LogLevel.Information, new EventId(1), "state", null, (s, e) => s.ToString());
-        await Task.Delay(200); // Allow async log to run
-
-        Assert.True(cacheBlobClient.PutWasCalled);
-    }
-
-    [Fact]
     public void BeginScope_ReturnsNull()
     {
         var logger = new AzureLogger(

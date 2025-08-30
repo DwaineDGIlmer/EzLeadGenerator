@@ -36,9 +36,16 @@ public class SearpApiSourceServiceTest : UnitTestsBase
             .ReturnsAsync((IEnumerable<JobResult>?)null);
 
         var service = CreateService();
-        var result = await service.UpdateJobSourceAsync();
+        await service.UpdateJobSourceAsync();
 
-        Assert.False(result);
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtLeastOnce);
     }
 
     [Fact]
@@ -61,9 +68,16 @@ public class SearpApiSourceServiceTest : UnitTestsBase
             .Returns(Task.CompletedTask);
 
         var service = CreateService();
-        var result = await service.UpdateJobSourceAsync();
+        await service.UpdateJobSourceAsync();
 
-        Assert.True(result);
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Never);
     }
 
 
@@ -95,7 +109,7 @@ public class SearpApiSourceServiceTest : UnitTestsBase
             .Returns(Task.CompletedTask);
 
         var service = CreateService();
-        var result = await service.UpdateJobSourceAsync();
+        await service.UpdateJobSourceAsync();
 
         _loggerMock.Verify(
             x => x.Log(
@@ -105,8 +119,6 @@ public class SearpApiSourceServiceTest : UnitTestsBase
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.AtLeastOnce);
-
-        Assert.True(result);
     }
 
     [Fact]
@@ -171,7 +183,7 @@ public class SearpApiSourceServiceTest : UnitTestsBase
     public void UpdateName_ReturnsCorrectName(string input, string expected)
     {
         // Act
-        var result = SearpApiSourceService.UpdateName(new HierarchyResults()
+        var result = SearpApiSourceService.UpdateHierarchyResultsName(new HierarchyResults()
         {
             OrgHierarchy =
             [
@@ -211,7 +223,7 @@ public class SearpApiSourceServiceTest : UnitTestsBase
         };
 
         // Act
-        var result = SearpApiSourceService.UpdateName(input);
+        var result = SearpApiSourceService.UpdateHierarchyResultsName(input);
 
         // Assert
         Assert.Single(result.OrgHierarchy);
@@ -225,7 +237,7 @@ public class SearpApiSourceServiceTest : UnitTestsBase
     public void UpdateName_ReturnsEmptyHierarchy_WhenInputIsNull()
     {
         // Act
-        var result = SearpApiSourceService.UpdateName((HierarchyResults)null!);
+        var result = SearpApiSourceService.UpdateHierarchyResultsName((HierarchyResults)null!);
 
         // Assert
         Assert.NotNull(result);
@@ -337,7 +349,7 @@ public class SearpApiSourceServiceTest : UnitTestsBase
         var loggerMock = new Mock<ILogger>();
 
         // Act
-        var result = SearpApiSourceService.IsValid(job, loggerMock.Object);
+        var result = SearpApiSourceService.IsJobResultValid(job, loggerMock.Object);
 
         // Assert
         Assert.Equal(expected, result);
@@ -358,7 +370,7 @@ public class SearpApiSourceServiceTest : UnitTestsBase
         var loggerMock = new MockLogger<SearpApiSourceService>(LogLevel.Information);
 
         // Act
-        var result = SearpApiSourceService.IsValid(job, loggerMock);
+        var result = SearpApiSourceService.IsJobResultValid(job, loggerMock);
 
         // Assert
         Assert.False(result);
