@@ -16,7 +16,7 @@ namespace WebApp.Pages;
 /// <param name="repository">The repository used to access company data. Cannot be null.</param>
 /// <param name="search">The search service used to perform searches for company-related data. Cannot be null.</param>
 /// <param name="logger">The logger used for logging information and errors. Cannot be null.</param>
-public class CompanyAnalysisPage(
+sealed public class CompanyAnalysisPage(
     IDisplayRepository repository,
     ISearch search,
     ILogger<CompanyAnalysisPage> logger) : PageModel

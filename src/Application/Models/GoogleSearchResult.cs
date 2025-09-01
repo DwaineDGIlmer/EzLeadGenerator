@@ -5,7 +5,7 @@ namespace Application.Models;
 /// <summary>
 /// Represents the search result data retrieved from a search engine.
 /// </summary>
-public class GoogleSearchResult
+sealed public class GoogleSearchResult
 {
     /// <summary>
     /// Metadata about the search, including ID, status, and timing information.
@@ -53,7 +53,7 @@ public class GoogleSearchResult
 /// <summary>
 /// Represents metadata about the search.
 /// </summary>
-public class SearchMetadata
+sealed public class SearchMetadata
 {
     /// <summary>
     /// Gets or sets the unique identifier for the entity.
@@ -107,7 +107,7 @@ public class SearchMetadata
 /// <summary>
 /// Represents the parameters used for the search query.
 /// </summary>
-public class SearchParameters
+sealed public class SearchParameters
 {
     /// <summary>
     /// Gets or sets the engine type identifier.
@@ -179,7 +179,7 @@ public class SearchParameters
 /// <summary>
 /// Represents information about the search results.
 /// </summary>
-public class SearchInformation
+sealed public class SearchInformation
 {
     /// <summary>
     /// Gets or sets the state of the organic search results.
@@ -215,7 +215,7 @@ public class SearchInformation
 /// <summary>
 /// Represents a related search.
 /// </summary>
-public class RelatedSearch
+sealed public class RelatedSearch
 {
     /// <summary>
     /// Gets or sets the query string used for searching or filtering data.
@@ -233,7 +233,7 @@ public class RelatedSearch
 /// <summary>
 /// Represents pagination details.
 /// </summary>
-public class Pagination
+sealed public class Pagination
 {
     /// <summary>
     /// Gets or sets the current value.
@@ -264,7 +264,7 @@ public class Pagination
 /// <summary>
 /// Represents SerpAPI-specific pagination details.
 /// </summary>
-public class SerpApiPagination
+sealed public class SerpApiPagination
 {
     /// <summary>
     /// Gets or sets the current value.

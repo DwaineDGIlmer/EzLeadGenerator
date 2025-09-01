@@ -4,7 +4,7 @@ using Core.Helpers;
 
 namespace Application.UnitTests.Models;
 
-public class CompanyProfileTest
+sealed public class CompanyProfileTest
 {
     [Fact]
     public void DefaultConstructor_InitializesProperties()

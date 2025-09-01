@@ -6,7 +6,7 @@ using WebApp.Pages;
 
 namespace WebApp.UnitTests.Pages;
 
-public class CompanyResearchModelTests
+sealed public class CompanyResearchModelTests
 {
     private readonly Mock<IDisplayRepository> _repoMock;
     private readonly Mock<ILogger<CompanyResearchModel>> _loggerMock;

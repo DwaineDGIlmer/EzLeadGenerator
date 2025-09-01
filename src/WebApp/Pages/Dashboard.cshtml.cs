@@ -8,7 +8,7 @@ namespace WebApp.Pages
     /// </summary>
     /// <remarks>This model is used to populate the dashboard view with key metrics and data visualizations.
     /// It includes properties for total counts, collections of detailed data, and calculated metrics.</remarks>
-    public class DashboardModel : PageModel
+    sealed public class DashboardModel : PageModel
     {
         private readonly ILogger<DashboardModel> _logger;
         private readonly IDisplayRepository _displayRepository;
@@ -105,7 +105,7 @@ namespace WebApp.Pages
     /// </summary>
     /// <remarks>This class is typically used to store and transfer information about a company's hiring
     /// agency,  the number of job postings, and the date of the latest job posting.</remarks>
-    public class CompanyAgencyRow
+    sealed public class CompanyAgencyRow
     {
         /// <summary>
         /// Gets or sets the name of the company.
@@ -131,7 +131,7 @@ namespace WebApp.Pages
     /// <summary>
     /// Represents a company with its name and the number of job openings.
     /// </summary>
-    public class TopCompany
+    sealed public class TopCompany
     {
         /// <summary>
         /// Gets or sets the name of the company.
@@ -150,7 +150,7 @@ namespace WebApp.Pages
     /// </summary>
     /// <remarks>This class is typically used to store and analyze data related to job title frequencies, such
     /// as in reporting or visualization scenarios.</remarks>
-    public class JobTitleDistribution
+    sealed public class JobTitleDistribution
     {
         /// <summary>
         /// Gets or sets the job title of the employee.

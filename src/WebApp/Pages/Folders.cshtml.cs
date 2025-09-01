@@ -13,7 +13,7 @@ namespace WebApp.Pages;
 /// Initializes a new instance of the <see cref="FolderModel"/> class.
 /// </remarks>
 /// <param name="logService">The service used to read log data from a blob storage. This parameter cannot be <see langword="null"/>.</param>
-public class FolderModel(LogBlobReaderService logService) : PageModel
+sealed public class FolderModel(LogBlobReaderService logService) : PageModel
 {
     private readonly LogBlobReaderService _logService = logService;
 

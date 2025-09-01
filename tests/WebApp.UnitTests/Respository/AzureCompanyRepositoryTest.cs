@@ -12,7 +12,7 @@ using WebApp.Respository;
 
 namespace WebApp.UnitTests.Respository;
 
-public class AzureCompanyRepositoryTest
+sealed public class AzureCompanyRepositoryTest
 {
     private readonly Mock<TableClient> _tableClientMock = new();
     private readonly Mock<IOptions<AzureSettings>> _azOptionsMock = new();

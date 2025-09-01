@@ -26,7 +26,7 @@ public class UnitTestsBase
     /// </remarks>
     /// <param name="logLevel">The minimum <see cref="LogLevel"/> at which log messages will be processed.</param>
     /// <param name="publisher">The <see cref="IPublisher"/> instance used to publish log messages. Cannot be <see langword="null"/>.</param>
-    public class MockLogger<T>(LogLevel logLevel, IPublisher publisher = null) : ILogger<T>
+    sealed public class MockLogger<T>(LogLevel logLevel, IPublisher publisher = null) : ILogger<T>
     {
         private readonly LogLevel _logLevel = logLevel;
         private readonly IPublisher _publisher = publisher ?? new ConsolePublisher(20);
@@ -96,7 +96,7 @@ public class UnitTestsBase
 /// environment. It provides methods to mock the operations of deleting, retrieving, and storing data in a cache, while
 /// tracking whether each operation was called. The actual data operations are not performed; instead, the methods
 /// return predefined results.</remarks>
-public class MockCacheBlobClient : ICacheBlobClient
+sealed public class MockCacheBlobClient : ICacheBlobClient
 {
     /// <summary>
     /// Gets a value indicating whether the delete operation has been invoked.

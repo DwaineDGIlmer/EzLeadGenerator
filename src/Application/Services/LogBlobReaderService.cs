@@ -18,7 +18,7 @@ namespace Application.Services;
 /// files within a folder, and reading log file contents. The service relies on a logging prefix and blob name
 /// configuration, which are provided through the <see cref="IOptions{TOptions}"/> parameter during
 /// initialization.</remarks>
-public class LogBlobReaderService
+sealed public class LogBlobReaderService
 {
     private readonly string _loggingPrefix;
     private const string _delimiter = "/";
@@ -76,7 +76,6 @@ public class LogBlobReaderService
     /// the specified folder.</returns>
     public async Task<List<string>> ListLogFilesAsync(string folder)
     {
-        var prefix = $"{_loggingPrefix}/{folder}/";
         var files = new List<string>();
         await foreach (var blob in _containerClient.GetBlobsAsync(prefix: _loggingPrefix))
         {
@@ -123,7 +122,7 @@ public class LogBlobReaderService
 /// <summary>
 /// Represents a log event with detailed properties mapped to JSON.
 /// </summary>
-public class LogEvent
+sealed public class LogEvent
 {
     /// <summary>
     /// The timestamp of the log event.
@@ -171,7 +170,7 @@ public class LogEvent
 /// <summary>
 /// Represents additional attributes for a log event.
 /// </summary>
-public class LogAttributes
+sealed public class LogAttributes
 {
     /// <summary>
     /// The correlation identifier.

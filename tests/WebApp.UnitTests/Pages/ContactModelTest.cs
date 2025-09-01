@@ -2,7 +2,7 @@
 
 namespace WebApp.UnitTests.Pages;
 
-public class ContactModelTests
+sealed public class ContactModelTests
 {
     [Fact]
     public void OnGet_DoesNotThrow()

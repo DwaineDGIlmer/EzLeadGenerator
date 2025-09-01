@@ -52,7 +52,7 @@ The `Configurations` folder provides settings classes for Azure, job execution, 
 These classes are typically bound to configuration sections in `appsettings.json` or environment variables using .NET's configuration system. Inject them via `IOptions<T>` or `IOptionsSnapshot<T>` where needed.
 
 ```csharp
-public class MyService
+sealed public class MyService
 {
     private readonly AzureSettings _azureSettings;
     public MyService(IOptions<AzureSettings> azureOptions)

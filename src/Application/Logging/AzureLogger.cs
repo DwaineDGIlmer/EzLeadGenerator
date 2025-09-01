@@ -17,7 +17,7 @@ namespace Application.Logging;
 /// supports structured logging with features such as log level filtering, scoped logging, and asynchronous storage
 /// of log events in Azure Blob Storage. It is designed for applications that require persistent, cloud-based
 /// logging with enhanced context management.</remarks>
-public class AzureLogger : ILogger, IDisposable
+sealed public class AzureLogger : ILogger, IDisposable
 {
     /// <summary>
     /// Represents a client used for interacting with cached blob storage.
@@ -166,7 +166,7 @@ public class AzureLogger : ILogger, IDisposable
             logEvent.ComponentId = Settings.ComponentId ?? string.Empty;
             logEvent.Environment = Settings.Environment ?? string.Empty;
             logEvent.Level = logLevel;
-            logEvent.Tags = logEvent.Tags ?? new Dictionary<string, string>();
+            logEvent.Tags ??= new Dictionary<string, string>();
             logEvent.Tags.Add("EventId", eventId.Id.ToString());
             logEvent.Exception = exception is not null ? new SerializableException(exception) : null;
             logEvent.CorrelationId = Activity.Current?.RootId ?? Guid.NewGuid().ToString();

@@ -16,7 +16,7 @@ namespace WebApp.Respository;
 /// directory. It supports operations such as adding, updating, retrieving, and deleting job profiles. The directory for
 /// storing job profiles is specified through configuration options, and the class ensures that this directory exists
 /// upon initialization. Logging is used to record operations and errors.</remarks>
-public class LocalJobsRepositoryStore : IJobsRepository
+sealed public class LocalJobsRepositoryStore : IJobsRepository
 {
     private readonly string _jobsProfileDirectory;
     private readonly int _cacheExpirationInHours;

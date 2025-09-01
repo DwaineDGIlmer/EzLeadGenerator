@@ -10,7 +10,7 @@ namespace WebApp.Pages;
 /// service. The <see cref="OnGetAsync"/> method is used to initialize the model with data from the specified folder and
 /// file.</remarks>
 /// <param name="logService"></param>
-public class LogModel(LogBlobReaderService logService) : PageModel
+sealed public class LogModel(LogBlobReaderService logService) : PageModel
 {
     private readonly LogBlobReaderService _logService = logService;
 

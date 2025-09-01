@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace Application.UnitTests.Services;
 
-public class SerpApiSearchServiceTest
+sealed public class SerpApiSearchServiceTest
 {
     private readonly Mock<IOptions<SerpApiSettings>> _optionsMock;
     private readonly Mock<ICacheService> _cacheServiceMock;
