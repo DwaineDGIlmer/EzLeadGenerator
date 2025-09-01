@@ -2,7 +2,7 @@ using Application.Models;
 
 namespace Application.UnitTests.Models;
 
-sealed public class OrganicResultTest
+public sealed class OrganicResultTest
 {
     [Fact]
     public void OrganicResult_DefaultValues_AreSetCorrectly()

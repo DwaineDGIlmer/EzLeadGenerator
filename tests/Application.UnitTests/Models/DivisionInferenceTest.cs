@@ -2,7 +2,7 @@ using Application.Models;
 
 namespace Application.UnitTests.Models;
 
-sealed public class DivisionInferenceTest
+public sealed class DivisionInferenceTest
 {
     [Fact]
     public void Constructor_ShouldInitializePropertiesWithDefaults()

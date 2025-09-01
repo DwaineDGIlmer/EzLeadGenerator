@@ -8,7 +8,7 @@ using WebApp.Middleware;
 
 namespace WebApp.UnitTests.Middleware;
 
-sealed public class JobServicesMiddlewareTest : UnitTestsBase
+public sealed class JobServicesMiddlewareTest : UnitTestsBase
 {
     private readonly Mock<IJobSourceService> _jobSourceServiceMock = new();
     private readonly Mock<ILogger<JobServicesMiddleware>> _loggerMock = new();

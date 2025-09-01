@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 namespace Application.UnitTests.Services;
 
-sealed public class SearpApiSourceServiceTest : UnitTestsBase
+public sealed class SearpApiSourceServiceTest : UnitTestsBase
 {
     private readonly Mock<ICacheService> _cacheServiceMock = new();
     private readonly Mock<ISearch> _searchServiceMock = new();

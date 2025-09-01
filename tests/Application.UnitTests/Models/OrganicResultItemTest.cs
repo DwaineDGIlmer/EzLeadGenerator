@@ -2,7 +2,7 @@
 
 namespace Application.UnitTests.Models;
 
-sealed public class OrganicResultItemTest
+public sealed class OrganicResultItemTest
 {
     [Fact]
     public void DefaultConstructor_InitializesPropertiesWithDefaults()

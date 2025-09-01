@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Application.UnitTests.Models;
 
-sealed public class GoogleJobsResultTest
+public sealed class GoogleJobsResultTest
 {
     [Fact]
     public void GoogleJobsResult_DefaultValues_AreInitialized()

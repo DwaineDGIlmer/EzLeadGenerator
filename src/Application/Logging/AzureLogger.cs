@@ -17,7 +17,7 @@ namespace Application.Logging;
 /// supports structured logging with features such as log level filtering, scoped logging, and asynchronous storage
 /// of log events in Azure Blob Storage. It is designed for applications that require persistent, cloud-based
 /// logging with enhanced context management.</remarks>
-sealed public class AzureLogger : ILogger, IDisposable
+public sealed class AzureLogger : ILogger, IDisposable
 {
     /// <summary>
     /// Represents a client used for interacting with cached blob storage.

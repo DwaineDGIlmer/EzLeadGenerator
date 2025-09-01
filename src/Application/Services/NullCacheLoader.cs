@@ -12,7 +12,7 @@ namespace Application.Services
     /// <summary>
     /// Used for testing.
     /// </summary>
-    sealed public class NullCacheLoader : ICacheLoader
+    public sealed class NullCacheLoader : ICacheLoader
     {
         private static readonly string _loggingPrefix = $"{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Year}";
         private readonly ILogger _logger;

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.UnitTests.Services;
 
-sealed public class DisplayRepositoryTest
+public sealed class DisplayRepositoryTest
 {
     private readonly Mock<ICompanyRepository> _companyRepoMock;
     private readonly Mock<IJobsRepository> _jobsRepoMock;

@@ -2,7 +2,7 @@ using Application.Models;
 
 namespace Application.UnitTests.Models;
 
-sealed public class JobSummaryTest
+public sealed class JobSummaryTest
 {
     [Fact]
     public void DefaultConstructor_InitializesPropertiesWithDefaults()

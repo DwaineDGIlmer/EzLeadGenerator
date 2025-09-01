@@ -18,7 +18,7 @@ namespace Application.Services;
 /// files within a folder, and reading log file contents. The service relies on a logging prefix and blob name
 /// configuration, which are provided through the <see cref="IOptions{TOptions}"/> parameter during
 /// initialization.</remarks>
-sealed public class LogBlobReaderService
+public sealed class LogBlobReaderService
 {
     private readonly string _loggingPrefix;
     private const string _delimiter = "/";
@@ -122,7 +122,7 @@ sealed public class LogBlobReaderService
 /// <summary>
 /// Represents a log event with detailed properties mapped to JSON.
 /// </summary>
-sealed public class LogEvent
+public sealed class LogEvent
 {
     /// <summary>
     /// The timestamp of the log event.
@@ -170,7 +170,7 @@ sealed public class LogEvent
 /// <summary>
 /// Represents additional attributes for a log event.
 /// </summary>
-sealed public class LogAttributes
+public sealed class LogAttributes
 {
     /// <summary>
     /// The correlation identifier.

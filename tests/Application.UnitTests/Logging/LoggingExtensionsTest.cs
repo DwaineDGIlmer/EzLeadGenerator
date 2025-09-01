@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.UnitTests.Logging;
 
-sealed public class LoggingExtensionsTest : UnitTestsBase
+public sealed class LoggingExtensionsTest : UnitTestsBase
 {
     [Fact]
     public void UserLoggedIn_LogsWarningWithUserName()

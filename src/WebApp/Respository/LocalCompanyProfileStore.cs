@@ -12,7 +12,7 @@ namespace WebApp.Respository;
 /// <summary>
 /// Local development repository for company profiles and company summaries using JSON files.
 /// </summary>
-sealed public class LocalCompanyProfileStore : ICompanyRepository
+public sealed class LocalCompanyProfileStore : ICompanyRepository
 {
     private readonly string _companyProfileDirectory;
     private readonly int _cacheExpirationDays;

@@ -8,7 +8,7 @@
 /// includes properties for identifying the item (e.g., <see cref="Title"/> and <see cref="Url"/>), categorizing it
 /// (e.g., <see cref="Type"/> and <see cref="Tags"/>), and providing additional context (e.g., <see cref="Source"/>,
 /// <see cref="Date"/>, and <see cref="Location"/>).</remarks>
-sealed public class OrganicResultItem
+public sealed class OrganicResultItem
 {
     /// <summary>
     /// Gets or sets the title associated with the current object.

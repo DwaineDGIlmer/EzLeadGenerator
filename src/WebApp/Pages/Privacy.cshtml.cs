@@ -9,7 +9,7 @@
     /// Initializes a new instance of the <see cref="PrivacyModel"/> class.
     /// </remarks>
     /// <param name="logger">The logger instance used to log messages related to the <see cref="PrivacyModel"/>.</param>
-    sealed public class PrivacyModel(ILogger<PrivacyModel> logger) : PageModel
+    public sealed class PrivacyModel(ILogger<PrivacyModel> logger) : PageModel
     {
         /// <summary>
         /// The logger instance used for logging information and errors.

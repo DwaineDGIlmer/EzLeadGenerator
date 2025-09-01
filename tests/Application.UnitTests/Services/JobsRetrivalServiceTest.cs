@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Application.UnitTests.Services;
 
-sealed public class JobsRetrivalServiceTest
+public sealed class JobsRetrivalServiceTest
 {
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
     private readonly Mock<ICacheService> _cacheServiceMock;

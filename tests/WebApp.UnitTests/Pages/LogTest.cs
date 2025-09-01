@@ -7,7 +7,7 @@ using WebApp.Pages;
 
 namespace WebApp.UnitTests.Pages;
 
-sealed public class LogTest
+public sealed class LogTest
 {
     [Fact]
     public void LogTest_PageModel_CanBeCreated()

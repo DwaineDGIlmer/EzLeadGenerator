@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Application.UnitTests.Logging;
 
-sealed public class AzureLoggerTest : UnitTestsBase
+public sealed class AzureLoggerTest : UnitTestsBase
 {
     private static EzLeadSettings GetSettings(LogLevel logLevel = LogLevel.Information, bool enabled = true)
     {

@@ -9,7 +9,7 @@ namespace WebApp.Pages;
 /// </summary>
 /// <remarks>This model is used in an ASP.NET Core Razor Pages application to display company research data. It
 /// includes functionality for retrieving and managing paginated company summaries and profiles.</remarks>
-sealed public class CompanyResearchModel : PageModel
+public sealed class CompanyResearchModel : PageModel
 {
     private readonly IDisplayRepository _displayRepository;
     private readonly ILogger<CompanyResearchModel> _logger;
@@ -92,7 +92,7 @@ sealed public class CompanyResearchModel : PageModel
 /// <param name="companyProfile">The company profile associated with this result. Cannot be <see langword="null"/>.</param>
 /// <param name="index">The zero-based index of the company profile. The resulting <see cref="CurrentIndex"/> will be this value
 /// incremented by 1.</param>
-sealed public class CompanyProfileResult(CompanyProfile companyProfile, int index)
+public sealed class CompanyProfileResult(CompanyProfile companyProfile, int index)
 {
     /// <summary>
     /// Gets or sets the company profile information.

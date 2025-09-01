@@ -2,7 +2,7 @@ using Application.Enums;
 
 namespace Application.UnitTests.Enums;
 
-sealed public class LogEventsTest
+public sealed class LogEventsTest
 {
     [Theory]
     [InlineData(LogEvents.None, 0)]

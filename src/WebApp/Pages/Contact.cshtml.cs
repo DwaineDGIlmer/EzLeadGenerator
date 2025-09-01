@@ -3,7 +3,7 @@ namespace WebApp.Pages
     /// <summary>
     /// Represents the model for the Contact page in an ASP.NET Core Razor Pages application.
     /// </summary>
-    sealed public class ContactModel : PageModel
+    public sealed class ContactModel : PageModel
     {
         /// <summary>
         /// Handles GET requests for the page.

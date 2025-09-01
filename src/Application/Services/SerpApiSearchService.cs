@@ -17,7 +17,7 @@ namespace Application.Services;
 /// <remarks>This service handles the execution of search queries, caching of results, and logging of operations.
 /// It requires configuration settings for the API key, endpoint, and cache expiration, as well as services for caching,
 /// HTTP client creation, and logging.</remarks>
-sealed public class SerpApiSearchService : ISearch
+public sealed class SerpApiSearchService : ISearch
 {
     private readonly IHttpClientFactory _clientFactory;
     private readonly ICacheService _cacheService;

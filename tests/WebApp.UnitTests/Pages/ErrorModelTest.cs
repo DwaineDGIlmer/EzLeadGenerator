@@ -4,7 +4,7 @@ using WebApp.Pages;
 
 namespace WebApp.UnitTests.Pages;
 
-sealed public class ErrorModelTests
+public sealed class ErrorModelTests
 {
     [Fact]
     public void ShowRequestId_ReturnsFalse_WhenRequestIdIsNullOrEmpty()

@@ -9,7 +9,7 @@ using WebApp.Respository;
 
 namespace WebApp.UnitTests.Respository;
 
-sealed public class LocalJobsRepositoryStoreTest
+public sealed class LocalJobsRepositoryStoreTest
 {
     private readonly string _testDirectory;
     private readonly Mock<ILogger<LocalJobsRepositoryStore>> _loggerMock;

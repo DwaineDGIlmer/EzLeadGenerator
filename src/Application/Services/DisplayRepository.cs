@@ -11,7 +11,7 @@ namespace Application.Services
     /// job summaries and company profiles. It initializes by asynchronously loading all jobs and companies from the
     /// specified repositories. The class supports paginated retrieval of job summaries and company profiles, allowing
     /// clients to efficiently access large datasets.</remarks>
-    sealed public class DisplayRepository : IDisplayRepository
+    public sealed class DisplayRepository : IDisplayRepository
     {
         private readonly ILogger<DisplayRepository> _logger;
         private readonly List<JobSummary> _allJobs = [];

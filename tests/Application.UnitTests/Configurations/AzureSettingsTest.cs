@@ -3,7 +3,7 @@ using Application.Constants;
 
 namespace Application.UnitTests.Configurations;
 
-sealed public class AzureSettingsTest
+public sealed class AzureSettingsTest
 {
 
     [Fact]

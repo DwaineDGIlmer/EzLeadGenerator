@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Application.UnitTests.Logging;
 
-sealed public class AzureLoggerProviderTest
+public sealed class AzureLoggerProviderTest
 {
     [Fact]
     public void CreateLogger_ReturnsAzureLogger_ForValidCategory()

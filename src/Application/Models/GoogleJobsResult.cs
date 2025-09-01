@@ -9,7 +9,7 @@ namespace Application.Models;
 /// <remarks>This class encapsulates the data returned from a Google Jobs search query. It includes various
 /// components such as search metadata, parameters used for the search, applied filters, the list of job results, and
 /// pagination information.</remarks>
-sealed public class GoogleJobsResult
+public sealed class GoogleJobsResult
 {
     /// <summary>
     /// Gets or sets the metadata associated with a search operation.
@@ -48,7 +48,7 @@ sealed public class GoogleJobsResult
 /// <remarks>This class provides properties to access various details about a search operation, such as its unique
 /// identifier, status, and timing information. It also includes URLs for accessing related resources and the raw HTML
 /// content of the search result.</remarks>
-sealed public class JobsSearchMetadata
+public sealed class JobsSearchMetadata
 {
     /// <summary>
     /// Gets or sets the unique identifier for the entity.
@@ -102,7 +102,7 @@ sealed public class JobsSearchMetadata
 /// <summary>
 /// Represents a set of parameters used for configuring a request or operation.
 /// </summary>
-sealed public class Parameters
+public sealed class Parameters
 {
     /// <summary>
     /// Gets or sets the Universal Data System (UDS) identifier.
@@ -122,7 +122,7 @@ sealed public class Parameters
 /// </summary>
 /// <remarks>This class encapsulates the details of an option, including its name, parameters, and related
 /// links.</remarks>
-sealed public class Option
+public sealed class Option
 {
     /// <summary>
     /// Gets or sets the name associated with the current instance.
@@ -155,7 +155,7 @@ sealed public class Option
 /// <remarks>This class encapsulates the details of a filter, including its name, parameters, and options, as well
 /// as links related to the filter's operation. It is typically used to configure and execute search queries with
 /// specific criteria.</remarks>
-sealed public class Filter
+public sealed class Filter
 {
     /// <summary>
     /// Gets or sets the name associated with the current instance.
@@ -194,7 +194,7 @@ sealed public class Filter
 /// <remarks>This class provides properties to store information about the posting date, schedule type, and
 /// various employment benefits such as health insurance, dental coverage, and paid time off. Each property can be
 /// individually set or retrieved to reflect the current state of these extensions.</remarks>
-sealed public class DetectedExtensions
+public sealed class DetectedExtensions
 {
     /// <summary>
     /// Gets or sets the timestamp indicating when the post was created.
@@ -230,7 +230,7 @@ sealed public class DetectedExtensions
 /// <summary>
 /// Represents a highlight of a job, including a title and a list of items describing the highlight.
 /// </summary>
-sealed public class JobHighlight
+public sealed class JobHighlight
 {
     /// <summary>
     /// Gets or sets the title of the item.
@@ -248,7 +248,7 @@ sealed public class JobHighlight
 /// <summary>
 /// Represents an option with a title and a link, typically used for navigation or selection purposes.
 /// </summary>
-sealed public class ApplyOption
+public sealed class ApplyOption
 {
     /// <summary>
     /// Gets or sets the title of the item.
@@ -269,7 +269,7 @@ sealed public class ApplyOption
 /// <remarks>This class encapsulates various properties of a job listing, such as the job title, company name,
 /// location, and additional metadata. It is used to store and transfer job-related information retrieved from a job
 /// search operation.</remarks>
-sealed public class JobResult
+public sealed class JobResult
 {
     /// <summary>
     /// Gets or sets the title of the item.
@@ -343,7 +343,7 @@ sealed public class JobResult
 /// </summary>
 /// <remarks>This class provides properties to access tokens and URLs for fetching the next page of
 /// results.</remarks>
-sealed public class SerpapiPagination
+public sealed class SerpapiPagination
 {
     /// <summary>
     /// Gets or sets the token used to retrieve the next page of results in a paginated query.

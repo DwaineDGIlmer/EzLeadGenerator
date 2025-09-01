@@ -7,7 +7,7 @@ namespace Application.Models;
 /// Represents a company's profile including metadata, organizational structure,
 /// and analysis used to support job and department inference.
 /// </summary>
-sealed public class CompanyProfile
+public sealed class CompanyProfile
 {
     /// <summary>
     /// A unique identifier for the company, used for routing and storage (e.g., "pwc").

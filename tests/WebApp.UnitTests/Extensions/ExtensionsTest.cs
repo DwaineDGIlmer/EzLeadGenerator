@@ -6,7 +6,7 @@ using WebApp.Extensions;
 
 namespace WebApp.UnitTests.Extensions;
 
-sealed public class ExtensionsTest
+public sealed class ExtensionsTest
 {
     // GetJobAsync Tests
     [Fact]

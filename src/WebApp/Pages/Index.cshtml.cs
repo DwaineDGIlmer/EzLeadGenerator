@@ -6,7 +6,7 @@ namespace WebApp.Pages
     /// <summary>
     /// Represents the model for the company job analysis page.
     /// </summary>
-    sealed public class IndexModel : PageModel
+    public sealed class IndexModel : PageModel
     {
         private readonly IDisplayRepository _displayRepository;
         private readonly ILogger<IndexModel> _logger;

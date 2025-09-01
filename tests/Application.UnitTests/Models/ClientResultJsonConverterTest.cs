@@ -4,12 +4,12 @@ using System.Text.Json;
 namespace Application.UnitTests.Models;
 
 // Dummy ClientResult<T> for testing purposes
-sealed public class ClientResult<T>(T value)
+public sealed class ClientResult<T>(T value)
 {
     public T Value { get; } = value;
 }
 
-sealed public class ClientResultJsonConverterTest
+public sealed class ClientResultJsonConverterTest
 {
     private readonly JsonSerializerOptions _options = new()
     {

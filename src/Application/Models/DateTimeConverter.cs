@@ -9,7 +9,7 @@ namespace Application.Models;
 /// <remarks>This converter reads and writes <see cref="DateTime"/> values in the ISO 8601 format,
 /// ensuring compatibility with standard JSON date-time representations. It throws a <see cref="JsonException"/> if
 /// the JSON value cannot be parsed into a valid <see cref="DateTime"/>.</remarks>
-sealed public class DateTimeConverter : JsonConverter<DateTime>
+public sealed class DateTimeConverter : JsonConverter<DateTime>
 {
     /// <summary>
     /// Reads and converts the JSON string representation of a date and time to a <see cref="DateTime"/> object.

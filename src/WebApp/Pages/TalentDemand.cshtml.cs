@@ -19,7 +19,7 @@ namespace WebApp.Pages;
 /// <param name="cache">The memory cache instance used for caching data.</param>
 /// <param name="httpClientFactory">The HTTP client factory to creat resilent client.</param>
 /// <param name="logger">The logger instance for this model.</param>
-sealed public class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpClientFactory httpClientFactory, ILogger<TalentDemandModel> logger) : PageModel
+public sealed class TalentDemandModel(IConfiguration config, IMemoryCache cache, IHttpClientFactory httpClientFactory, ILogger<TalentDemandModel> logger) : PageModel
 {
     private readonly IConfiguration _config = config;
     private readonly IMemoryCache _cache = cache;
@@ -324,7 +324,7 @@ sealed public class TalentDemandModel(IConfiguration config, IMemoryCache cache,
 /// </summary>
 /// <remarks>This class is designed to encapsulate the essential information about a job posting.  It can be used
 /// to display job listings, store job-related data, or facilitate job application workflows.</remarks>
-sealed public class JobPosting
+public sealed class JobPosting
 {
     /// <summary>
     /// Gets or sets the title associated with the current object.

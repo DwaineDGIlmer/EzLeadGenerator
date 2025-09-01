@@ -6,7 +6,7 @@ namespace Application.Models;
 /// <summary>
 /// Represents a summary of a job posting, including company details, job title, location,
 /// </summary>
-sealed public class JobSummary
+public sealed class JobSummary
 {
     /// <summary>
     /// Gets or sets the unique identifier for the job.

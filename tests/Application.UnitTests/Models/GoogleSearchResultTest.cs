@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Application.UnitTests.Models;
 
-sealed public class GoogleSearchResultTest
+public sealed class GoogleSearchResultTest
 {
     [Fact]
     public void GoogleSearchResult_DefaultProperties_AreInitialized()

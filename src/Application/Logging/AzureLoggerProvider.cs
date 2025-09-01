@@ -18,7 +18,7 @@ namespace Application.Logging;
 /// <param name="func">A factory function that creates instances of <see cref="ILogEvent"/>.</param>
 /// <param name="cacheBlobClient">The client used to interact with the cache blob storage.</param>
 /// <param name="options">The configuration options for the logger provider.</param>
-sealed public class AzureLoggerProvider(
+public sealed class AzureLoggerProvider(
     Func<ILogEvent> func,
     ICacheBlobClient cacheBlobClient,
     IOptions<EzLeadSettings> options) : ILoggerProvider

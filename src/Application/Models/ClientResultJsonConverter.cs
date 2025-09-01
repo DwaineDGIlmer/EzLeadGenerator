@@ -11,7 +11,7 @@ namespace Application.Models;
 /// property. It is used to correctly serialize and deserialize <see cref="ClientResult{T}"/> objects to and from
 /// JSON.</remarks>
 /// <typeparam name="T">The type of the value contained within the <see cref="ClientResult{T}"/>.</typeparam>
-sealed public class ClientResultJsonConverter<T> : JsonConverter<ClientResult<T>>
+public sealed class ClientResultJsonConverter<T> : JsonConverter<ClientResult<T>>
 {
     /// <summary>
     /// Reads and converts the JSON data to a <see cref="ClientResult{T}"/> object.

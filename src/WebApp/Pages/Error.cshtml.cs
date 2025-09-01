@@ -10,7 +10,7 @@ namespace WebApp.Pages
     /// error tracking.</remarks>
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [IgnoreAntiforgeryToken]
-    sealed public class ErrorModel : PageModel
+    public sealed class ErrorModel : PageModel
     {
         /// <summary>
         /// Gets or sets the unique identifier for the current request.
