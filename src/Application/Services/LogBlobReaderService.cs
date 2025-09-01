@@ -76,7 +76,8 @@ sealed public class LogBlobReaderService
     /// the specified folder.</returns>
     public async Task<List<string>> ListLogFilesAsync(string folder)
     {
-        await foreach (var blob in _containerClient.GetBlobsAsync(prefix: $"{folder}/"))
+        var files = new List<string>();
+        await foreach (var blob in _containerClient.GetBlobsAsync(prefix: _loggingPrefix))
         {
             var fileName = blob.Name[(blob.Name.LastIndexOf('/') + 1)..];
             files.Add(fileName);
