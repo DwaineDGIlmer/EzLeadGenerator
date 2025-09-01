@@ -6,7 +6,7 @@ using Moq;
 
 namespace WebApp.UnitTests.Pages;
 
-public class FoldersTest
+sealed public class FoldersTest
 {
     [Fact]
     public void Constructor_Should_InstantiateClass()

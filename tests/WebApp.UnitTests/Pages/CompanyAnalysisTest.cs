@@ -7,7 +7,7 @@ using static WebApp.UnitTests.UnitTestsBase;
 
 namespace WebApp.UnitTests.Pages;
 
-public class CompanyAnalysisTest
+sealed public class CompanyAnalysisTest
 {
     [Fact]
     public void GetTitle_Returns_News_When_NewsKeyword_In_Snippet()

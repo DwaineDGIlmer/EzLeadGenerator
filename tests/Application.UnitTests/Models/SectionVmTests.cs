@@ -2,7 +2,7 @@
 
 namespace Application.UnitTests.Models;
 
-public class SectionVmTests
+sealed public class SectionVmTests
 {
     [Fact]
     public void SectionVm_DefaultConstructor_InitializesProperties()

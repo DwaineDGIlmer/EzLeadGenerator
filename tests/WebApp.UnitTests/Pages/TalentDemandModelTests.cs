@@ -7,7 +7,7 @@ using WebApp.Pages;
 
 namespace WebApp.UnitTests.Pages;
 
-public class TalentDemandModelTests
+sealed public class TalentDemandModelTests
 {
     private readonly Mock<IConfiguration> _mockConfig;
     private readonly IMemoryCache _memoryCache;

@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace Application.UnitTests.Services;
 
-public class SerpApiSearchJobsServiceTest
+sealed public class SerpApiSearchJobsServiceTest
 {
     private readonly JsonSerializerOptions _options = new() { PropertyNamingPolicy = null };
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock = new();

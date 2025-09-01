@@ -7,7 +7,7 @@ using WebApp.Pages;
 
 namespace WebApp.UnitTests.Pages;
 
-public class LogsTestModelTests
+sealed public class LogsTestModelTests
 {
     [Fact]
     public async Task OnGet_DoesNotThrow()

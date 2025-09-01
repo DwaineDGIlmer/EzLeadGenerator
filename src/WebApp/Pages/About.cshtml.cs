@@ -5,7 +5,7 @@ namespace WebApp.Pages
     /// </summary>
     /// <remarks>This class is used to handle the data and logic for the "About" page.  The <see
     /// cref="OnGet"/> method is invoked when a GET request is made to the page.</remarks>
-    public class AboutModel : PageModel
+    sealed public class AboutModel : PageModel
     {
         /// <summary>
         /// Handles GET requests for the page.

@@ -11,7 +11,7 @@ namespace WebApp.Pages;
 /// Initializes a new instance of the <see cref="LogsModel"/> class with the specified log service.
 /// </remarks>
 /// <param name="logService">The service used to read log data from the underlying storage.</param>
-public class LogsModel(LogBlobReaderService logService) : PageModel
+sealed public class LogsModel(LogBlobReaderService logService) : PageModel
 {
     private readonly LogBlobReaderService _logService = logService;
 

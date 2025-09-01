@@ -15,7 +15,7 @@ namespace Application.Services;
 /// </summary>
 /// <remarks>This service is configured with API settings and utilizes an HTTP client factory to perform requests.
 /// It requires valid API key, base address, and endpoint settings to function correctly.</remarks>
-public class SerpApiSearchJobsService : IJobsRetrieval<JobResult>
+sealed public class SerpApiSearchJobsService : IJobsRetrieval<JobResult>
 {
     private readonly IHttpClientFactory _clientFactory;
     private readonly ICacheService _cacheService;

@@ -21,7 +21,7 @@ namespace WebApp.Respository;
 /// <param name="azSettings">Configuration settings from Azure settings, including the table name.</param>
 /// <param name="ezSettings">Configuration settings from EzLead settings.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
-public class AzureCompanyRepository(
+sealed public class AzureCompanyRepository(
     TableClient tableClient,
     ICacheService cachingService,
     IOptions<AzureSettings> azSettings,

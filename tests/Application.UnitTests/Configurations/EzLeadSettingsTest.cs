@@ -3,7 +3,7 @@ using Application.Constants;
 
 namespace Application.UnitTests.Configurations;
 
-public class EzLeadSettingsTest
+sealed public class EzLeadSettingsTest
 {
     [Fact]
     public void Default_JobExecutionInSeconds_ShouldBe3600()

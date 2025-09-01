@@ -21,7 +21,7 @@ namespace Application.Services;
 /// <remarks>This service integrates with various components to fetch job listings,  infer additional information
 /// using AI, and store the results. It handles  both job data and company profiles, ensuring that the information is 
 /// up-to-date and accurately reflects the current job market as retrieved  from Google.</remarks>
-public class SearpApiSourceService : IJobSourceService
+sealed public class SearpApiSourceService : IJobSourceService
 {
     private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "their"];
     private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so", "not"];
@@ -527,7 +527,7 @@ public class SearpApiSourceService : IJobSourceService
 /// </summary>
 /// <remarks>This class provides a collection of <see cref="HierarchyItem"/> that describe the structure of an
 /// organization. The <see cref="OrgHierarchy"/> property contains the hierarchical data.</remarks>
-public class HierarchyResults
+sealed public class HierarchyResults
 {
     /// <summary>
     /// Gets or sets the organizational hierarchy as a list of hierarchy items.
@@ -539,7 +539,7 @@ public class HierarchyResults
 /// <summary>
 /// Represents an item in a hierarchy with a name and a title.
 /// </summary>
-public class HierarchyItem
+sealed public class HierarchyItem
 {
     /// <summary>
     /// Gets or sets the name associated with the entity.

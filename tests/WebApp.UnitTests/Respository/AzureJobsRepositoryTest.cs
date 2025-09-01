@@ -10,7 +10,7 @@ using WebApp.Respository;
 
 namespace WebApp.UnitTests.Respository;
 
-public class AzureJobsRepositoryTest
+sealed public class AzureJobsRepositoryTest
 {
     private readonly Mock<TableClient> _tableClientMock = new();
     private readonly Mock<ILogger<AzureJobsRepository>> _loggerMock = new();

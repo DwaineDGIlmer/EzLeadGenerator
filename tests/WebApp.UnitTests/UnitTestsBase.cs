@@ -126,7 +126,7 @@ public class UnitTestsBase
     /// type <typeparamref name="T"/>. It is useful for unit testing scenarios where a real search implementation is not
     /// required or available.</remarks>
     /// <typeparam name="T">The type of the search result returned by the mock implementation.</typeparam>
-    public class MockSearch<P>(P result) : ISearch
+    sealed public class MockSearch<P>(P result) : ISearch
     {
         private readonly P _result = result;
 
@@ -151,7 +151,7 @@ public class UnitTestsBase
     /// </remarks>
     /// <param name="logLevel">The minimum <see cref="LogLevel"/> at which log messages will be processed.</param>
     /// <param name="publisher">The <see cref="IPublisher"/> instance used to publish log messages. Cannot be <see langword="null"/>.</param>
-    public class MockLogger<T>(LogLevel logLevel, IPublisher publisher = null) : ILogger<T>
+    sealed public class MockLogger<T>(LogLevel logLevel, IPublisher publisher = null) : ILogger<T>
     {
         private readonly LogLevel _logLevel = logLevel;
         private readonly IPublisher _publisher = publisher ?? new ConsolePublisher(20);

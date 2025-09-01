@@ -8,7 +8,7 @@ using WebApp.Middleware;
 
 namespace WebApp.UnitTests.Middleware;
 
-public class JobServicesMiddlewareTest : UnitTestsBase
+sealed public class JobServicesMiddlewareTest : UnitTestsBase
 {
     private readonly Mock<IJobSourceService> _jobSourceServiceMock = new();
     private readonly Mock<ILogger<JobServicesMiddleware>> _loggerMock = new();
@@ -223,15 +223,19 @@ public class JobServicesMiddlewareTest : UnitTestsBase
             mockLogger);
 
         // Anonymous user
-        var anonymousContext = new DefaultHttpContext();
-        anonymousContext.User = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity());
+        var anonymousContext = new DefaultHttpContext
+        {
+            User = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity())
+        };
 
         // Authenticated user
         var identity = new System.Security.Claims.ClaimsIdentity("TestAuthType");
         identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "TestUser"));
         identity = new System.Security.Claims.ClaimsIdentity(identity.Claims, "TestAuthType", identity.NameClaimType, identity.RoleClaimType);
-        var authenticatedContext = new DefaultHttpContext();
-        authenticatedContext.User = new System.Security.Claims.ClaimsPrincipal(identity);
+        var authenticatedContext = new DefaultHttpContext
+        {
+            User = new System.Security.Claims.ClaimsPrincipal(identity)
+        };
 
         // Act
         await middleware.InvokeAsync(anonymousContext);

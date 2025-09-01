@@ -2,7 +2,7 @@ using Application.Constants;
 
 namespace Application.UnitTests.Constants;
 
-public class DefaultsTest
+sealed public class DefaultsTest
 {
     [Fact]
     public void SerpApiQueryExpirationInMinutes_ShouldBeCorrect()

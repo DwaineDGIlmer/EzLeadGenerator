@@ -15,7 +15,7 @@ using WebApp.Respository;
 
 namespace WebApp.UnitTests.Extensions;
 
-public class ServiceCollectionExtensionsTest
+sealed public class ServiceCollectionExtensionsTest
 {
     [Fact]
     public void AddCompanyProfileStore_RegistersLocalCompanyProfileStore_WhenNotProduction()

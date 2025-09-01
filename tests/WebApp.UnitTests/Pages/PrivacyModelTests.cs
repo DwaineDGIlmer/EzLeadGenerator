@@ -4,7 +4,7 @@ using WebApp.Pages;
 
 namespace WebApp.UnitTests.Pages;
 
-public class PrivacyModelTests
+sealed public class PrivacyModelTests
 {
     [Fact]
     public void OnGet_LogsInformation()

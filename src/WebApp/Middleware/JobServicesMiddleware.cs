@@ -21,7 +21,7 @@ namespace WebApp.Middleware;
 /// <param name="logger">The logger instance used for logging middleware activity. Cannot be <see langword="null"/>.</param>
 /// <exception cref="ArgumentNullException">Thrown if <paramref name="next"/>, <paramref name="jobSourceService"/>, or <paramref name="logger"/> is <see
 /// langword="null"/>.</exception>
-public class JobServicesMiddleware(
+sealed public class JobServicesMiddleware(
 RequestDelegate next,
 IOptions<EzLeadSettings> options,
 IJobSourceService jobSourceService,

@@ -11,7 +11,7 @@ using WebApp.Respository;
 
 namespace WebApp.UnitTests.Respository;
 
-public class LocalCompanyProfileStoreTest
+sealed public class LocalCompanyProfileStoreTest
 {
     private readonly string _testDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     private readonly Mock<ICacheService> _cacheServiceMock = new();

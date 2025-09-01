@@ -5,7 +5,7 @@ using WebApp.Pages;
 
 namespace WebApp.UnitTests.Pages;
 
-public class IndexTest
+sealed public class IndexTest
 {
     private readonly Mock<ILogger<IndexModel>> _mockLogger;
     private readonly Mock<IDisplayRepository> _mockDisplayRepository;

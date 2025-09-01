@@ -21,7 +21,7 @@ namespace WebApp.Respository;
 /// <param name="options">Configuration settings for Azure services, including connection strings and other relevant settings.</param>
 /// <param name="settings">Configuration settings specific to the EzLead application.</param>
 /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance used for logging operations within the repository.</param>
-public class AzureJobsRepository(
+sealed public class AzureJobsRepository(
     TableClient tableClient,
     ICacheService cachingService,
     IOptions<AzureSettings> options,

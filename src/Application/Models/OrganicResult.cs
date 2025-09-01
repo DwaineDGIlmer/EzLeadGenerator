@@ -5,7 +5,7 @@ namespace Application.Models;
 /// <summary>
 /// Represents an organic search result.
 /// </summary>
-public class OrganicResult
+sealed public class OrganicResult
 {
     /// <summary>
     /// Gets or sets the position index within a collection.
@@ -83,7 +83,7 @@ public class OrganicResult
 /// <summary>
 /// Represents an entity containing a word and its associated link.
 /// </summary>
-public class MustInclude
+sealed public class MustInclude
 {
     /// <summary>
     /// Gets or sets the word associated with this instance.
@@ -100,7 +100,7 @@ public class MustInclude
 /// Represents information about the top-level details.
 /// </summary>
 /// <remarks>This class provides access to the top-level details through the <see cref="Top"/> property.</remarks>
-public class TopInfo
+sealed public class TopInfo
 {
     /// <summary>
     /// Gets or sets the details associated with the top-level configuration or entity.
@@ -113,7 +113,7 @@ public class TopInfo
 /// </summary>
 /// <remarks>This class provides a property to store and retrieve a list of file extensions.  It can be used to
 /// define or filter supported file types in various scenarios, such as file uploads or processing.</remarks>
-public class TopDetails
+sealed public class TopDetails
 {
     /// <summary>
     /// Gets or sets the list of file extensions associated with this instance.

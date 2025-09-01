@@ -7,7 +7,7 @@ namespace Application.Configurations
     /// </summary>
     /// <remarks>This class is used to configure various settings required for interacting with Azure
     /// services. It includes properties such as the name of the Azure Table used for storage operations.</remarks>
-    public class AzureSettings
+    sealed public class AzureSettings
     {
         /// <summary>
         /// Gets or sets the name of the Azure Table used for storage operations.
