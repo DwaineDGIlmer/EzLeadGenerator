@@ -21,7 +21,7 @@ namespace Application.Services;
 /// <remarks>This service integrates with various components to fetch job listings,  infer additional information
 /// using AI, and store the results. It handles  both job data and company profiles, ensuring that the information is 
 /// up-to-date and accurately reflects the current job market as retrieved  from Google.</remarks>
-public sealed class SearpApiSourceService : IJobSourceService
+public sealed partial class SearpApiSourceService : IJobSourceService
 {
     private static readonly List<string> _pronouns = ["I", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "their"];
     private static readonly List<string> _conjunctions = ["and", "but", "or", "yet", "for", "nor", "so", "not"];
@@ -32,6 +32,7 @@ public sealed class SearpApiSourceService : IJobSourceService
     [
         "Recruit",
         "Hirevouch",
+        "RulesIQ",
         "Diverse Lynx",
         "tekshapers",
         "JobGet",
@@ -167,34 +168,15 @@ public sealed class SearpApiSourceService : IJobSourceService
                     return;
                 }
 
-                var snippets = googleResults
+                string snippet = string.Join(" ", googleResults
                                    .Select(result => result.Snippet)
-                                   .ToList();
+                                   .ToList().Select(s => s));
 
-                string snippet = string.Join(" ", snippets.Select(link => $"site:{link}"));
-                string domainname = CoreRegex.ExtractDomainName(snippet);
-                string link = googleResults.FirstOrDefault()?.Link ?? string.Empty;
+                string domainname = ExtractDomainName(snippet);
+                string link = googleResults.Where(l => l.Link is not null).Select(l => l).FirstOrDefault()?.Link ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(domainname))
                 {
-                    var names = job.CompanyName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var item in googleResults)
-                    {
-                        var links = new[] { item.Link };
-                        foreach (var candidateLink in links)
-                        {
-                            if (names.Any(name => candidateLink.Contains(name, StringComparison.CurrentCultureIgnoreCase)))
-                            {
-                                domainname = CoreRegex.ExtractDomainName(candidateLink);
-                                link = candidateLink;
-                                _logger.LogInformation("Extracted domain name: {DomainName} for company: {CompanyName}", domainname, job.CompanyName);
-                                break;
-                            }
-                        }
-                        if (!string.IsNullOrWhiteSpace(domainname))
-                        {
-                            break;
-                        }
-                    }
+                    domainname = ExtractDomainName(link);   
                 }
 
                 if (!string.IsNullOrWhiteSpace(job.Division))
@@ -280,7 +262,7 @@ public sealed class SearpApiSourceService : IJobSourceService
             return;
         }
         // Preserve titles ending with " I", " II", or " III"
-        if (Regex.IsMatch(job.Title, @"\b(I|II|III)$"))
+        if (JobTitleRegEx().IsMatch(job.Title))
         {
             return;
         }
@@ -456,6 +438,29 @@ public sealed class SearpApiSourceService : IJobSourceService
     }
 
     /// <summary>
+    /// Extracts the domain name from the specified text.
+    /// </summary>
+    /// <remarks>This method attempts to extract a domain name from the provided text using predefined
+    /// patterns.  If no domain name is found, an empty string is returned.</remarks>
+    /// <param name="text">The input text from which to extract the domain name. This parameter cannot be null or whitespace.</param>
+    /// <returns>The extracted domain name if found; otherwise, an empty string.</returns>
+    public static string ExtractDomainName(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
+
+        var match = DomainNameRegEx().Match(text);
+        if (match.Success)
+        {
+            return match.Value;
+        }
+        // Fallback to CoreRegex method
+        return CoreRegex.ExtractDomainName(text);
+    }
+
+    /// <summary>
     /// Retrieves the organizational hierarchy relevant to a job posting by analyzing the job description  and the
     /// company's public organizational structure.
     /// </summary>
@@ -521,6 +526,11 @@ public sealed class SearpApiSourceService : IJobSourceService
         }
         return null;
     }
+
+    [GeneratedRegex(@"((?:www\.)?[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,})")]
+    public static partial Regex DomainNameRegEx();
+    [GeneratedRegex(@"\b(I|II|III)$")]
+    public static partial Regex JobTitleRegEx();
 }
 
 /// <summary>

@@ -376,4 +376,24 @@ public sealed class SearpApiSourceServiceTest : UnitTestsBase
         Assert.False(result);
         Assert.True(loggerMock.Contains("[Information] Job with ID 1 has missing company name or description, skipping."));
     }
+
+    [Theory]
+    [InlineData("Visit https://www.example.com for info.", "www.example.com")]
+    [InlineData("Check out www.test-site.com now!", "www.test-site.com")]
+    [InlineData("No domain here", "")]
+    [InlineData("", "")]
+    [InlineData("   ", "")]
+    [InlineData("Go to www.sub.domain.com for details.", "www.sub.domain.com")]
+    [InlineData("Contact us at www.company-name.com.", "www.company-name.com")]
+    [InlineData("URL: www.example.com/page", "www.example.com")]
+    [InlineData("www.example.com", "www.example.com")]
+    [InlineData("example.com", "example.com")]
+    public void ExtractDomainName_ReturnsExpectedDomain(string input, string expected)
+    {
+        // Act
+        var result = SearpApiSourceService.ExtractDomainName(input);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
 }
