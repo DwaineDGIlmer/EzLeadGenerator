@@ -32,6 +32,7 @@ public sealed class SearpApiSourceService : IJobSourceService
     [
         "Recruit",
         "Hirevouch",
+        "Diverse Lynx",
         "tekshapers",
         "JobGet",
         "Yeah! Global",
