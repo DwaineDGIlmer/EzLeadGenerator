@@ -176,7 +176,7 @@ public sealed partial class SearpApiSourceService : IJobSourceService
                 string link = googleResults.Where(l => l.Link is not null).Select(l => l).FirstOrDefault()?.Link ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(domainname))
                 {
-                    domainname = ExtractDomainName(link);   
+                    domainname = ExtractDomainName(link);
                 }
 
                 if (!string.IsNullOrWhiteSpace(job.Division))
