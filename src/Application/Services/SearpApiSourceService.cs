@@ -170,10 +170,10 @@ public sealed partial class SearpApiSourceService : IJobSourceService
 
                 string snippet = string.Join(" ", googleResults
                                    .Select(result => result.Snippet)
-                                   .ToList().Select(s => s));
+                                   .ToList());
 
                 string domainname = ExtractDomainName(snippet);
-                string link = googleResults.Where(l => l.Link is not null).Select(l => l).FirstOrDefault()?.Link ?? string.Empty;
+                string link = googleResults.Where(l => l.Link is not null).FirstOrDefault()?.Link ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(domainname))
                 {
                     domainname = ExtractDomainName(link);
