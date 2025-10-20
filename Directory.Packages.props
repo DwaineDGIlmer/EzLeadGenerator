@@ -6,6 +6,7 @@
     <!-- Central package version management -->
     <PackageVersion Include="AngleSharp" Version="1.3.0" />
     <PackageVersion Include="Azure.Identity" Version="1.15.0" />
+    <PackageVersion Include="Domain" Version="2.0.0" />
     <PackageVersion Include="Microsoft.Azure.Functions.Worker" Version="2.0.0" />
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.5" />
     <PackageVersion Include="Microsoft.Azure.Management.ContainerRegistry" Version="6.0.0" />
@@ -19,13 +20,13 @@
     <PackageVersion Include="PreMailer.Net" Version="2.7.2" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageVersion Include="OpenAI" Version="2.3.0" />
-    <PackageVersion Include="Core" Version="1.3.1" />
-    <PackageVersion Include="Loggers" Version="1.3.1" />
+    <PackageVersion Include="Core" Version="2.0.0" />
+    <PackageVersion Include="Loggers" Version="2.0.0" />
     <PackageVersion Include="Azure.Data.Tables" Version="12.11.0" />
-    <PackageVersion Include="Azure.Storage.Blobs" Version="12.25.0" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
     <PackageVersion Include="Chart.js" Version="3.7.1" />
     <!-- Other packages -->
-    <PackageVersion Include="HtmlAgilityPack" Version="1.12.2" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
@@ -44,9 +45,9 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="FluentAssertions" Version="8.5.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
   </ItemGroup>
 </Project>
